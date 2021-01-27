@@ -59,45 +59,56 @@ public Estudiante guardarEstudiante(String nombresEstudiante, String apellidosEs
 
 
     if ((!nombresEstudiante.isEmpty()) && (!apellidosEstudiante.isEmpty()) && (fechaNac != null)
-            &&(pais != null) &&(deporte != null) && (idioma != null) && (universidad!= null) &&
-            (especialidad!= null) && (carrera != null) && (usuario!=null) &&(semestre!=null) && (pasatiempo!=null) && (pasion!=null)){
+            &&(pais != null) && (carrera != null) && (usuario!=null)){
         estudiante.setNombre(nombresEstudiante);
         estudiante.setApellido(apellidosEstudiante);
         estudiante.setFechaNac(fechaNac);
         estudiante.setIdpai(pais);
         estudiante.setUsuid(usuario);
-        estudiante.setIdEsp(especialidad);
+        if (especialidad!=null) {
+            estudiante.setIdEsp(especialidad);
+        }
         estudiante.setIdCar(carrera);
-        estudiante.setIdUni(universidad);
+        if (universidad!=null) {
+            estudiante.setIdUni(universidad);
+        }
         estudiante.setEstPrincipal(1);
-       // estudiante.setPasId(pasion);
-        estudiante.setSemestre(semestre);
+        if (semestre!=null) {
+            estudiante.setSemestre(semestre);
+        }
         estudiante = estudianteRepository.save(estudiante);
         int est = estudiante.getId();
-        if (estudiante.getId()!=null){
-            for (int i=0;i < deporte.size();i++){ //guardando deporte en tabla maestra
-                dep.setDepIdDeporte(Integer.valueOf(deporte.get(i).toString()));
-                dep.setEstIdDep(est);
-                deporteMaestroRepository.save(dep);
-                dep = new DeporteMaestro();
+        if (estudiante.getId()!=null) {
+            if (deporte != null) {
+                for (int i = 0; i < deporte.size(); i++) { //guardando deporte en tabla maestra
+                    dep.setDepIdDeporte(Integer.valueOf(deporte.get(i).toString()));
+                    dep.setEstIdDep(est);
+                    deporteMaestroRepository.save(dep);
+                    dep = new DeporteMaestro();
+                }
             }
-
-            for (int i=0;i < idioma.size();i++){ //guardando idioma en tabla maestra
-                idi.setIdiIdIdioma(Integer.valueOf(idioma.get(i).toString()));
-                idi.setEstIDIdioma(est);
-                idiomaMaestroRepository.save(idi);
-                idi= new IdiomaMaestro();
+            if (idioma != null) {
+                for (int i = 0; i < idioma.size(); i++) { //guardando idioma en tabla maestra
+                    idi.setIdiIdIdioma(Integer.valueOf(idioma.get(i).toString()));
+                    idi.setEstIDIdioma(est);
+                    idiomaMaestroRepository.save(idi);
+                    idi = new IdiomaMaestro();
+                }
             }
-            for (int i=0;i < pasatiempo.size();i++){ //guardando Pasatiempo en tabla maestra
-                hom.setHobId(Integer.valueOf(pasatiempo.get(i).toString()));
-                hom.setEstId(est);
-                pasatiempoMaestroRepository.save(hom);
-                idi= new IdiomaMaestro();
+            if (pasatiempo != null) {
+                for (int i = 0; i < pasatiempo.size(); i++) { //guardando Pasatiempo en tabla maestra
+                    hom.setHobId(Integer.valueOf(pasatiempo.get(i).toString()));
+                    hom.setEstId(est);
+                    pasatiempoMaestroRepository.save(hom);
+                    idi = new IdiomaMaestro();
+                }
             }
-            pam.setDescripcion(pasion);
-            pam.setEstId(est);
-            pasionesMaestroRepository.save(pam);
-            pam= new PasionMaestro();
+            if (pasion !=null) {
+                pam.setDescripcion(pasion);
+                pam.setEstId(est);
+                pasionesMaestroRepository.save(pam);
+                pam = new PasionMaestro();
+            }
         }
 
     }

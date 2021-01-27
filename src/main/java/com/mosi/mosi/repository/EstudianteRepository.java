@@ -58,11 +58,11 @@ public interface EstudianteRepository extends CrudRepository<Estudiante,Integer>
     @Transactional
     @Modifying
     @Query(value=SQL_UPDATE_ESTUDIANTE_PRINCIPAL, nativeQuery=true)
-    int updatePerfilPrincipal(@Param("idEstudiante") int idEstudiante,@Param("Estatus") int Estatus);
+    int updateStatusPerfil(@Param("idEstudiante") int idEstudiante,@Param("Estatus") int Estatus);
 
 
-    String SQL_CONSULTA_ESTUDIANTE_ACTIVO = "SELECT EST_Id from EST_Estudiantes where USU_Id = :idUsu and EST_Principal = 1 ";
+    String SQL_CONSULTA_ESTUDIANTE_ACTIVO = "SELECT * from EST_Estudiantes where USU_Id = :idUsu and EST_Principal = 1 ";
     @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTE_ACTIVO)
-    Integer consultaPerfilActivo(@Param("idUsu") Integer usuId);
+    Estudiante consultaPerfilActivo(@Param("idUsu") Integer usuId);
 
 }
