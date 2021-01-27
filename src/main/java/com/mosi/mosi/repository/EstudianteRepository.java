@@ -1,9 +1,11 @@
 package com.mosi.mosi.repository;
 
 import com.mosi.mosi.bean.Estudiante;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -51,5 +53,16 @@ public interface EstudianteRepository extends CrudRepository<Estudiante,Integer>
             "                                        where usu.usu_id = :idUsu";
     @Query(nativeQuery = true, value = SQL_CONSULTA_PERFIL_COMPLETO)
     List<Object[]> consultaEstudianteCompleto(@Param("idUsu") Integer usuId);
+
+    String SQL_UPDATE_ESTUDIANTE_PRINCIPAL = "UPDATE EST_Estudiantes SET EST_Principal = :Estatus where EST_Id = :idEstudiante";
+    @Transactional
+    @Modifying
+    @Query(value=SQL_UPDATE_ESTUDIANTE_PRINCIPAL, nativeQuery=true)
+    int updatePerfilPrincipal(@Param("idEstudiante") int idEstudiante,@Param("Estatus") int Estatus);
+
+
+    String SQL_CONSULTA_ESTUDIANTE_ACTIVO = "SELECT EST_Id from EST_Estudiantes where USU_Id = :idUsu and EST_Principal = 1 ";
+    @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTE_ACTIVO)
+    Integer consultaPerfilActivo(@Param("idUsu") Integer usuId);
 
 }

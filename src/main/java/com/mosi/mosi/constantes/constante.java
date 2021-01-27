@@ -20,15 +20,18 @@ public interface constante {
     String CLAVE = "clave";
     String EMAIL = "email";
     String ASIGNATURA = "asignatura";
-    Integer PRACTICAS = 1;
-    Integer DESAFIOS = 2;
     String ID_ASIGNATURA = "idAsignatura";
     String ID_ESTUDIANTE = "idEstudiante";
     String ID_EMPRESA = "idEmpresa";
+
+    Integer PRACTICAS = 1;
+    Integer DESAFIOS = 2;
     Integer ENVIADO = 1;
     Integer RECIBIDO = 2;
     Integer ACEPTADO = 3;
     Integer RECHAZADO = 4;
+    Integer ACTIVO = 1;
+    Integer INACTIVO = 0;
 
 
 }

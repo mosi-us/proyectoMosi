@@ -390,7 +390,21 @@ public class userController {
 
         return detAsig;
     }
+    @PostMapping("cambiarPerfilPrincipal")
+    public String cambiarPerfilPrincipal(HttpServletRequest request, HttpServletResponse response,
+                                                    @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer usuario 	= (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty()) ? Integer.valueOf(params.get(ID_USER).toString()) : null;
+        Integer idEst 	= (params.containsKey(ID_ESTUDIANTE) && params.get(ID_ESTUDIANTE) != null && !params.get(ID_ESTUDIANTE).toString().isEmpty()) ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
 
+        // primero consulto perfil estudiante activo actualmente y cambio estatus a inactivo
+        Integer idEstudianteActivo = estudianteRepository.consultaPerfilActivo(usuario);
+          estudianteRepository.updatePerfilPrincipal(idEstudianteActivo,INACTIVO);
+          //cambio estatus de perfil estudiante seleccionado a Activo
+        Integer resp = estudianteRepository.updatePerfilPrincipal(idEst,ACTIVO);
+        String respf = "Cambio de perfil Exitoso";
+        return respf;
+    }
 
 }
 
