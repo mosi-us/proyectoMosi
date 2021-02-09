@@ -31,10 +31,6 @@ public class Estudiante implements Serializable {
     @Column(name="PAI_Id")
     private Integer idpai;
 
-    @ApiObjectField(description = "id del Especialidad", required = true)
-    @Column(name="ESP_Id")
-    private Integer idEsp;
-
     @ApiObjectField(description = "id del Carrera", required = true)
     @Column(name="CAR_Id")
     private Integer idCar;
@@ -55,6 +51,29 @@ public class Estudiante implements Serializable {
     @Column(name="EST_Sem")
     private Integer semestre;
 
+    @ApiObjectField(description = "Descripcion", required = true)
+    @Column(name="Est_Descripcion")
+    private String descripcion;
+
+    @ApiObjectField(description = "telefono", required = true)
+    @Column(name="EST_Telefono")
+    private String telefono;
+
+    @ApiObjectField(description = "Codigo del Pais", required = true)
+    @Column(name="EST_CODPAIS")
+    private String codigoPais;
+
+    @ApiObjectField(description = "Correo", required = true)
+    @Column(name="EST_Email")
+    private String correo;
+
+    @ApiObjectField(description = "Ciudad", required = true)
+    @Column(name="CIU_Id")
+    private Integer idCiudad;
+
+    @ApiObjectField(description = "Lugar", required = true)
+    @Column(name="EST_Lugar")
+    private Integer lugar;
 
     public Integer getId() {
         return id;
@@ -96,13 +115,6 @@ public class Estudiante implements Serializable {
         this.idpai = idpai;
     }
 
-    public Integer getIdEsp() {
-        return idEsp;
-    }
-
-    public void setIdEsp(Integer idEsp) {
-        this.idEsp = idEsp;
-    }
 
     public Integer getIdCar() {
         return idCar;
@@ -142,5 +154,53 @@ public class Estudiante implements Serializable {
 
     public void setSemestre(Integer semestre) {
         this.semestre = semestre;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public String getCodigoPais() {
+        return codigoPais;
+    }
+
+    public void setCodigoPais(String codigoPais) {
+        this.codigoPais = codigoPais;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
+    public Integer getIdCiudad() {
+        return idCiudad;
+    }
+
+    public void setIdCiudad(Integer idCiudad) {
+        this.idCiudad = idCiudad;
+    }
+
+    public Integer getLugar() {
+        return lugar;
+    }
+
+    public void setLugar(Integer lugar) {
+        this.lugar = lugar;
     }
 }

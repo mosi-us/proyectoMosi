@@ -18,4 +18,6 @@ public interface AsignaturaRepository extends JpaRepository<Asignatura,String> {
             "where asi.ASI_id= :idAsi";
     @Query(nativeQuery = true, value = SQL_DETALLE_ASIGNATURA)
     Object[] consultaDetalleAsignatura(@Param("idAsi") Integer idAsi);
+
+    Asignatura findByAsiId(Integer asiId);
 }

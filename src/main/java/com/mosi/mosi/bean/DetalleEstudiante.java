@@ -19,14 +19,10 @@ public class DetalleEstudiante implements Serializable {
     @Column(name="DET_Descripcion")
     private String descripcion;
 
-    @ApiObjectField(description = "id del Especialidad", required = true)
-    @Column(name="ESP_Id")
-    private Integer DetIdEsp;
-
 
     @ApiObjectField(description = "Apellido del estudiante", required = true)
     @Column(name="ASI_Id")
-    private String Asignatura;
+    private Integer Asignatura;
 
     @ApiObjectField(description = "Fecha de Nacimiento", required = true)
     @Column(name="EMP_Id")
@@ -64,19 +60,11 @@ public class DetalleEstudiante implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public Integer getDetIdEsp() {
-        return DetIdEsp;
-    }
-
-    public void setDetIdEsp(Integer detIdEsp) {
-        DetIdEsp = detIdEsp;
-    }
-
-    public String getAsignatura() {
+    public Integer getAsignatura() {
         return Asignatura;
     }
 
-    public void setAsignatura(String asignatura) {
+    public void setAsignatura(Integer asignatura) {
         Asignatura = asignatura;
     }
 

@@ -6,7 +6,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "ASI_Asignatura", schema = "dbo", catalog = "MOSI")
 public class Asignatura {
-    private int asiId;
+    private Integer asiId;
     private String asiTitulo;
     private String asiDescripcion;
     private String asiTipo;

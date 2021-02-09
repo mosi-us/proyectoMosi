@@ -39,7 +39,7 @@ public class UserService {
                     validar_clave = true;
                     /*validar sesion en uso pendiente*/
                     if (tipo_persona == 1) {/*Estudiante*/
-                        List<Object[]> estudiante = estudianteRepository.consultaEstudianteCompleto(idUsu);
+                        List<Object[]> estudiante = estudianteRepository.consultaEstudiante(idUsu);
                         perfilEstudiante = estudianteService.doConstruirEstudiante(estudiante);
                     }/*agregar else para Empresa y Universidad*/
                     /*genero Token*/

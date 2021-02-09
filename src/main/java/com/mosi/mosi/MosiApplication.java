@@ -47,7 +47,11 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/consultarPasatiempos",
 						"/postularEstudiante",
 						"/detalleAsignatura",
-						"/cambiarPerfilPrincipal").permitAll()
+						"/cambiarPerfilPrincipal",
+						"/consultarSyT",
+						"/consultarHabilidadesBlandas",
+						"/consultarCiudades",
+						"/agregarPerfilPrincipal").permitAll()
 				.anyRequest().authenticated();
 	}
 }

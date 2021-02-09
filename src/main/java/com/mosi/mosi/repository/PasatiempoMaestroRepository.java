@@ -8,7 +8,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface PasatiempoMaestroRepository extends JpaRepository<PasatiempoMaestro,Integer> {
-    String SQL_CONSULTA_PASATIEMPO_ESTUDIANTE = "select HOM_Id from HOM_PasatiempoMaestro WHERE EST_Id in (:idEst) ";
+    String SQL_CONSULTA_PASATIEMPO_ESTUDIANTE = "select HP.HOB_Id,HP.HOB_Nombre from HOM_PasatiempoMaestro HOM\n" +
+            "inner join HOB_Pasatiempo HP on HOM.HOB_Id = HP.HOB_Id\n" +
+            "WHERE HOM.EST_Id = :idEst ";
     @Query(nativeQuery = true, value = SQL_CONSULTA_PASATIEMPO_ESTUDIANTE)
-    List<Integer> consultaPasatiempoMaestroEstudiante(@Param("idEst") Integer idEst);
+    List<Object[]> consultaPasatiempoMaestroEstudiante(@Param("idEst") Integer idEst);
 }

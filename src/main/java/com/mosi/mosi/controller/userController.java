@@ -30,10 +30,6 @@ public class userController {
     @Autowired
     EstudianteRepository estudianteRepository;
     @Autowired
-    EstudianteEspecialidadRepository estudianteEspecialidadRepository;
-    @Autowired
-    EspecialidadRepository especialidadRepository;
-    @Autowired
     DeporteMaestroRepository deporteMaestroRepository;
     @Autowired
     UniversidadEstudianteRepository universidadEstudianteRepository;
@@ -51,6 +47,12 @@ public class userController {
     CarreraRepository carreraRepository;
     @Autowired
     PasatiempoRepository pasatiempoRepository;
+    @Autowired
+    CiudadesRepository ciudadesRepository;
+    @Autowired
+    SoftwareTecnologiaRepository softwareTecnologiaRepository;
+    @Autowired
+    HabilidadesBlandasRepository habilidadesBlandasRepository;
     @Autowired
     PasionesMaestroRepository pasionesMaestroRepository;
     @Autowired
@@ -84,20 +86,35 @@ public class userController {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         String nombresEstudiante 	= (params.containsKey(NOMBRES) && params.get(NOMBRES) != null) ? params.get(NOMBRES).toString() : null;
         String apellidosEstudiante 	= (params.containsKey(APELLIDOS) && params.get(APELLIDOS) != null) ? params.get(APELLIDOS).toString() : null;
-        Integer fechaNac 	= (params.containsKey(FECHA) && params.get(FECHA) != null && !params.get(FECHA).toString().isEmpty()) ? Integer.valueOf(params.get(FECHA).toString()) : null;
-        Integer pais 	= (params.containsKey(PAIS_ID) && params.get(PAIS_ID) != null && !params.get(PAIS_ID).toString().isEmpty()) ? Integer.valueOf(params.get(PAIS_ID).toString()) : null;
-        Integer usuario 	= (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty()) ? Integer.valueOf(params.get(ID_USER).toString()) : null;
-        Integer semestre = (params.containsKey(SEMESTRE) && params.get(SEMESTRE) != null && !params.get(SEMESTRE).toString().isEmpty()) ? Integer.valueOf(params.get(SEMESTRE).toString()) : null;
+        Integer fechaNac 	= (params.containsKey(FECHA) && params.get(FECHA) != null && !params.get(FECHA).toString().isEmpty())
+                ? Integer.valueOf(params.get(FECHA).toString()) : null;
+        Integer pais 	= (params.containsKey(PAIS_ID) && params.get(PAIS_ID) != null && !params.get(PAIS_ID).toString().isEmpty())
+                ? Integer.valueOf(params.get(PAIS_ID).toString()) : null;
+        Integer ciudad 	= (params.containsKey(CIUDAD) && params.get(CIUDAD) != null && !params.get(CIUDAD).toString().isEmpty())
+                ? Integer.valueOf(params.get(CIUDAD).toString()) : null;
+        String telefono 	= (params.containsKey(TELEFONO) && params.get(TELEFONO) != null && !params.get(TELEFONO).toString().isEmpty())
+                ? params.get(TELEFONO).toString() : null;
+        String codigoPais 	= (params.containsKey(CODIGO_PAIS) && params.get(CODIGO_PAIS) != null && !params.get(CODIGO_PAIS).toString().isEmpty())
+                ? params.get(CODIGO_PAIS).toString() : null;
+        String correo  = (params.containsKey(CORREO) && params.get(CORREO) != null && !params.get(CORREO).toString().isEmpty()) ? params.get(CORREO).toString() : null;
+        Integer usuario 	= (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty())
+                ? Integer.valueOf(params.get(ID_USER).toString()) : null;
+        Integer semestre = (params.containsKey(SEMESTRE) && params.get(SEMESTRE) != null && !params.get(SEMESTRE).toString().isEmpty())
+                ? Integer.valueOf(params.get(SEMESTRE).toString()) : null;
         List<?> deporte = (params.containsKey(DEPORTE_ID) &&  params.get(DEPORTE_ID) != null) ? UserService.convertObjectToList(params.get(DEPORTE_ID)) : null;
-        Integer universidad = (params.containsKey(UNIVERSIDAD_ID) && params.get(UNIVERSIDAD_ID) != null && !params.get(UNIVERSIDAD_ID).toString().isEmpty()) ? Integer.valueOf(params.get(UNIVERSIDAD_ID).toString()) : null;
-        List<?> idioma = (params.containsKey(IDIOMA_ID) &&  params.get(IDIOMA_ID) != null) ? UserService.convertObjectToList(params.get(IDIOMA_ID)) : null;
-        Integer especialidad = (params.containsKey(ESPECIALIDAD_ID) && params.get(ESPECIALIDAD_ID) != null && !params.get(ESPECIALIDAD_ID).toString().isEmpty()) ? Integer.valueOf(params.get(ESPECIALIDAD_ID).toString()) : null;
-        Integer carrera = (params.containsKey(CARRERA_ID) && params.get(CARRERA_ID) != null && !params.get(CARRERA_ID).toString().isEmpty()) ? Integer.valueOf(params.get(CARRERA_ID).toString()) : null;
-        String pasion = (params.containsKey(PASION) && params.get(PASION) != null && !params.get(PASION).toString().isEmpty()) ? params.get(PASION).toString() : null;
+        Integer universidad = (params.containsKey(UNIVERSIDAD_ID) && params.get(UNIVERSIDAD_ID) != null && !params.get(UNIVERSIDAD_ID).toString().isEmpty())
+                ? Integer.valueOf(params.get(UNIVERSIDAD_ID).toString()) : null;
+        List<?> idioma = (params.containsKey(IDIOMAS) &&  params.get(IDIOMAS) != null) ? UserService.convertObjectToList(params.get(IDIOMAS)) : null;
+        Integer carrera = (params.containsKey(CARRERA_ID) && params.get(CARRERA_ID) != null && !params.get(CARRERA_ID).toString().isEmpty())
+                ? Integer.valueOf(params.get(CARRERA_ID).toString()) : null;
+        String descripcion = (params.containsKey(DESCRIPCION_EST) && params.get(DESCRIPCION_EST) != null && !params.get(DESCRIPCION_EST).toString().isEmpty())
+                ? params.get(DESCRIPCION_EST).toString() : null;
         List<?> pasatiempo = (params.containsKey(PASATIEMPO) &&  params.get(PASATIEMPO) != null) ? UserService.convertObjectToList(params.get(PASATIEMPO)) : null;
+        List<?> softYTecn = (params.containsKey(SOFTWARE_TECNOLOGIA) &&  params.get(SOFTWARE_TECNOLOGIA) != null) ? UserService.convertObjectToList(params.get(SOFTWARE_TECNOLOGIA)) : null;
+        List<?> hablidadesB = (params.containsKey(HABILIDADES) &&  params.get(HABILIDADES) != null) ? UserService.convertObjectToList(params.get(HABILIDADES)) : null;
 
-        estudiante = estudianteService.guardarEstudiante(nombresEstudiante,apellidosEstudiante,fechaNac,pais,deporte,
-                idioma,universidad,especialidad,carrera, usuario,semestre,pasatiempo,pasion);
+        estudiante = estudianteService.guardarEstudiante(nombresEstudiante,apellidosEstudiante,fechaNac,pais,ciudad,telefono,codigoPais,correo,deporte,
+                idioma,universidad,carrera, usuario,semestre,pasatiempo,descripcion,softYTecn,hablidadesB);
 
         return estudiante;
 
@@ -110,7 +127,6 @@ public class userController {
             @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
 
         IdiomaMaestro idi =new IdiomaMaestro();
-        EstudianteEspecialidad esp =new EstudianteEspecialidad();
         CarreraUniversitariaMaestro carr =new CarreraUniversitariaMaestro();
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         Integer usuario 	= (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty()) ? Integer.valueOf(params.get(ID_USER).toString()) : null;
@@ -149,161 +165,156 @@ public class userController {
     return objectResult;
     }
     @PostMapping("buscar_Practica_desafio")
-    public List<List<HashMap<String, String>>> buscarPracticaDesafio(
+    public List<HashMap<String, Object>> buscarPracticaDesafio(
             @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
-        Integer usuario = (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty()) ? Integer.valueOf(params.get(ID_USER).toString()) : null;
-        Integer asignatura = (params.containsKey(ASIGNATURA) && params.get(ASIGNATURA) != null && !params.get(ASIGNATURA).toString().isEmpty()) ? Integer.valueOf(params.get(ASIGNATURA).toString()) : null;
+        Integer usuario = (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty()) ?
+                Integer.valueOf(params.get(ID_USER).toString()) : null;
+        String asignatura = (params.containsKey(ASIGNATURA) && params.get(ASIGNATURA) != null && !params.get(ASIGNATURA).toString().isEmpty()) ?
+                params.get(ASIGNATURA).toString() : null;
+        List<HashMap<String,Object>> result = new ArrayList<>();
 
         List<List<HashMap<String, String>>> perfil = estudianteService.consulta(usuario);
 
         Integer idEst = Integer.valueOf(perfil.get(0).get(0).get("idEstudiante"));
         Integer idPais = Integer.valueOf(perfil.get(0).get(0).get("idPais"));
-        Integer idCar = Integer.valueOf(perfil.get(0).get(0).get("Carrera"));
-        Integer idEsp = Integer.valueOf(perfil.get(0).get(0).get("Especialidad"));
-        Integer semestre = Integer.valueOf(perfil.get(0).get(0).get("Semestre"));
+        Integer idCar = Integer.valueOf(perfil.get(0).get(0).get("idCarrera"));
+        Integer semestre = Integer.valueOf(perfil.get(0).get(0).get("semestre"));
+        Integer idUni = Integer.valueOf(perfil.get(0).get(0).get("idUni"));
 
-        /*busco deporte*/
-        List<Integer> idsDeporte = new ArrayList<>();
-        Integer d = perfil.get(1).size();
-        for (int i = 0; i < d; i++) {
-            idsDeporte.add(Integer.valueOf(perfil.get(1).get(0).get("id")));
-        }
-        /**idioma*/
-        List<Integer> idsIdioma = new ArrayList<>();
-        Integer a = perfil.get(2).size();
-        for (int i = 0; i < a; i++) {
-            idsIdioma.add(Integer.valueOf(perfil.get(2).get(0).get("id")));
-        }
 
-        /***/
         /**busqueda por carrera y pais*/
         Integer caracteristica = 0;
-
-        List<DetalleEstudiante> det_estudiante = detalleEstudianteRepository.consultar_estudiantes_empresa(idCar,idPais,idEsp,semestre,asignatura);
-        HashMap<String,String> detalleEstudianteEmp = new HashMap<>();
-        List<Integer> idsDet = new ArrayList<>();
-        HashMap<String,String> listaEspSemCarr = new HashMap<>();
-
-        for (int i = 0; i < det_estudiante.size(); i++) {
-             detalleEstudianteEmp = this.buildPerfildetalleEstudiante(det_estudiante);
-         String g = detalleEstudianteEmp.get("id");
-            idsDet.add(Integer.valueOf(g));
-            detalleEstudianteEmp = new HashMap<>();
+        Integer idAsi =  0;
+        if(asignatura.equals("Practicas") || (asignatura.equals("practicas"))){
+            idAsi = PRACTICAS;
+        }else if (asignatura.equals("Desafios") || (asignatura.equals("desafios"))) {
+            idAsi = DESAFIOS;
         }
-        /*listado deporte empresa*/
-        List<Object[]> dep_Empresa = deporteMaestroRepository.consultar_deporte_estudiante_empresa(idsDet);
-        List<Object[]> idi_Empresa = idiomaMaestroRepository.consultar_idioma_estudiante_empresa(idsDet);
-        List<List<HashMap<String,String>>> perfilC = new ArrayList();
-        /*List<HashMap<String,String>> perfilA*/
-       /* for (int i = 0; i < det_estudiante.size(); i++) {//contruir array de detalle de estudinte
-          //  perfilC.add();
-            for (int w=0; w<dep_Empresa.size();w++){ //deporte
-                String x = dep_Empresa.get(w)[0].toString();
-                if (det_estudiante.get(i).getId().toString().equals(x)) {
-                    perfilC.add(dep_Empresa.get(w));
-                }
-            }
-            for (int e=0; e<dep_Empresa.size();e++){ //idioma
-                String x = idi_Empresa.get(e)[0].toString();
-                if (det_estudiante.get(i).getId().toString().equals(x)) {
-                    perfilC.add(idi_Empresa.get(e));
-                }
-            }
-        }*/
+        List<DetalleEstudiante> det_estudiante = detalleEstudianteRepository.consultar_estudiantes_empresa(idCar,idPais,semestre,idAsi);
+        List<List<HashMap<String,String>>> resulDetalleEstudiante = new ArrayList<>();
+        List<HashMap<String,Object>> resulDetalleEstudiantes = estudianteService.listarDetalleEstudiantes(det_estudiante);
 
-       /* for (int i = 0; i<resul.size(); i++){
-            depoList.put("id",resul.get(i)[0].toString());
-            depoList.put("Nombre",resul.get(i)[1].toString());
-            resulDepo.add(depoList);
-            depoList = new HashMap<String, String>();
-        }*/
-      /*  List<List<HashMap<String, String>>> listEmpresasDetalle= new ArrayList<>();
-        List<List<List<HashMap<String, String>>>> ListaEmpresas = new ArrayList<>();
-        HashMap<String, String> listEmpD = new HashMap<String, String>();
-        HashMap<String, String> listEmpI = new HashMap<String, String>();
+        List<List<HashMap<String,Object>>> listadoOrdenadoDetalle = new ArrayList<>();
+        List<HashMap<String,Object>> list_por_items = new ArrayList<>();
+        HashMap<String,Object> afinidad = new HashMap<>();
 
-        List<HashMap<String, String>> list_Emp = new ArrayList<>();
-        List<List<HashMap<String,String>>> emp_list = new ArrayList<>();
+       // ya tengo el listado armado ahora se procede a comparar
+        Integer atributosEmpresa = 2; // inicia en 2 porque el valor de pais y carrera estan incluidos
+        Integer atributosEstudiante = 2;
+        Integer semestreEmpresa = 0;
+        Integer semestreEstudiante = 0;
+        Integer uniId_empresa = 0;
 
-        for (int i = 0; i < det_estudiante.size(); i++) {
-            List<Integer[]> dep_estudiante = deporteMaestroRepository.consultar_deporte_estudiante_empresa(idsDet);
-            if (dep_estudiante.size()>0 && dep_estudiante!=null) {
-                caracteristica =+ 1;
-                for (int j = 0; j < dep_estudiante.size(); j++) {
-                    listEmpD.put("idDep" + j, dep_estudiante.get(j)[i].toString());
-                    list_Emp.add(listEmpD);
-                    listEmpD = new HashMap<>();
 
-                }
-                emp_list.add(list_Emp);
+        for (int e=0;e<resulDetalleEstudiantes.size();e++){
+            /*LISTADO DE PRACTICAS/ DESAFIOS*/
+            DetalleEstudiante estEmpresa = (DetalleEstudiante) resulDetalleEstudiantes.get(e).get("estudiante");
+            Object[] listAsig =asignaturaRepository.consultaDetalleAsignatura(estEmpresa.getAsignatura());
+            HashMap<String,Object> asignaturaEmpresa =new HashMap<>();
+            asignaturaEmpresa.put("asignatura",listAsig);
+            result.add(asignaturaEmpresa);
+            if ((estEmpresa.getSemestre()!=null)) {
+                 semestreEmpresa = Integer.valueOf(estEmpresa.getSemestre());
             }
-            list_Emp = new ArrayList<>();
-            List<Integer[]> idiId_estudiante = idiomaMaestroRepository.consultar_idioma_estudiante_empresa(idsDet);
-            if (idiId_estudiante.size()>0 && idiId_estudiante!=null) {
-                caracteristica =+ 1;
-                for (int j = 0; j < idiId_estudiante.size(); j++) {
-                    listEmpI.put("idIdi" + j, idiId_estudiante.get(j)[i].toString());
-                    list_Emp.add(listEmpI);
-                    listEmpI = new HashMap<>();
+            if (estEmpresa.getIdUni()!=null) {
+                uniId_empresa = Integer.valueOf(estEmpresa.getIdUni());
+            }
+            Integer empId = estEmpresa.getIdEmp();
+            Integer lugarEmp = detalleEstudianteRepository.consultaLugarTrabajo(empId);
+            Integer lugarEst = Integer.valueOf(perfil.get(0).get(0).get("lugar"));
 
-                }
-                emp_list.add(list_Emp);
+            HashMap<String,String> idiomasEmpresa = (HashMap<String, String>) resulDetalleEstudiantes.get(e).get("idioma");
+            List<HashMap<String,String>> idiomasEstudiante = perfil.get(2);
+
+           HashMap<String,String> deportesEmpresa =(HashMap<String, String>) resulDetalleEstudiantes.get(e).get("deporte");
+            List<HashMap<String,String>> deportesEstudiante = perfil.get(1);
+            HashMap<String,String> habilidadesEmpresa = (HashMap<String, String>) resulDetalleEstudiantes.get(e).get("habilidades");
+            List<HashMap<String,String>> habilidadesEstudiante = perfil.get(4);
+            HashMap<String,String> sytEmpresa = (HashMap<String, String>) resulDetalleEstudiantes.get(e).get("softYtecn");
+            List<HashMap<String,String>> sytEstudiante = perfil.get(5);;
+            if ((semestre==semestreEmpresa) || (semestre>semestreEmpresa) ){
+                atributosEmpresa = atributosEmpresa + 1;
+                atributosEstudiante = atributosEstudiante +1;
             }
-            list_Emp = new ArrayList<>();
-            listaEspSemCarr.put("espId",det_estudiante.get(0)[1].toString());
-            listaEspSemCarr.put("semestre",det_estudiante.get(0)[2].toString());
-            list_Emp.add(listaEspSemCarr);
-            listEmpresasDetalle.add(list_Emp);
-            listEmpresasDetalle.add(emp_list.get(0));
-            listEmpresasDetalle.add(emp_list.get(1));
-            listaEspSemCarr = new HashMap<>();
-            ListaEmpresas.add(listEmpresasDetalle);
-        }*/
-        /*Integer acum =0;
-        Boolean BandSemestre = false; Boolean BandEspecialidad = false; Boolean BandIdioma = false; Boolean BandDeporte = false; Integer puntaje = 0;
-        for (int k=0; k<ListaEmpresas.size();k++){
-            String semestreEmp = ListaEmpresas.get(k).get(0).get(0).get("semestre");
-            String semestreEst = perfil.get(0).get(0).get("Semestre");
-            if (semestreEmp==semestreEst){
-                BandSemestre = true;
-                acum =+1;
+            if (uniId_empresa==idUni){
+                atributosEmpresa = atributosEmpresa + 1;
+                atributosEstudiante = atributosEstudiante +1;
             }
-            String especialidadEmp = ListaEmpresas.get(k).get(0).get(0).get("espId");
-            String especialidadEst =perfil.get(4).get(0).get("id");
-            if (especialidadEmp==especialidadEst){//especialidad
-                BandEspecialidad = true;
-                acum =+1;
+            if (lugarEst == lugarEmp){
+                atributosEmpresa = atributosEmpresa + 1;
+                atributosEstudiante = atributosEstudiante +1;
             }
-            //deporte
-            for (int l=0;l<ListaEmpresas.get(k).get(1).size();l++){
-                for (int m =0;m<perfil.get(1).size();m++){
-                    if (ListaEmpresas.get(k).get(1).get(l).get("idDepo")==perfil.get(1).get(m).get("id")){
-                        if (ListaEmpresas.get(k).get(2).get(l).get("idIdi")==perfil.get(3).get(m).get("id")){
-                            BandIdioma = true;
-                        }
-                        if (BandIdioma)
-                            acum =+1;
+
+            int size_idioma = idiomasEmpresa.size()/2;
+           for (int z=0;z<size_idioma;z++){ // idiomas
+                Integer idiomaEmpresa_list = Integer.valueOf(idiomasEmpresa.get("idIdi" +(z+1)));
+                Integer nivelIdiomaEmpresa = Integer.valueOf(idiomasEmpresa.get("nivel"+(z+1)));
+               atributosEmpresa = atributosEmpresa + 1;
+                for (int x= 0;x<idiomasEstudiante.size();x++) {
+                    Integer idiomasEstudiante_list=Integer.valueOf( idiomasEstudiante.get(x).get("id"));
+                    Integer nivelIdiomaEstudiante = Integer.valueOf(idiomasEstudiante.get(x).get("nivel"));
+                    if ((idiomaEmpresa_list ==idiomasEstudiante_list)&&((nivelIdiomaEstudiante==nivelIdiomaEmpresa)||(nivelIdiomaEstudiante>nivelIdiomaEmpresa))) {
+                        atributosEstudiante = atributosEstudiante + 1;
                     }
                 }
             }
-        }*/
-        return perfil;
-    }
-    public  HashMap<String,String> buildPerfildetalleEstudiante(List<DetalleEstudiante> perfil_empresa){
-        HashMap<String,String> detalle = new HashMap<>();
-        detalle.put("id",perfil_empresa.get(0).getId().toString());
-        detalle.put("descripcion",perfil_empresa.get(0).getDescripcion().toString());
-        detalle.put("espId",perfil_empresa.get(0).getDetIdEsp().toString());
-        detalle.put("asiID",perfil_empresa.get(0).getAsignatura().toString());
-        detalle.put("empID",perfil_empresa.get(0).getIdEmp().toString());
-        detalle.put("paiId",perfil_empresa.get(0).getIdpai().toString());
-        detalle.put("det_sem",perfil_empresa.get(0).getSemestre().toString());
-        detalle.put("carId",perfil_empresa.get(0).getIdCar().toString());
-        detalle.put("uniID",perfil_empresa.get(0).getIdUni().toString());
+            int size_deporte = deportesEmpresa.size();
+            for (int z=0;z<size_deporte;z++){ // deporte
+                Integer DeporteEmpresa_list = Integer.valueOf(deportesEmpresa.get("idDep" +(z+1)));
+                atributosEmpresa = atributosEmpresa + 1;
+                for (int x= 0;x<size_deporte;x++) {
+                      Integer DeporteEstudiante_list=Integer.valueOf( deportesEstudiante.get(x).get("id"));
+                    if (DeporteEmpresa_list ==DeporteEstudiante_list) {
+                        atributosEstudiante = atributosEstudiante + 1;
+                    }
+                }
+            }
+            int size_habilidades = habilidadesEmpresa.size();
+            for (int z=0;z<size_habilidades;z++){ // habilidades
+                Integer HabilidadesEmpresa_list = Integer.valueOf(habilidadesEmpresa.get("idhab" +(z+1)));
+                atributosEmpresa = atributosEmpresa + 1;
+                for (int x= 0;x<habilidadesEstudiante.size();x++) {
+                    Integer HabilidadesEstudiante_list=Integer.valueOf( habilidadesEstudiante.get(x).get("id"));
+                    if (HabilidadesEmpresa_list ==HabilidadesEstudiante_list) {
+                        atributosEstudiante = atributosEstudiante + 1;
+                    }
+                }
+            }
+            int size_syt = sytEmpresa.size()/2;
+            for (int z=0;z<size_syt;z++){ // Software y Tecnologias
+                Integer sytEmpresa_list = Integer.valueOf(sytEmpresa.get("idSyt" +(z+1)));
+                Integer nivelSytEmpresa = Integer.valueOf(sytEmpresa.get("nivel"+(z+1)));
+                atributosEmpresa = atributosEmpresa + 1;
+                for (int x= 0;x<idiomasEstudiante.size();x++) {
+                    Integer sytEstudiante_list=Integer.valueOf( sytEstudiante.get(x).get("id"));
+                    Integer nivelSytEstudiante = Integer.valueOf(sytEstudiante.get(x).get("nivel"));
+                    if ((sytEmpresa_list ==sytEstudiante_list)&&((nivelSytEstudiante==nivelSytEstudiante)||(nivelSytEstudiante>nivelSytEmpresa))) {
+                        atributosEstudiante = atributosEstudiante + 1;
+                    }
+                }
+            }
+            Integer puntaje = (atributosEstudiante *100) / atributosEmpresa;
+            afinidad.put("afinidad", puntaje.toString() + "%");
+            list_por_items.add(resulDetalleEstudiantes.get(e));
 
-        return detalle;
+            list_por_items.add(afinidad);
+
+            listadoOrdenadoDetalle.add(list_por_items);
+            result.add(afinidad);
+            atributosEmpresa = 0;
+            atributosEstudiante=0;
+            puntaje=0;
+            afinidad = new HashMap<>();
+            list_por_items =new ArrayList<>();
+
+
+        }
+
+        return result;
+
     }
+
 
     @PostMapping("userLogin")
     public HashMap<String,String> loginUser(HttpServletRequest request, HttpServletResponse response,
@@ -330,11 +341,6 @@ public class userController {
             objectResult.put("tipo", "error");
         }
         return objectResult;
-    }
-    @PostMapping("consultarEspecialidades")
-    public List<Especialidad> consultarEspecialidades(HttpServletRequest request, HttpServletResponse response) {
-        List<Especialidad> listEspecialidad= especialidadRepository.findAllByIdGreaterThan(0);
-        return listEspecialidad;
     }
     @PostMapping("consultarDeportes")
     public List<Deporte> consultarDeporte(HttpServletRequest request, HttpServletResponse response) {
@@ -366,6 +372,21 @@ public class userController {
         List<Pasatiempo> ListPasatiempo= pasatiempoRepository.findAllByIdGreaterThan(0);
         return ListPasatiempo;
     }
+    @PostMapping("consultarSyT")
+    public List<SoftwareTecnologias> consultarSyT(HttpServletRequest request, HttpServletResponse response) {
+        List<SoftwareTecnologias> ListSyT= softwareTecnologiaRepository.findAllBySytIdGreaterThan(0);
+        return ListSyT;
+    }
+    @PostMapping("consultarHabilidadesBlandas")
+    public List<HabilidadesBlandas> consultarHabilidadesBlandas(HttpServletRequest request, HttpServletResponse response) {
+        List<HabilidadesBlandas> ListSyT = habilidadesBlandasRepository.findAllByHabIdGreaterThan(0);
+        return ListSyT;
+    }
+    @PostMapping("consultarCiudades")
+    public List<Ciudades> consultarCiudades(HttpServletRequest request, HttpServletResponse response) {
+        List<Ciudades> ListCiudades= ciudadesRepository.findAllByCiuIdGreaterThan(0);
+        return ListCiudades;
+    }
     @PostMapping("postularEstudiante")
     public String postularEstudiante(HttpServletRequest request, HttpServletResponse response,
                                                @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
@@ -376,7 +397,7 @@ public class userController {
         Integer idEstudiante = (params.containsKey(ID_ESTUDIANTE) && params.get(ID_ESTUDIANTE) != null) ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
 
         if (idAsignatura!=null && idEmpresa!=null && idEstudiante!=null){
-           resp = estudianteService.postular(idAsignatura,idEmpresa,idEmpresa);
+           resp = estudianteService.postular(idAsignatura,idEmpresa,idEstudiante);
         }
         return resp;
     }
@@ -407,6 +428,48 @@ public class userController {
         String respf = "Cambio de perfil Exitoso";
 
         return perfilPrinc;
+    }
+
+    @PostMapping("agregarPerfilPrincipal")
+    public Estudiante agregarPerfilPrincipal(HttpServletRequest request, HttpServletResponse response,
+                                             @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer usuario 	= (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty()) ? Integer.valueOf(params.get(ID_USER).toString()) : null;
+        Integer carrera 	= (params.containsKey(CARRERA_ID) && params.get(CARRERA_ID) != null && !params.get(CARRERA_ID).toString().isEmpty()) ? Integer.valueOf(params.get(CARRERA_ID).toString()) : null;
+        Integer universidad 	= (params.containsKey(UNIVERSIDAD_ID) && params.get(UNIVERSIDAD_ID) != null && !params.get(UNIVERSIDAD_ID).toString().isEmpty()) ? Integer.valueOf(params.get(UNIVERSIDAD_ID).toString()) : null;
+        Integer semestre 	= (params.containsKey(SEMESTRE) && params.get(SEMESTRE) != null && !params.get(SEMESTRE).toString().isEmpty()) ? Integer.valueOf(params.get(SEMESTRE).toString()) : null;
+        Integer lugar 	= (params.containsKey(LUGAR) && params.get(LUGAR) != null && !params.get(LUGAR).toString().isEmpty()) ? Integer.valueOf(params.get(LUGAR).toString()) : null;
+
+        // primero consulto perfil estudiante activo actualmente y cambio estatus a inactivo
+        Estudiante perfilPrinc =estudianteRepository.consultaPerfilActivo(usuario);
+        Integer idEstudianteActivo = perfilPrinc.getId();
+        estudianteRepository.updateStatusPerfil(idEstudianteActivo,INACTIVO);
+        //cambio estatus de perfil estudiante seleccionado a Activo
+        String nombre,apellido,telf,codpais;
+        Integer fechaN,pais,ciudad;
+        nombre = perfilPrinc.getNombre();
+        apellido= perfilPrinc.getApellido();
+        fechaN= perfilPrinc.getFechaNac();
+        pais=perfilPrinc.getIdpai();
+        telf=perfilPrinc.getTelefono();
+        codpais=perfilPrinc.getCodigoPais();
+        ciudad=perfilPrinc.getIdCiudad();
+        Estudiante newPerfil = new Estudiante();
+        newPerfil.setNombre(nombre);
+        newPerfil.setApellido(apellido);
+        newPerfil.setFechaNac(fechaN);
+        newPerfil.setIdpai(pais);
+        newPerfil.setTelefono(telf);
+        newPerfil.setCodigoPais(codpais);
+        newPerfil.setIdCiudad(ciudad);
+        newPerfil.setIdCar(carrera);
+        newPerfil.setIdUni(universidad);
+        newPerfil.setSemestre(semestre);
+        newPerfil.setLugar(lugar);
+        newPerfil.setEstPrincipal(0);
+        Estudiante result = estudianteRepository.save(newPerfil);
+
+        return result;
     }
 
 }

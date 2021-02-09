@@ -24,6 +24,17 @@ private Integer id;
     @Column(name="DET_ID")
     private Integer DetIdIdioma;
 
+    @Column(name="IDE_NIVEL")
+    private Integer Nivel;
+
+    public Integer getNivel() {
+        return Nivel;
+    }
+
+    public void setNivel(Integer nivel) {
+        Nivel = nivel;
+    }
+
     public Integer getId() {
         return id;
     }

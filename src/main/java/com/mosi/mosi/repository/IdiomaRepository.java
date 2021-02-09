@@ -12,5 +12,5 @@ public interface IdiomaRepository extends JpaRepository<Idioma,String> {
 
     String SQL_CONSULTA_NOMBRE_IDIOMA = "SELECT * FROM IDI_Idiomas WHERE IDI_ID in :idiIdi ";
     @Query(nativeQuery = true, value = SQL_CONSULTA_NOMBRE_IDIOMA)
-    List<Object[]> consultaIdiomaEstudiante(@Param("idiIdi") List<Integer> idiIdi);
+    List<Object[]> consultaIdiomaEstudiante(@Param("idiIdi") List<Object[]> idiIdi);
 }

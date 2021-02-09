@@ -14,18 +14,29 @@ public interface EstudianteRepository extends CrudRepository<Estudiante,Integer>
     String SQL_CONSULTA_ESTUDIANTE = "  select est.EST_Nombres AS Nombre, " +
             "       est.EST_Apellidos as apellido, " +
             "       est.EST_Fecha_Nac as fechaNac, " +
-            "       pai.PAI_Nombre as pais, " +
+            "       usu.USU_id," +
             "       USU.USU_Nombre_Usuario, " +
-            "       est.Est_id," +
+            "       est.Est_id, " +
             "       PAI.PAI_ID, " +
+            "       pai.PAI_Nombre as pais, " +
             "       EST.EST_SEM, " +
-            "       est.ESP_Id, " +
-            "       est.CAR_Id, " +
-            "       est.UNI_Id " +
-            "        from EST_Estudiantes EST " +
-            "              inner join PAI_Paises pai on PAI.PAI_Id = EST.PAI_Id " +
-            "              INNER JOIN USU_USUARIOS USU ON USU.USU_Id = EST.USU_id " +
-            "             where usu.usu_id = :idUsu";
+            "       est.CAR_id, " +
+            "       CCU.CAR_Nombre, " +
+            "       est.UNI_Id, " +
+            "       uu.UNI_Nombre, " +
+            "       est.EST_Descripcion, " +
+            "       est.EST_Email, " +
+            "       EST.EST_CodPais + ' ' + EST.EST_Telefono as telefono, " +
+            "       ciu.CIU_Id," +
+            "       ciu.CIU_Nombre," +
+            "       est.EST_Lugar " +
+            "from EST_Estudiantes EST " +
+            "                        inner join PAI_Paises pai on PAI.PAI_Id = EST.PAI_Id " +
+            "                        inner join CIU_Ciudades ciu on CIU.CIU_Id = est.CIU_Id " +
+            "                        inner join USU_USUARIOS USU ON USU.USU_Id = EST.USU_id " +
+            "                        inner join CAR_CarrerasUniv CCU on EST.CAR_Id = CCU.CAR_Id " +
+            "                        inner join UNI_Universidades UU on EST.UNI_Id = UU.UNI_Id " +
+            "                         where usu.usu_id = :idUsu and EST.EST_Principal=1";
     @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTE)
     List<Object[]> consultaEstudiante(@Param("idUsu") Integer usuId);
 
@@ -41,13 +52,11 @@ public interface EstudianteRepository extends CrudRepository<Estudiante,Integer>
             "                               est.Est_id as id,  " +
             "                                pai.pai_id, " +
             "                               EST.EST_SEM as semestre,  " +
-            "                               ESP.ESP_Nombre as especialidad,  " +
             "                               CAR.CAR_Nombre as carrera,  " +
             "                               UNI.UNI_Nombre as universidad  " +
             "                                from EST_Estudiantes EST  " +
             "                                      INNER JOIN PAI_Paises pai on PAI.PAI_Id = EST.PAI_Id  " +
             "                                      INNER JOIN USU_USUARIOS USU ON USU.USU_Id = EST.USU_id  " +
-            "                                      INNER JOIN ESP_Especialidad ESP on EST.ESP_Id = ESP.ESP_Id  " +
             "                                      INNER JOIN CAR_CarrerasUniv CAR on EST.CAR_Id = CAR.CAR_Id  " +
             "                                      INNER JOIN UNI_Universidades UNI on EST.UNI_Id = UNI.UNI_Id" +
             "                                        where usu.usu_id = :idUsu";
