@@ -1,6 +1,7 @@
 package com.mosi.mosi.repository;
 
 import com.mosi.mosi.bean.Estudiante;
+import com.mosi.mosi.bean.Users;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -36,9 +37,9 @@ public interface EstudianteRepository extends CrudRepository<Estudiante,Integer>
             "                        inner join USU_USUARIOS USU ON USU.USU_Id = EST.USU_id " +
             "                        inner join CAR_CarrerasUniv CCU on EST.CAR_Id = CCU.CAR_Id " +
             "                        inner join UNI_Universidades UU on EST.UNI_Id = UU.UNI_Id " +
-            "                         where usu.usu_id = :idUsu and EST.EST_Principal=1";
+            "                         where ((usu.usu_id = :idUsu or EST.EST_Id = :estId) and EST.EST_Principal=1)";
     @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTE)
-    List<Object[]> consultaEstudiante(@Param("idUsu") Integer usuId);
+    List<Object[]> consultaEstudiante(@Param("idUsu") Integer usuId,@Param("estId") Integer estId);
 
     String SQL_CONSULTA_NOMBRE_DEPORTE = "SELECT * FROM UNI_Universidades WHERE UNI_ID in :idUni ";
     @Query(nativeQuery = true, value = SQL_CONSULTA_NOMBRE_DEPORTE)
@@ -59,9 +60,9 @@ public interface EstudianteRepository extends CrudRepository<Estudiante,Integer>
             "                                      INNER JOIN USU_USUARIOS USU ON USU.USU_Id = EST.USU_id  " +
             "                                      INNER JOIN CAR_CarrerasUniv CAR on EST.CAR_Id = CAR.CAR_Id  " +
             "                                      INNER JOIN UNI_Universidades UNI on EST.UNI_Id = UNI.UNI_Id" +
-            "                                        where usu.usu_id = :idUsu";
+            "                                        where usu.usu_id = :idUsu or est EST_Id = :estId ";
     @Query(nativeQuery = true, value = SQL_CONSULTA_PERFIL_COMPLETO)
-    List<Object[]> consultaEstudianteCompleto(@Param("idUsu") Integer usuId);
+    List<Object[]> consultaEstudianteCompleto(@Param("idUsu") Integer usuId,@Param("estId") Integer estId);
 
     String SQL_UPDATE_ESTUDIANTE_PRINCIPAL = "UPDATE EST_Estudiantes SET EST_Principal = :Estatus where EST_Id = :idEstudiante";
     @Transactional
@@ -74,4 +75,5 @@ public interface EstudianteRepository extends CrudRepository<Estudiante,Integer>
     @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTE_ACTIVO)
     Estudiante consultaPerfilActivo(@Param("idUsu") Integer usuId);
 
+    Estudiante findByUsuario(Users user);
 }

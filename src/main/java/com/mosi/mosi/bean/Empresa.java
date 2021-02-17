@@ -1,93 +1,167 @@
 package com.mosi.mosi.bean;
 
+
 import javax.persistence.*;
-import java.util.Objects;
 
 @Entity
 @Table(name = "EMP_Empresa", schema = "dbo", catalog = "MOSI")
-public class Empresa {
-    private int empId;
-    private String empDescripcion;
-    private Integer rubId;
-    private String empUbicacion;
-    private String empSitioWeb;
-    private String empNombre;
+public class  Empresa {
+
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "EMP_Id")
-    public int getEmpId() {
-        return empId;
+    private Integer id;
+
+    public Integer getId() {
+        return id;
     }
 
-    public void setEmpId(int empId) {
-        this.empId = empId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Basic
     @Column(name = "EMP_Descripcion")
-    public String getEmpDescripcion() {
-        return empDescripcion;
+    private String Descripcion;
+
+    public String getDescripcion() {
+        return Descripcion;
     }
 
-    public void setEmpDescripcion(String empDescripcion) {
-        this.empDescripcion = empDescripcion;
+    public void setDescripcion(String Descripcion) {
+        this.Descripcion = Descripcion;
     }
 
-    @Basic
-    @Column(name = "RUB_id")
-    public Integer getRubId() {
-        return rubId;
-    }
-
-    public void setRubId(Integer rubId) {
-        this.rubId = rubId;
-    }
+    @OneToOne
+    @JoinColumn(name = "RUB_id")
+    private RubRubro rubro;
 
     @Basic
     @Column(name = "EMP_Ubicacion")
-    public String getEmpUbicacion() {
-        return empUbicacion;
+    private String Ubicacion;
+
+    public String getUbicacion() {
+        return Ubicacion;
     }
 
-    public void setEmpUbicacion(String empUbicacion) {
-        this.empUbicacion = empUbicacion;
+    public void setUbicacion(String Ubicacion) {
+        this.Ubicacion = Ubicacion;
     }
 
     @Basic
-    @Column(name = "EMP_SitioWeb")
-    public String getEmpSitioWeb() {
-        return empSitioWeb;
+    @Column(name = "EMP_SITIOWEB")
+    private String SitioWeb;
+
+    public String getSitioWeb() {
+        return SitioWeb;
     }
 
-    public void setEmpSitioWeb(String empSitioWeb) {
-        this.empSitioWeb = empSitioWeb;
+    public void setSitioWeb(String SitioWeb) {
+        this.SitioWeb = SitioWeb;
     }
 
     @Basic
     @Column(name = "EMP_Nombre")
-    public String getEmpNombre() {
-        return empNombre;
+    private String Nombre;
+
+    public String getNombre() {
+        return Nombre;
     }
 
-    public void setEmpNombre(String empNombre) {
-        this.empNombre = empNombre;
+    public void setNombre(String Nombre) {
+        this.Nombre = Nombre;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Empresa empresa = (Empresa) o;
-        return empId == empresa.empId &&
-                Objects.equals(empDescripcion, empresa.empDescripcion) &&
-                Objects.equals(rubId, empresa.rubId) &&
-                Objects.equals(empUbicacion, empresa.empUbicacion) &&
-                Objects.equals(empSitioWeb, empresa.empSitioWeb) &&
-                Objects.equals(empNombre, empresa.empNombre);
+    @Basic
+    @Column(name = "EMP_RAZONSOCIAL")
+    private String Razonsocial;
+
+    public String getRazonsocial() {
+        return Razonsocial;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(empId, empDescripcion, rubId, empUbicacion, empSitioWeb, empNombre);
+    public void setRazonsocial(String Razonsocial) {
+        this.Razonsocial = Razonsocial;
+    }
+
+    @Basic
+    @Column(name = "EMP_Telefono")
+    private String Telefono;
+
+    public String getTelefono() {
+        return Telefono;
+    }
+
+    public void setTelefono(String Telefono) {
+        this.Telefono = Telefono;
+    }
+
+    @Basic
+    @Column(name = "EMP_Correo")
+    private String Correo;
+
+    public String getCorreo() {
+        return Correo;
+    }
+
+    public void setCorreo(String Correo) {
+        this.Correo = Correo;
+    }
+
+    @Basic
+    @Column(name = "EMP_Mision")
+    private String Mision;
+
+    public String getMision() {
+        return Mision;
+    }
+
+    public void setMision(String Mision) {
+        this.Mision = Mision;
+    }
+
+    @Basic
+    @Column(name = "EMP_Vision")
+    private String Vision;
+
+    public String getVision() {
+        return Vision;
+    }
+
+    public void setVision(String Vision) {
+        this.Vision = Vision;
+    }
+
+    @OneToOne
+    @JoinColumn(name = "PAI_Id")
+    private Paises pais;
+
+    @OneToOne
+    @JoinColumn(name = "USU_Id")
+    private Users users;
+
+    public RubRubro getRubro() {
+        return rubro;
+    }
+
+    public void setRubro(RubRubro rubro) {
+        this.rubro = rubro;
+    }
+
+    public Paises getPais() {
+        return pais;
+    }
+
+    public void setPais(Paises pais) {
+        this.pais = pais;
+    }
+
+    public Users getUsers() {
+        return users;
+    }
+
+    public void setUsers(Users users) {
+        this.users = users;
     }
 }

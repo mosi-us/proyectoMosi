@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface PasatiempoRepository extends JpaRepository<Pasatiempo,String> {
+public interface PasatiempoRepository extends JpaRepository<Pasatiempo,Integer> {
     List<Pasatiempo> findAllByIdGreaterThan(Integer zero);
 
     String SQL_CONSULTA_NOMBRE_PASATIEMPO = "SELECT * FROM HOB_Pasatiempo WHERE HOB_ID in :pasId ";

@@ -15,14 +15,15 @@ public class IdiomaMaestro implements Serializable {
 @Column(name="IDE_Id")
 private Integer id;
 
-    @Column(name="IDI_Id")
-    private Integer idiIdIdioma;
-
-    @Column(name="EST_Id")
-    private Integer EstIDIdioma;
-
-    @Column(name="DET_ID")
-    private Integer DetIdIdioma;
+    @OneToOne
+    @JoinColumn(name="IDI_Id")
+    private Idioma idioma;
+    @OneToOne
+    @JoinColumn(name="EST_Id")
+    private Estudiante estudiante;
+    @OneToOne
+    @JoinColumn(name="DET_ID")
+    private DetalleEstudiante detalleEstudiante;
 
     @Column(name="IDE_NIVEL")
     private Integer Nivel;
@@ -43,27 +44,27 @@ private Integer id;
         this.id = id;
     }
 
-    public Integer getIdiIdIdioma() {
-        return idiIdIdioma;
+    public Idioma getIdioma() {
+        return idioma;
     }
 
-    public void setIdiIdIdioma(Integer idiIdIdioma) {
-        this.idiIdIdioma = idiIdIdioma;
+    public void setIdioma(Idioma idioma) {
+        this.idioma = idioma;
     }
 
-    public Integer getEstIDIdioma() {
-        return EstIDIdioma;
+    public Estudiante getEstudiante() {
+        return estudiante;
     }
 
-    public void setEstIDIdioma(Integer estIDIdioma) {
-        EstIDIdioma = estIDIdioma;
+    public void setEstudiante(Estudiante estudiante) {
+        this.estudiante = estudiante;
     }
 
-    public Integer getDetIdIdioma() {
-        return DetIdIdioma;
+    public DetalleEstudiante getDetalleEstudiante() {
+        return detalleEstudiante;
     }
 
-    public void setDetIdIdioma(Integer detIdIdioma) {
-        DetIdIdioma = detIdIdioma;
+    public void setDetalleEstudiante(DetalleEstudiante detalleEstudiante) {
+        this.detalleEstudiante = detalleEstudiante;
     }
 }

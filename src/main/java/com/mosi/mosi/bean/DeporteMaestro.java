@@ -15,14 +15,19 @@ public class DeporteMaestro implements Serializable {
     @Column(name="DEE_Id")
     private Integer id;
 
-    @Column(name="DEP_Id")
-    private Integer depIdDep;
+    @OneToOne
+    @JoinColumn(name="DEP_Id")
+    private Deporte deporte;
 
-    @Column(name="EST_Id")
-    private Integer EstIdDep;
 
-    @Column(name="DET_ID")
-    private Integer detIdDep;
+    @OneToOne
+    @JoinColumn(name="EST_Id")
+    private Estudiante estudiante;
+
+
+    @OneToOne
+    @JoinColumn(name="DET_ID")
+    private DetalleEstudiante detalleEstudiante;
 
     public Integer getId() {
         return id;
@@ -32,36 +37,29 @@ public class DeporteMaestro implements Serializable {
         this.id = id;
     }
 
-    public Integer getDepIdDeporte() {
-        return depIdDep;
+
+    public Deporte getDeporte() {
+        return deporte;
     }
 
-    public void setDepIdDeporte(Integer depIdDeporte) {
-        this.depIdDep = depIdDeporte;
+    public void setDeporte(Deporte deporte) {
+        this.deporte = deporte;
     }
 
-    public Integer getDepIdDep() {
-        return depIdDep;
+    public Estudiante getEstudiante() {
+        return estudiante;
     }
 
-    public void setDepIdDep(Integer depIdDep) {
-        this.depIdDep = depIdDep;
+    public void setEstudiante(Estudiante estudiante) {
+        this.estudiante = estudiante;
     }
 
-    public Integer getEstIdDep() {
-        return EstIdDep;
+    public DetalleEstudiante getDetalleEstudiante() {
+        return detalleEstudiante;
     }
 
-    public void setEstIdDep(Integer estIdDep) {
-        EstIdDep = estIdDep;
-    }
-
-    public Integer getDetIdDep() {
-        return detIdDep;
-    }
-
-    public void setDetIdDep(Integer detIdDep) {
-        this.detIdDep = detIdDep;
+    public void setDetalleEstudiante(DetalleEstudiante detalleEstudiante) {
+        this.detalleEstudiante = detalleEstudiante;
     }
 
     public DeporteMaestro() {

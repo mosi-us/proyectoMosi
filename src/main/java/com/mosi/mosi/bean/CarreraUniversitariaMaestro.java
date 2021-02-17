@@ -17,14 +17,17 @@ public class CarreraUniversitariaMaestro implements Serializable {
     @Column(name="CAM_Semestre")
     private Integer semestre;
 
-    @Column(name="CAR_Id")
-    private Integer caridCar;
+    @OneToOne
+    @JoinColumn(name="CAR_Id")
+    private Carrera carrera;
 
-    @Column(name="EST_Id")
-    private Integer estIdCar;
+    @OneToOne
+    @JoinColumn(name="EST_Id")
+    private Estudiante estudiante;
 
-    @Column(name="DET_Id")
-    private Integer detIdCar;
+    @OneToOne
+    @JoinColumn(name="DET_Id")
+    private DetalleEstudiante detalleEstudiante;
 
     public Integer getId() {
         return id;
@@ -34,35 +37,35 @@ public class CarreraUniversitariaMaestro implements Serializable {
         this.id = id;
     }
 
-    public Integer getEstIdCar() {
-        return estIdCar;
-    }
-
-    public void setEstIdCar(Integer estIdCar) {
-        this.estIdCar = estIdCar;
-    }
-
-    public Integer getDetIdCar() {
-        return detIdCar;
-    }
-
-    public void setDetIdCar(Integer detIdCar) {
-        this.detIdCar = detIdCar;
-    }
-
-    public Integer getCaridCar() {
-        return caridCar;
-    }
-
-    public void setCaridCar(Integer caridCar) {
-        this.caridCar = caridCar;
-    }
-
     public Integer getSemestre() {
         return semestre;
     }
 
     public void setSemestre(Integer semestre) {
         this.semestre = semestre;
+    }
+
+    public Carrera getCarrera() {
+        return carrera;
+    }
+
+    public void setCarrera(Carrera carrera) {
+        this.carrera = carrera;
+    }
+
+    public Estudiante getEstudiante() {
+        return estudiante;
+    }
+
+    public void setEstudiante(Estudiante estudiante) {
+        this.estudiante = estudiante;
+    }
+
+    public DetalleEstudiante getDetalleEstudiante() {
+        return detalleEstudiante;
+    }
+
+    public void setDetalleEstudiante(DetalleEstudiante detalleEstudiante) {
+        this.detalleEstudiante = detalleEstudiante;
     }
 }

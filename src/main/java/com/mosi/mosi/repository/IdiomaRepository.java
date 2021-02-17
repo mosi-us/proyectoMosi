@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface IdiomaRepository extends JpaRepository<Idioma,String> {
+public interface IdiomaRepository extends JpaRepository<Idioma,Integer> {
     List<Idioma> findAllByIdGreaterThan(Integer zero);
 
     String SQL_CONSULTA_NOMBRE_IDIOMA = "SELECT * FROM IDI_Idiomas WHERE IDI_ID in :idiIdi ";

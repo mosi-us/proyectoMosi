@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface CarreraRepository extends JpaRepository<Carrera,String> {
+public interface CarreraRepository extends JpaRepository<Carrera,Integer> {
     List<Carrera> findAllByIdGreaterThan(Integer zero);
     String SQL_CONSULTA_NOMBRE_CARRERA = "SELECT * FROM CAR_CarrerasUniv WHERE CAR_ID in :idCar ";
     @Query(nativeQuery = true, value = SQL_CONSULTA_NOMBRE_CARRERA)

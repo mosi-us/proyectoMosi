@@ -6,12 +6,13 @@ import java.util.Objects;
 @Entity
 @Table(name = "SYT_SOFTWARETECNOLOGIAS", schema = "dbo", catalog = "MOSI")
 public class SoftwareTecnologias {
-    private int sytId;
+    private Integer sytId;
     private String sytNombre;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SYT_Id")
-    public int getSytId() {
+    public Integer getSytId() {
         return sytId;
     }
 

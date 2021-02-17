@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface UserRepository extends JpaRepository<Users,Integer> {
-    Users[] findByNombre(String nombre);
+    Users findByEmail(String email);
 
     Users findById(int id);
     String SQL_EXIST_EMAIL = "SELECT top 1 USU_email FROM USU_USUARIOS WHERE USU_email = :email";

@@ -1,69 +1,58 @@
 package com.mosi.mosi.bean;
 
 import javax.persistence.*;
-import java.util.Objects;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "HAM_HABILIDADESBLANDASMAESTRO", schema = "dbo", catalog = "MOSI")
-public class HabilidadesBlandasMaestro {
-    private int hamId;
-    private Integer estId;
-    private Integer detId;
-    private Integer habId;
+public class HabilidadesBlandasMaestro implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "HAM_Id")
-    public int getHamId() {
-        return hamId;
+    private Integer id;
+
+    @OneToOne
+    @JoinColumn(name = "EST_Id")
+    private Estudiante estudiante;
+
+    @OneToOne
+    @JoinColumn(name = "DET_Id")
+    private DetalleEstudiante detalleEstudiante;
+
+    @OneToOne
+    @JoinColumn(name = "HAB_Id")
+    private HabilidadesBlandas habilidadesBlandas;
+
+    public Integer getId() {
+        return id;
     }
 
-    public void setHamId(int hamId) {
-        this.hamId = hamId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    @Basic
-    @Column(name = "EST_Id")
-    public Integer getEstId() {
-        return estId;
+    public Estudiante getEstudiante() {
+        return estudiante;
     }
 
-    public void setEstId(Integer estId) {
-        this.estId = estId;
+    public void setEstudiante(Estudiante estudiante) {
+        this.estudiante = estudiante;
     }
 
-    @Basic
-    @Column(name = "DET_Id")
-    public Integer getDetId() {
-        return detId;
+    public DetalleEstudiante getDetalleEstudiante() {
+        return detalleEstudiante;
     }
 
-    public void setDetId(Integer detId) {
-        this.detId = detId;
+    public void setDetalleEstudiante(DetalleEstudiante detalleEstudiante) {
+        this.detalleEstudiante = detalleEstudiante;
     }
 
-    @Basic
-    @Column(name = "HAB_Id")
-    public Integer getHabId() {
-        return habId;
-    }
-    public void setHabId(Integer habId) {
-        this.habId = habId;
+    public HabilidadesBlandas getHabilidadesBlandas() {
+        return habilidadesBlandas;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        HabilidadesBlandasMaestro that = (HabilidadesBlandasMaestro) o;
-        return hamId == that.hamId &&
-                Objects.equals(estId, that.estId) &&
-                Objects.equals(detId, that.detId)&&
-                Objects.equals(habId,that.habId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(hamId, estId, detId, habId);
+    public void setHabilidadesBlandas(HabilidadesBlandas habilidadesBlandas) {
+        this.habilidadesBlandas = habilidadesBlandas;
     }
 }

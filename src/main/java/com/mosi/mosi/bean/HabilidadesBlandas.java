@@ -6,12 +6,12 @@ import java.util.Objects;
 @Entity
 @Table(name = "HAB_HABILIDADESBLANDAS", schema = "dbo", catalog = "MOSI")
 public class HabilidadesBlandas {
-    private int habId;
+    private Integer habId;
     private String habNombre;
 
     @Id
     @Column(name = "HAB_id")
-    public int getHabId() {
+    public Integer getHabId() {
         return habId;
     }
 

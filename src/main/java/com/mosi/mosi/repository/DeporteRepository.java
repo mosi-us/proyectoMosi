@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface DeporteRepository extends JpaRepository<Deporte,String> {
+public interface DeporteRepository extends JpaRepository<Deporte,Integer> {
     List<Deporte> findAllByIdGreaterThan(Integer zero);
 
     String SQL_CONSULTA_NOMBRE_DEPORTE = "SELECT * FROM DEP_Deportes WHERE DEP_ID in (:idDep) ";

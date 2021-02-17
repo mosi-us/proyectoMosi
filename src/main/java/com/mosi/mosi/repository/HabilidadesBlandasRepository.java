@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface HabilidadesBlandasRepository extends JpaRepository<HabilidadesBlandas,Integer> {
     List<HabilidadesBlandas> findAllByHabIdGreaterThan(Integer zero);
+
+
 }

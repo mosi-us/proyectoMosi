@@ -1,111 +1,118 @@
 package com.mosi.mosi.bean;
 
-import org.jsondoc.core.annotation.ApiObjectField;
-
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Entity
-@Table(name= "DET_Estudiante")
-public class DetalleEstudiante implements Serializable {
+@Table(name = "DET_Estudiante", schema = "dbo", catalog = "MOSI")
+public class DetalleEstudiante {
+
+
+
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiObjectField(description = "Id del Estudiante", required = true)
-    @Column(name="DET_id")
-    private Integer id;
-
-    @ApiObjectField(description = "Nombre de Estudiante", required = true)
-    @Column(name="DET_Descripcion")
-    private String descripcion;
-
-
-    @ApiObjectField(description = "Apellido del estudiante", required = true)
-    @Column(name="ASI_Id")
-    private Integer Asignatura;
-
-    @ApiObjectField(description = "Fecha de Nacimiento", required = true)
-    @Column(name="EMP_Id")
-    private Integer idEmp;
-
-    @ApiObjectField(description = "id del Pais", required = true)
-    @Column(name="PAI_Id")
-    private Integer idpai;
-
-    @ApiObjectField(description = "Semestre", required = true)
-    @Column(name="DET_Sem")
-    private Integer semestre;
-
-    @ApiObjectField(description = "id del Carrera", required = true)
-    @Column(name="CAR_Id")
-    private Integer idCar;
-
-    @ApiObjectField(description = "id Universidad", required = true)
-    @Column(name="UNI_Id")
-    private Integer idUni;
-
-    public Integer getId() {
-        return id;
+    @Column(name = "DET_ID")
+    private Integer detId;
+    public Integer getDetId() {
+        return detId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setDetId(Integer detId) {
+        this.detId = detId;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    @Basic
+    @Column(name = "DET_Descripcion")
+    private String detDescripcion;
+    public String getDetDescripcion() {
+        return detDescripcion;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setDetDescripcion(String detDescripcion) {
+        this.detDescripcion = detDescripcion;
     }
 
-    public Integer getAsignatura() {
-        return Asignatura;
+    @OneToOne
+    @JoinColumn(name = "ASI_Id")
+    private Asignatura asignatura;
+
+    @OneToOne
+    @JoinColumn(name = "EMP_ID")
+    private Empresa empresa;
+
+    @OneToOne
+    @JoinColumn(name = "PAI_ID")
+    private Paises pais;
+
+    @Basic
+    @Column(name = "DET_SEM")
+    private Integer detSem;
+
+    public Integer getDetSem() {
+        return detSem;
+    }
+    public void setDetSem(Integer detSem) {
+        this.detSem = detSem;
     }
 
-    public void setAsignatura(Integer asignatura) {
-        Asignatura = asignatura;
+    @OneToOne
+    @JoinColumn(name = "CAR_Id")
+    private Carrera carrera;
+
+    @OneToOne
+    @JoinColumn(name = "UNI_Id")
+    private Universidad universidad;
+
+    @Basic
+    @Column(name = "DET_TIPO")
+    private Integer tipo;
+
+    public Asignatura getAsignatura() {
+        return asignatura;
     }
 
-    public Integer getIdEmp() {
-        return idEmp;
+    public void setAsignatura(Asignatura asignatura) {
+        this.asignatura = asignatura;
     }
 
-    public void setIdEmp(Integer idEmp) {
-        this.idEmp = idEmp;
+    public Empresa getEmpresa() {
+        return empresa;
     }
 
-    public Integer getIdpai() {
-        return idpai;
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
     }
 
-    public void setIdpai(Integer idpai) {
-        this.idpai = idpai;
+    public Paises getPais() {
+        return pais;
     }
 
-    public Integer getSemestre() {
-        return semestre;
+    public void setPais(Paises pais) {
+        this.pais = pais;
     }
 
-    public void setSemestre(Integer semestre) {
-        this.semestre = semestre;
+    public Carrera getCarrera() {
+        return carrera;
     }
 
-    public Integer getIdCar() {
-        return idCar;
+    public void setCarrera(Carrera carrera) {
+        this.carrera = carrera;
     }
 
-    public void setIdCar(Integer idCar) {
-        this.idCar = idCar;
+    public Universidad getUniversidad() {
+        return universidad;
     }
 
-    public Integer getIdUni() {
-        return idUni;
+    public void setUniversidad(Universidad universidad) {
+        this.universidad = universidad;
     }
 
-    public void setIdUni(Integer idUni) {
-        this.idUni = idUni;
+    public Integer getTipo() {
+        return tipo;
     }
 
+    public void setTipo(Integer tipo) {
+        this.tipo = tipo;
+    }
 }

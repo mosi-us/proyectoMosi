@@ -6,17 +6,15 @@ import java.util.Date;
 @Entity
 @Table(name = "POS_POSTULACIONES", schema = "dbo", catalog = "MOSI")
 public class Postulaciones {
-    private int posId;
-    private Integer asiId;
-    private Integer empId;
-    private Integer estId;
-    private Integer detId;
-    private Date posFecha;
-    private Integer posEstatus;
+
+
+
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "POS_Id")
+    private int posId;
     public int getPosId() {
         return posId;
     }
@@ -25,48 +23,27 @@ public class Postulaciones {
         this.posId = posId;
     }
 
-    @Basic
-    @Column(name = "ASI_Id")
-    public Integer getAsiId() {
-        return asiId;
-    }
+    @OneToOne
+    @JoinColumn(name = "ASI_Id")
+    private Asignatura asignatura;
 
-    public void setAsiId(Integer asiId) {
-        this.asiId = asiId;
-    }
+    @OneToOne
+    @JoinColumn(name = "EMP_Id")
+    private Empresa empresa;
 
-    @Basic
-    @Column(name = "EMP_Id")
-    public Integer getEmpId() {
-        return empId;
-    }
 
-    public void setEmpId(Integer empId) {
-        this.empId = empId;
-    }
+    @OneToOne
+    @JoinColumn(name = "EST_Id")
+    private Estudiante estudiante;
 
-    @Basic
-    @Column(name = "EST_Id")
-    public Integer getEstId() {
-        return estId;
-    }
 
-    public void setEstId(Integer estId) {
-        this.estId = estId;
-    }
-
-    @Basic
-    @Column(name = "DET_Id")
-    public Integer getDetId() {
-        return detId;
-    }
-
-    public void setDetId(Integer detId) {
-        this.detId = detId;
-    }
+    @OneToOne
+    @JoinColumn(name = "DET_Id")
+    private DetalleEstudiante detalleEstudiante;
 
     @Basic
     @Column(name = "POS_Fecha")
+    private Date posFecha;
     public Date getPosFecha() {
         return posFecha;
     }
@@ -77,6 +54,7 @@ public class Postulaciones {
 
     @Basic
     @Column(name = "POS_Estatus")
+    private Integer posEstatus;
     public Integer getPosEstatus() {
         return posEstatus;
     }
@@ -85,5 +63,35 @@ public class Postulaciones {
         this.posEstatus = posEstatus;
     }
 
+    public Asignatura getAsignatura() {
+        return asignatura;
+    }
 
+    public void setAsignatura(Asignatura asignatura) {
+        this.asignatura = asignatura;
+    }
+
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
+    }
+
+    public Estudiante getEstudiante() {
+        return estudiante;
+    }
+
+    public void setEstudiante(Estudiante estudiante) {
+        this.estudiante = estudiante;
+    }
+
+    public DetalleEstudiante getDetalleEstudiante() {
+        return detalleEstudiante;
+    }
+
+    public void setDetalleEstudiante(DetalleEstudiante detalleEstudiante) {
+        this.detalleEstudiante = detalleEstudiante;
+    }
 }

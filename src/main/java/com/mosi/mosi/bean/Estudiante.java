@@ -27,25 +27,29 @@ public class Estudiante implements Serializable {
     @Column(name="EST_Fecha_Nac")
     private Integer fechaNac;
 
+    @OneToOne
     @ApiObjectField(description = "id del Pais", required = true)
-    @Column(name="PAI_Id")
-    private Integer idpai;
+    @JoinColumn(name="PAI_Id")
+    private Paises pais;
 
+    @OneToOne
     @ApiObjectField(description = "id del Carrera", required = true)
-    @Column(name="CAR_Id")
-    private Integer idCar;
+    @JoinColumn(name="CAR_Id")
+    private Carrera carrera;
 
+    @OneToOne
     @ApiObjectField(description = "id Universidad", required = true)
-    @Column(name="UNI_Id")
-    private Integer idUni;
+    @JoinColumn(name="UNI_Id")
+    private Universidad universidad;
 
     @ApiObjectField(description = "Es principal", required = true)
     @Column(name="EST_Principal")
     private Integer estPrincipal;
 
+    @OneToOne
     @ApiObjectField(description = "id del usuario", required = true)
-    @Column(name="USU_Id")
-    private Integer usuid;
+    @JoinColumn(name="USU_Id")
+    private Users usuario;
 
     @ApiObjectField(description = "Semestre", required = true)
     @Column(name="EST_Sem")
@@ -67,9 +71,10 @@ public class Estudiante implements Serializable {
     @Column(name="EST_Email")
     private String correo;
 
+    @OneToOne
     @ApiObjectField(description = "Ciudad", required = true)
-    @Column(name="CIU_Id")
-    private Integer idCiudad;
+    @JoinColumn(name="CIU_Id")
+    private Ciudades ciudad;
 
     @ApiObjectField(description = "Lugar", required = true)
     @Column(name="EST_Lugar")
@@ -107,29 +112,12 @@ public class Estudiante implements Serializable {
         this.fechaNac = fechaNac;
     }
 
-    public Integer getIdpai() {
-        return idpai;
+    public Paises getPais() {
+        return pais;
     }
 
-    public void setIdpai(Integer idpai) {
-        this.idpai = idpai;
-    }
-
-
-    public Integer getIdCar() {
-        return idCar;
-    }
-
-    public void setIdCar(Integer idCar) {
-        this.idCar = idCar;
-    }
-
-    public Integer getIdUni() {
-        return idUni;
-    }
-
-    public void setIdUni(Integer idUni) {
-        this.idUni = idUni;
+    public void setPais(Paises pais) {
+        this.pais = pais;
     }
 
     public Integer getEstPrincipal() {
@@ -138,14 +126,6 @@ public class Estudiante implements Serializable {
 
     public void setEstPrincipal(Integer estPrincipal) {
         this.estPrincipal = estPrincipal;
-    }
-
-    public Integer getUsuid() {
-        return usuid;
-    }
-
-    public void setUsuid(Integer usuid) {
-        this.usuid = usuid;
     }
 
     public Integer getSemestre() {
@@ -188,19 +168,43 @@ public class Estudiante implements Serializable {
         this.correo = correo;
     }
 
-    public Integer getIdCiudad() {
-        return idCiudad;
-    }
-
-    public void setIdCiudad(Integer idCiudad) {
-        this.idCiudad = idCiudad;
-    }
-
     public Integer getLugar() {
         return lugar;
     }
 
     public void setLugar(Integer lugar) {
         this.lugar = lugar;
+    }
+
+    public Carrera getCarrera() {
+        return carrera;
+    }
+
+    public void setCarrera(Carrera carrera) {
+        this.carrera = carrera;
+    }
+
+    public Universidad getUniversidad() {
+        return universidad;
+    }
+
+    public void setUniversidad(Universidad universidad) {
+        this.universidad = universidad;
+    }
+
+    public Ciudades getCiudad() {
+        return ciudad;
+    }
+
+    public void setCiudad(Ciudades ciudad) {
+        this.ciudad = ciudad;
+    }
+
+    public Users getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Users usuario) {
+        this.usuario = usuario;
     }
 }

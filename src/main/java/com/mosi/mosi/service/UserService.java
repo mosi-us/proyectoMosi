@@ -1,6 +1,9 @@
 package com.mosi.mosi.service;
 
+import com.mosi.mosi.bean.Empresa;
+import com.mosi.mosi.bean.Estudiante;
 import com.mosi.mosi.bean.Users;
+import com.mosi.mosi.repository.EmpresaRepository;
 import com.mosi.mosi.repository.EstudianteRepository;
 import com.mosi.mosi.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
@@ -13,6 +16,9 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.mosi.mosi.constantes.constante.EMPRESA;
+import static com.mosi.mosi.constantes.constante.ESTUDIANTE;
+
 @Service
 public class UserService {
     @Autowired
@@ -21,33 +27,37 @@ public class UserService {
     EstudianteRepository estudianteRepository;
     @Autowired
     EstudianteService estudianteService;
+    @Autowired
+    EmpresaRepository empresaRepository;
+    @Autowired
+    empresaService empresaService;
 
-    public  HashMap<String,String>  userlogin(String nombreusuario, String clave){
+    public  HashMap<String,String>  userlogin(String email, String clave){
         HashMap<String,String> objectResult = new HashMap<>();
 
         Boolean validar_clave = false;
-        HashMap<String,String> perfilEstudiante = new HashMap<>();
-        Users[] usuario= userRepository.findByNombre(nombreusuario);
-        if ((usuario!= null )&&(usuario.length>0)) {
-            Integer estatus = usuario[0].getEstatus();
-            String claveUsu = usuario[0].getPassword();
-            Integer idUsu = usuario[0].getId();
-            Integer tipo_persona = usuario[0].getTipo_persona();
-            String userName = usuario[0].getNombre();
+        Empresa perfil = new Empresa();
+        Users usuario= userRepository.findByEmail(email);
+        if (usuario!= null ){
+            Integer estatus = usuario.getEstatus();
+            String claveUsu = usuario.getPassword();
+            Integer idUsu = usuario.getId();
+            Integer tipo_persona = usuario.getTipo_persona();
             if (estatus == 1/*Activo*/) {
                 if (claveUsu.equals(clave)) {// clave viene encriptada desde front
                     validar_clave = true;
                     /*validar sesion en uso pendiente*/
-                    if (tipo_persona == 1) {/*Estudiante*/
-                        List<Object[]> estudiante = estudianteRepository.consultaEstudiante(idUsu);
-                        perfilEstudiante = estudianteService.doConstruirEstudiante(estudiante);
-                    }/*agregar else para Empresa y Universidad*/
+                    if (tipo_persona == ESTUDIANTE) {/*Estudiante*/
+                        Estudiante estudiante = estudianteRepository.findByUsuario(usuario);
+                    }else if (tipo_persona==EMPRESA){/*agregar else para Empresa y Universidad*/
+                        perfil = empresaService.consultaPerfilEmpresa(idUsu);
+                    }
                     /*genero Token*/
                     String token = getJWTToken(idUsu);
                     Integer check = userRepository.updateTokenByIdUser(idUsu, token);
                     if (check > 0) {
-                        perfilEstudiante.put("Mensaje", "Inicio de Sesion Exitoso");
-                        objectResult = perfilEstudiante;
+                        objectResult.put("Mensaje", "Inicio de Sesion Exitoso");
+                        //objectResult = perfil;
                     }
 
                 } else {
@@ -62,25 +72,20 @@ public class UserService {
         return objectResult;
     }
 
-    public Object signIn(String nombreusuario, String clave, String email ){
+    public Object signIn(String clave, String email ){
         Object objectResult = null;
         Users nuevoUsu = new Users();
         String existEmail = userRepository.buscarEmail(email);
-        Users[] nuevoNombre = userRepository.findByNombre(nombreusuario);
         if ((existEmail==null)){
-            if ((nuevoNombre == null )|| (nuevoNombre.length<1)){
-
-                nuevoUsu.setNombre(nombreusuario);
                 nuevoUsu.setEmail(email);
                 nuevoUsu.setPassword(clave);
                 nuevoUsu.setEstatus(1);
+                nuevoUsu.setTipo_persona(ESTUDIANTE);
                 nuevoUsu.setFecha(new Date());
                 nuevoUsu = userRepository.save(nuevoUsu);
                 String idUsu = nuevoUsu.getId().toString();
                 objectResult= mensaje("Usuario Creado con Exito",idUsu,"idUsu");
-            }else {
-                objectResult = mensaje("El Usuario ya Existe",null,null);
-            }
+
         }else{
             objectResult = mensaje("El email ya esta registrado",null,null);
         }
@@ -127,6 +132,15 @@ public class UserService {
             list = new ArrayList<>((Collection<?>)obj);
         }
         return list;
+    }
+    public Users findUsersbyId(Integer id) {
+        Optional<Users> users = null;
+        try {
+            users = userRepository.findById(id);
+        } catch (Exception e) {
+
+        }
+        return users.get();
     }
 
 }

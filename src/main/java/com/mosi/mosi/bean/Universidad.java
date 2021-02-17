@@ -5,16 +5,16 @@ import org.jsondoc.core.annotation.ApiObjectField;
 import javax.persistence.*;
 import java.io.Serializable;
 @Entity
-@Table(name="CAR_CARRERASUNIV")
+@Table(name="UNI_UNIVERSIDADES")
 public class Universidad implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiObjectField(description = "Id", required = true)
-    @Column(name="CAR_ID")
+    @Column(name="UNI_Id")
     private Integer id;
 
-    @Column(name="CAR_NOMBRE")
-    private String NombreCarrera;
+    @Column(name="UNI_nombre")
+    private String NombreUni;
 
     public Integer getId() {
         return id;
@@ -24,11 +24,11 @@ public class Universidad implements Serializable {
         this.id = id;
     }
 
-    public String getNombreCarrera() {
-        return NombreCarrera;
+    public String getNombreUni() {
+        return NombreUni;
     }
 
-    public void setNombreCarrera(String nombreCarrera) {
-        NombreCarrera = nombreCarrera;
+    public void setNombreUni(String nombreCarrera) {
+        NombreUni = nombreCarrera;
     }
 }

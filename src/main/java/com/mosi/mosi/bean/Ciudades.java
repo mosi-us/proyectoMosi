@@ -6,23 +6,25 @@ import java.util.Objects;
 @Entity
 @Table(name = "CIU_Ciudades", schema = "dbo", catalog = "MOSI")
 public class Ciudades {
-    private int id;
-    private String ciuNombre;
+
+
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "CIU_Id")
-    public int getCiuId() {
+    private Integer id;
+
+    public Integer getId() {
         return id;
     }
 
-    public void setCiuId(int ciuId) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-
     @Basic
     @Column(name = "CIU_Nombre")
+    private String ciuNombre;
     public String getCiuNombre() {
         return ciuNombre;
     }
