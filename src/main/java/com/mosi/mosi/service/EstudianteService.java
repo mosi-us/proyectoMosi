@@ -13,6 +13,10 @@ import static com.mosi.mosi.constantes.constante.*;
 @Service
 public class EstudianteService {
     @Autowired
+    PreguntasRepository preguntasRepository;
+    @Autowired
+    RespuestaRepository respuestaRepository;
+    @Autowired
     HabilidadesBlandasRepository habilidadesBlandasRepository;
     @Autowired
     SoftwareTecnologiaRepository softwareTecnologiaRepository;
@@ -266,45 +270,70 @@ public List<Object> consultaEstudiante(Integer usuario){
         return errorMessage;
     }
 
-    public String postular(Integer idAsi, Integer idEmp, Integer IdEst){
+    public String postular(Integer idAsi, Integer idEmp, Integer IdEst,Integer afinidad,List<?> resp){
 
     /**
      * Agregar logica:
      * cuando el correo usado para registro este asociado a mosi se le dara acceso ilimitado al estudiante para usar la plataforma, de lo
      * contrario solo se le dara un año gratis.
      * */
-        String resp = "";
+        String respu = "";
         Postulaciones postulaciones = new Postulaciones();
         Postulaciones postulado = new Postulaciones();
-        postulaciones.setAsignatura(asignaturaRepository.findByAsiId(idAsi));
+        Asignatura asi = asignaturaRepository.findByAsiId(idAsi);
+        Estudiante est = this.buscarEstudianteporId(IdEst);
+        postulaciones.setAsignatura(asi);
         postulaciones.setEmpresa(empresaService.buscarEmpresaporId(idEmp));
-        postulaciones.setEstudiante(this.buscarEstudianteporId(IdEst));
+        postulaciones.setEstudiante(est);
         postulaciones.setPosFecha(new Date());
         postulaciones.setPosEstatus(ENVIADO); // 1 : Enviado
+        postulaciones.setCompatibilidad(afinidad);
         postulado = postulacionesRepository.save(postulaciones);
-        /*guardo notificacion*/
-        Notificaciones not = new Notificaciones();
-        Optional<Estudiante> est = estudianteRepository.findById(IdEst);
-        Estudiante estudiante = est.get();
-        String nombreEst = estudiante.getNombre() + " " + estudiante.getApellido();
-        Asignatura desafio_practica = asignaturaRepository.findByAsiId(idAsi);
-        String nombreAsig = desafio_practica.getAsiTitulo();
-        not.setNotTitulo(nombreEst + TITULO_NOTIFICACION_POSTULACION + nombreAsig);
-        not.setNotEstatus(ENVIADO);
-        not.setNotFechaEnvio(new Date());
-        not.setNotIdRemitente(IdEst);
-        not.setNotIdDestino(idEmp);
-        Notificaciones env_not = notificacionesRepository.save(not);
+        /*guardo respuestas*/
+        Respuestas respuestas = new Respuestas();
+        for (int i=0;i<resp.size();i++){
+            HashMap<String,String> r = (HashMap<String, String>) resp.get(i);
+            respuestas.setResRespuestas(r.get("respuestas"));
+            Integer idPre =Integer.valueOf(String.valueOf(r.get("idPregunta")));
+            Preguntas preguntas = preguntasRepository.findById(idPre).get();
+            respuestas.setPregunta(preguntas);
+            respuestas.setAsignatura(asi);
+            respuestas.setEstudiante(est);
+            respuestas.setPostulaciones(postulado);
+            respuestas = respuestaRepository.save(respuestas);
+            respuestas = new Respuestas();
+        }
+
+    Boolean not = this.notificar(est.getId(),asi,TITULO_NOTIFICACION_POSTULACION,ENVIADO,idEmp,ESTUDIANTE);
 
         if ((postulado != null) && (not != null)){
-            resp = "Se ha postulado Exitosamente";
+            respu = "Se ha postulado Exitosamente";
         }else{
-            resp = "Ha ocurrido un error";
+            respu = "Ha ocurrido un error";
         }
-        return resp;
+        return respu;
     }
 
-
+    public Boolean notificar( Integer remitente,Asignatura asi,String titulo,Integer estatus,Integer destino,Integer tipoPersona){
+        /*guardo notificacion*/
+        String nombre = "";
+        Notificaciones not = new Notificaciones();
+        if (tipoPersona==ESTUDIANTE){
+            Estudiante rem = estudianteRepository.findById(remitente).get();
+            nombre = rem.getNombre() + " " + rem.getApellido();
+        }else if (tipoPersona==EMPRESA){
+            Empresa rem = empresaRepository.findById(remitente).get();
+            nombre = rem.getNombre();
+        }
+        String nombreAsig = asi.getAsiTitulo();
+        not.setNotTitulo(nombre + titulo + nombreAsig);
+        not.setNotEstatus(ENVIADO);
+        not.setNotFechaEnvio(new Date());
+        not.setNotIdRemitente(remitente);
+        not.setNotIdDestino(destino);
+        Notificaciones env_not = notificacionesRepository.save(not);
+    return true;
+    }
    public List<HashMap<String,Object>> listarDetalleEstudiantes (List<DetalleEstudiante> det_estudiante){
        HashMap<String,String> detalleEstudianteEmp = new HashMap<>();
        List<Integer> idsDet = new ArrayList<>();
@@ -400,27 +429,6 @@ public List<Object> consultaEstudiante(Integer usuario){
     return ListaCompleta;
    }
 
-    /*public  HashMap<String,String> buildPerfildetalleEstudiante(DetalleEstudiante perfil_empresa){
-        HashMap<String,String> detalle = new HashMap<>();
-        detalle.put("id",perfil_empresa.getDetId().toString());
-        if (perfil_empresa.getDetDescripcion()!=null) {
-            detalle.put("descripcion",perfil_empresa.getDetDescripcion().toString());
-        }
-        detalle.put("asiID", perfil_empresa.getAsiId().toString());
-        detalle.put("empID", perfil_empresa.getEmpId().toString());
-        detalle.put("paiId",perfil_empresa.getPaiId().toString());
-
-        if (perfil_empresa.getDetSem()!=null) {
-            detalle.put("det_sem", perfil_empresa.getDetSem().toString());
-        }
-        detalle.put("carId",perfil_empresa.getCarId().toString());
-        if (perfil_empresa.getUniId()!=null) {
-            detalle.put("uniID", perfil_empresa.getUniId().toString());
-        }
-        detalle.put("asiId",perfil_empresa.getAsiId().toString());
-
-        return detalle;
-    }*/
     public Boolean guardar_Dep_idi_hab_syt(List<?> deporte,List<?> idioma, List<?>habilidades, List<?>softTecn,List<?>pasatiempo,Integer est,Integer tipo){
         DeporteMaestro dep =new DeporteMaestro();
         IdiomaMaestro idi =new IdiomaMaestro();
@@ -545,6 +553,8 @@ public List<Object> consultaEstudiante(Integer usuario){
 
         Integer semestre =((Estudiante) perfil.get(0)).getSemestre();;
         Integer idUni =((Estudiante) perfil.get(0)).getUniversidad().getId();
+        String carreraDato = ((Estudiante) perfil.get(0)).getCarrera().getNombreCarrera();
+        String paisDato = ((Estudiante) perfil.get(0)).getPais().getNombrePais();
         List<HashMap<String,String>> deportesEstudiante = (List<HashMap<String, String>>) perfil.get(1);
         List<HashMap<String,String>> idiomasEstudiante = (List<HashMap<String, String>>) perfil.get(2);
         List<HashMap<String,String>> habilidadesEstudiante = (List<HashMap<String, String>>) perfil.get(3);
@@ -552,6 +562,7 @@ public List<Object> consultaEstudiante(Integer usuario){
         List<List<HashMap<String, Object>>> listadoOrdenadoDetalle = new ArrayList<>();
         List<HashMap<String, Object>> list_por_items = new ArrayList<>();
         HashMap<String, Object> afinidad = new HashMap<>();
+        HashMap<String, Object> datosCompatibles = new HashMap<>();
         Integer atributosEmpresa = 2; // inicia en 2 porque el valor de pais y carrera estan incluidos
         Integer atributosEstudiante = 2;
         Integer semestreEmpresa = 0;
@@ -575,7 +586,7 @@ public List<Object> consultaEstudiante(Integer usuario){
             }
 
             Integer empId = estEmpresa.getEmpresa().getId();
-            Integer lugarEmp = detalleEstudianteRepository.consultaLugarTrabajo(empId);
+            Integer lugarEmp = detalleEstudianteRepository.consultaLugarTrabajo(estEmpresa.getAsignatura().getAsiId());
             if (lugarEmp!=null){
                 atributosEmpresa = atributosEmpresa + 1;
             }
@@ -585,13 +596,24 @@ public List<Object> consultaEstudiante(Integer usuario){
             if ((semestre == semestreEmpresa) || (semestre > semestreEmpresa)) {
 
                 atributosEstudiante = atributosEstudiante + 1;
+                datosCompatibles.put("semestre",semestre);
             }
             if (uniId_empresa == idUni) {
 
                 atributosEstudiante = atributosEstudiante + 1;
+                Universidad uni = universidadService.findUniversidadById(idUni);
+                datosCompatibles.put("universidad",uni.getNombreUni());
+
             }
             if (lugarEst == lugarEmp) {
                 atributosEstudiante = atributosEstudiante + 1;
+                if ((lugarEst == PRESENCIAL)) {
+                    datosCompatibles.put("lugar", "Presencial");
+                } else if (lugarEst == REMOTO){
+                    datosCompatibles.put("lugar", "Remoto");
+                }else if (lugarEst==AMBOS){
+                    datosCompatibles.put("lugar", "Ambos");
+                }
             }
 
             HashMap<String,String> idiomasEmpresa =(HashMap) listadoCompleto.get(e).get("idioma");
@@ -609,6 +631,14 @@ public List<Object> consultaEstudiante(Integer usuario){
                         Integer nivelIdiomaEstudiante = Integer.valueOf(idiomas.get("Nivel").toString());
                         if ((idiomaEmpresa_list == idiomasEstudiante_list) && ((nivelIdiomaEstudiante == nivelIdiomaEmpresa) || (nivelIdiomaEstudiante > nivelIdiomaEmpresa))) {
                             atributosEstudiante = atributosEstudiante + 1;
+                            Idioma idiomaDato = idiomaRepository.findById(idiomasEstudiante_list).get();
+                            if (nivelIdiomaEstudiante ==BASICO) {
+                                datosCompatibles.put("Idioma", idiomaDato.getNombreIdioma() +" " + "Basico");
+                            }else if (nivelIdiomaEstudiante ==INTERMEDIO){
+                                datosCompatibles.put("Idioma", idiomaDato.getNombreIdioma() +" "+ "Intermedio");
+                            }else if (nivelIdiomaEstudiante ==AVANZADO){
+                                datosCompatibles.put("Idioma", idiomaDato.getNombreIdioma() +" " + "Avanzado");
+                            }
                         }
                     }
                 }
@@ -624,10 +654,14 @@ public List<Object> consultaEstudiante(Integer usuario){
                         Integer DeporteEstudiante_list = ((Deporte) deporteObj).getId();
                         if (DeporteEmpresa_list == DeporteEstudiante_list) {
                             atributosEstudiante = atributosEstudiante + 1;
+                            Deporte deporteDato = deporteRepository.findById(DeporteEmpresa_list).get();
+                            datosCompatibles.put("deporte", deporteDato.getNombreDeporte());
                         }
                     }
                 }
             }
+
+
             HashMap<String,String> habilidadesEmpresa = (HashMap) listadoCompleto.get(e).get("habilidades");
             if (habilidadesEmpresa!= null && habilidadesEmpresa.size() >0) {
                 int size_habilidades = habilidadesEmpresa.size();
@@ -639,6 +673,8 @@ public List<Object> consultaEstudiante(Integer usuario){
                         Integer HabilidadesEstudiante_list = ((HabilidadesBlandas) habilidadesObj).getHabId();
                         if (HabilidadesEmpresa_list == HabilidadesEstudiante_list) {
                             atributosEstudiante = atributosEstudiante + 1;
+                            HabilidadesBlandas habilidadesDato = habilidadesBlandasRepository.findById(HabilidadesEstudiante_list).get();
+                            datosCompatibles.put("habilidades", habilidadesDato.getHabNombre());
                         }
                     }
                 }
@@ -657,10 +693,21 @@ public List<Object> consultaEstudiante(Integer usuario){
                         Integer nivelSytEstudiante = Integer.valueOf(syts.get("Nivel").toString());
                         if ((sytEmpresa_list == sytEstudiante_list) && ((nivelSytEstudiante == nivelSytEstudiante) || (nivelSytEstudiante > nivelSytEmpresa))) {
                             atributosEstudiante = atributosEstudiante + 1;
+                            SoftwareTecnologias sytDato= softwareTecnologiaRepository.findById(sytEstudiante_list).get();
+                            if (nivelSytEstudiante ==BASICO) {
+                                datosCompatibles.put("Syt", sytDato.getSytNombre() +" " + "Basico");
+                            }else if (nivelSytEstudiante ==INTERMEDIO){
+                                datosCompatibles.put("Syt", sytDato.getSytNombre() +" "+ "Intermedio");
+                            }else if (nivelSytEstudiante ==AVANZADO){
+                                datosCompatibles.put("Syt", sytDato.getSytNombre() +" " + "Avanzado");
+                            }
                         }
                     }
                 }
             }
+            datosCompatibles.put("Pais", paisDato);
+            datosCompatibles.put("carrera", carreraDato);
+
             Integer puntaje = (atributosEstudiante * 100) / atributosEmpresa;
             afinidad.put("afinidad", puntaje.toString());
             list_por_items.add(listadoCompleto.get(e));
@@ -669,6 +716,7 @@ public List<Object> consultaEstudiante(Integer usuario){
 
             listadoOrdenadoDetalle.add(list_por_items);
             asigList.add(afinidad);
+            asigList.add(datosCompatibles);
             result.add(asigList);
             asigList = new ArrayList<>();
             atributosEmpresa = 2;
@@ -693,11 +741,6 @@ public List<Object> consultaEstudiante(Integer usuario){
             Carrera carrera = ((Estudiante) perfil.get(0)).getCarrera();
             Integer semestre =((Estudiante) perfil.get(0)).getSemestre();
 
-            Integer atributosEmpresa = 2; // inicia en 2 porque el valor de pais y carrera estan incluidos
-            Integer atributosEstudiante = 2;
-            Integer semestreEmpresa = 0;
-            Integer semestreEstudiante = 0;
-            Integer uniId_empresa = 0;
             /**busqueda por carrera y pais*/
             List<DetalleEstudiante> det_estudiante = new ArrayList<DetalleEstudiante>();
             det_estudiante = detalleEstudianteRepository.consultar_estudiantes_empresa(idCar, idPais, semestre, tipo);
@@ -803,5 +846,35 @@ public List<Object> consultaEstudiante(Integer usuario){
         }
 
     return true;
+    }
+    public List<List<HashMap<String, Object>>> consultarAfinidad(Integer idEstudiante, Integer idAsignatura){
+        Estudiante perfil = estudianteRepository.findById(idEstudiante).get();
+        List<Object> perfilcompletoEstudiante = this.consultaCaracteristicas(perfil,null,ESTUDIANTE);
+        Asignatura asignaturaObj= asignaturaRepository.findByAsiId(idAsignatura);
+        DetalleEstudiante estudianteEmpresa = detalleEstudianteRepository.findByAsignatura(asignaturaObj);
+        List<DetalleEstudiante> perfilEstudianteEmpresa = new ArrayList();
+        perfilEstudianteEmpresa.add(estudianteEmpresa);
+        List<HashMap<String,Object>> perfilEstudianteEmpresaCompleto = this.listarDetalleEstudiantes(perfilEstudianteEmpresa);
+        List<List<HashMap<String, Object>>> compatibilidad = this.compatibilidad(perfilEstudianteEmpresaCompleto,perfilcompletoEstudiante);
+
+        return compatibilidad;
+    }
+    public List<Preguntas> consultarPreguntas(Integer idAsi){
+        List<Preguntas> preguntas = new ArrayList<>();
+        Asignatura asignatura = asignaturaRepository.findByAsiId(idAsi);
+        preguntas = preguntasRepository.findByAsignatura(asignatura);
+        return preguntas;
+
+    }
+    public String forma_de_trabajo(Integer lugar){
+    String lugar_Trabajo = "";
+        if (lugar == REMOTO){
+            lugar_Trabajo= "Remoto";
+        }else if (lugar==PRESENCIAL){
+            lugar_Trabajo="Presencial";
+        }else if (lugar==AMBOS){
+            lugar_Trabajo="Remoto o Presencial";
+        }
+        return lugar_Trabajo;
     }
 }

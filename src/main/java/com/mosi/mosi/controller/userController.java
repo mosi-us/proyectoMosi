@@ -263,20 +263,16 @@ public class userController {
         Integer idAsignatura = (params.containsKey(ID_ASIGNATURA) && params.get(ID_ASIGNATURA) != null) ? Integer.valueOf(params.get(ID_ASIGNATURA).toString()): null;
         Integer idEmpresa = (params.containsKey(ID_EMPRESA) && params.get(ID_EMPRESA) != null) ? Integer.valueOf(params.get(ID_EMPRESA).toString()) : null;
         Integer idEstudiante = (params.containsKey(ID_ESTUDIANTE) && params.get(ID_ESTUDIANTE) != null) ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
-        List<List<HashMap<String, Object>>>result = new ArrayList<>();
+        List<?> respuestas = (params.containsKey(RESPUESTAS) &&  params.get(RESPUESTAS) != null) ? UserService.convertObjectToList(params.get(RESPUESTAS)) : null;
 
-        Integer afinidad=0;
-        //result = estudianteService.buscarCompatibilidad(0,idEstudiante,idAsignatura);
-        Object asign = new Object();
-       /* for (int i=0; i<result.size();i++){
-            asign= result.get(i).get(0).get("asignatura");
-            Integer id = Integer.valueOf(asign[0][0].toString());
-            if  (idAsignatura ==id){
-                afinidad = (Integer.valueOf(result.get(i).get(1).get("afinidad").toString()));
-            }
-        }*/
-        if (idAsignatura!=null && idEmpresa!=null && idEstudiante!=null){
-           resp = estudianteService.postular(idAsignatura,idEmpresa,idEstudiante);
+        List<List<HashMap<String, Object>>>result = new ArrayList<>();
+        List<List<HashMap<String, Object>>> compatibilidad =estudianteService.consultarAfinidad(idEstudiante,idAsignatura);
+        Integer afinidad = Integer.valueOf(compatibilidad.get(0).get(1).get("afinidad").toString());
+
+        if (idAsignatura!=null && idEmpresa!=null && idEstudiante!=null && afinidad!=null && respuestas!=null){
+           resp = estudianteService.postular(idAsignatura,idEmpresa,idEstudiante,afinidad,respuestas);
+        }else {
+        resp = "Se ha postulado Exitosamente";
         }
         return resp;
     }
@@ -390,6 +386,13 @@ public class userController {
 
         return syt;
     }
-
+    @PostMapping("consultarPreguntas")
+    public List<Preguntas> consultarPreguntas(HttpServletRequest request, HttpServletResponse response,
+                                        @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer asignatura = (params.containsKey(ASIGNATURA) && params.get(ASIGNATURA) != null) ? Integer.valueOf(params.get(ASIGNATURA).toString()) : null;
+        List<Preguntas> preguntas = estudianteService.consultarPreguntas(asignatura);
+        return preguntas;
+    }
 }
 

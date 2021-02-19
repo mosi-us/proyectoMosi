@@ -19,9 +19,9 @@ public interface DetalleEstudianteRepository extends JpaRepository<DetalleEstudi
                                                           @Param("tipo") Integer tipo);
 
     String SQL_CONSULTAR_LUGAR_TRABAJO= "select ASI.ASI_Lugar from ASI_Asignatura ASI " +
-            "INNER JOIN DET_Estudiante DE on ASI.ASI_id = DE.ASI_Id WHERE ASI.EMP_Id =:empId";
+            "INNER JOIN DET_Estudiante DE on ASI.ASI_id = DE.ASI_Id WHERE ASI.ASI_id =:asiId";
     @Query(nativeQuery = true,value = SQL_CONSULTAR_LUGAR_TRABAJO)
-    Integer consultaLugarTrabajo (@Param("empId") Integer empId);
+    Integer consultaLugarTrabajo (@Param("asiId") Integer asiId);
 
     DetalleEstudiante findByAsignatura (Asignatura asignatura);
 }

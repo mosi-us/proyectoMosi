@@ -2,11 +2,9 @@ package com.mosi.mosi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mosi.mosi.bean.Asignatura;
-import com.mosi.mosi.bean.DetalleEstudiante;
-import com.mosi.mosi.bean.Empresa;
-import com.mosi.mosi.bean.Preguntas;
+import com.mosi.mosi.bean.*;
 import com.mosi.mosi.repository.AsignaturaRepository;
+import com.mosi.mosi.repository.EstudianteRepository;
 import com.mosi.mosi.repository.PreguntasRepository;
 import com.mosi.mosi.service.EstudianteService;
 import com.mosi.mosi.service.UserService;
@@ -17,6 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,8 @@ public class empresaController {
     AsignaturaRepository asignaturaRepository;
     @Autowired
     PreguntasRepository preguntasRepository;
+    @Autowired
+    EstudianteRepository estudianteRepository;
     @Autowired
     private EstudianteService estudianteService;
 
@@ -170,6 +173,86 @@ public class empresaController {
         HashMap<String,Object> result = empresaService.verDetallePractDesaf(asignatura);
 
         return result;
+    }
+    @PostMapping("/verPostulantes")
+    public List<HashMap<String,Object>> verPostulantes(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+
+        Integer asignatura = (params.containsKey(ASIGNATURA) && params.get(ASIGNATURA) != null && !params.get(ASIGNATURA).toString().isEmpty())
+                ? Integer.valueOf(params.get(ASIGNATURA).toString()) : null;
+
+
+        List<HashMap<String,Object>> result = empresaService.verPostulante(asignatura);
+
+
+        return result;
+    }
+    @PostMapping("/verPerfilEstudiante")
+    public HashMap<String,Object> verPerfilEstudiante(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException, ParseException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idEstudiante = (params.containsKey(ID_ESTUDIANTE) && params.get(ID_ESTUDIANTE) != null && !params.get(ID_ESTUDIANTE).toString().isEmpty())
+                ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
+        HashMap<String,Object> result = new HashMap<>();
+        Estudiante perfil = estudianteRepository.findById(idEstudiante).get();
+       // HashMap<String,Object> Estudiante =estudianteService.consultaEstudiante()
+        List<Object> caracteristicas= estudianteService.consultaCaracteristicas(perfil,null,ESTUDIANTE);
+        Estudiante estudiante = ((Estudiante) caracteristicas.get(0));
+        String nombres = ((Estudiante) caracteristicas.get(0)).getNombre().toString();
+        String apellidos = ((Estudiante) caracteristicas.get(0)).getApellido().toString();
+        Integer dia, mes, año;
+        año = Integer.valueOf((estudiante.getFechaNac().toString()).substring(0,4));
+        mes =Integer.valueOf((estudiante.getFechaNac().toString()).substring(4,6));
+        dia =Integer.valueOf((estudiante.getFechaNac().toString()).substring(6,8));
+        Period edad = Period.between(LocalDate.of(año,mes,dia),LocalDate.now());
+        result.put("Nombre y Apellido",nombres + " " + apellidos);
+        result.put("Fecha de NAcimiento",dia+"/"+mes+"/"+año);
+        result.put("Edad",edad.getYears());
+        result.put("Pais",estudiante.getPais().getNombrePais());
+        result.put("Ciudad",estudiante.getCiudad().getCiuNombre());
+        String forma_de_trabajo = estudianteService.forma_de_trabajo(estudiante.getLugar());
+        result.put("Forma de Trabajo",forma_de_trabajo);
+        result.put("Informacion de Contanto:", estudiante.getCorreo().substring(0,4) + "*********.com -" + estudiante.getTelefono().substring(0,4) + "*******" );
+        result.put("Semestre",estudiante.getSemestre());
+        result.put("Deportes",caracteristicas.get(1));
+        result.put("Idiomas",caracteristicas.get(2));
+        result.put("Habilidades",caracteristicas.get(3));
+        result.put("Pasatiempo",caracteristicas.get(4));
+        result.put("Software y Tecnologias",caracteristicas.get(5));
+
+        return result;
+    }
+
+    @PostMapping("/seleccionarEstudiante")
+    public HashMap<String,Object> seleccionarEstudiante(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException, ParseException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idEstudiante = (params.containsKey(ID_ESTUDIANTE) && params.get(ID_ESTUDIANTE) != null && !params.get(ID_ESTUDIANTE).toString().isEmpty())
+                ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
+        Integer idAsignatura = (params.containsKey(ID_ASIGNATURA) && params.get(ID_ASIGNATURA) != null && !params.get(ID_ASIGNATURA).toString().isEmpty())
+                ? Integer.valueOf(params.get(ID_ASIGNATURA).toString()) : null;
+        HashMap<String,Object> info_de_contacto_Estudiante = new HashMap<>();
+
+        int seleccionar = empresaService.seleccionarEstudiante(idEstudiante,idAsignatura);
+
+        if (seleccionar==1){
+
+            Estudiante estudiante=estudianteRepository.findById(idEstudiante).get();
+            Asignatura asignatura = asignaturaRepository.findByAsiId(idAsignatura);
+            Boolean not = estudianteService.notificar(asignatura.getEmpresa().getId(),asignatura,TITULO_NOTIFICACION_SELECCION,ACEPTADO,idEstudiante,EMPRESA);
+            info_de_contacto_Estudiante.put("Telefono: ", estudiante.getCodigoPais()+"-"+estudiante.getTelefono());
+            info_de_contacto_Estudiante.put("Correo: ", estudiante.getCorreo());
+            info_de_contacto_Estudiante.put("Nombre: ", estudiante.getNombre()+" "+ estudiante.getApellido());
+        }
+        return info_de_contacto_Estudiante;
+    }
+    @PostMapping("/verEstudiantesSeleccionados")
+    public List<Postulaciones> verEstudiantesSeleccionados(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException, ParseException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idAsignatura = (params.containsKey(ID_ASIGNATURA) && params.get(ID_ASIGNATURA) != null && !params.get(ID_ASIGNATURA).toString().isEmpty())
+                ? Integer.valueOf(params.get(ID_ASIGNATURA).toString()) : null;
+
+        List<Postulaciones> listaEstudiantesSeleccionados = empresaService.verEstudiantesSeleccionados(idAsignatura);
+
+        return listaEstudiantesSeleccionados;
     }
 
     }

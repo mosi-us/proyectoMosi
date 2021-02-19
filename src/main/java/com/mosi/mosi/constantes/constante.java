@@ -33,6 +33,7 @@ public interface constante {
     String ID_ESTUDIANTE = "idEstudiante";
     String ID_EMPRESA = "idEmpresa";
     String LUGAR = "idLugar";
+    String RESPUESTAS="respuestas";
 
     String TITULO_ASI ="titulo";
     String DESCRIPCION_ASI ="descripcion_asignatura";
@@ -50,10 +51,15 @@ public interface constante {
     String RAZON_SOCIAL_EMP = "razonSocial";
     String MISION_EMP = "mision";
     String VISION = "vision";
-
+    /**Lugar*/
     Integer PRESENCIAL = 1;
     Integer REMOTO = 2;
     Integer AMBOS =3;
+    /**Niveles*/
+    Integer BASICO = 1;
+    Integer INTERMEDIO = 2;
+    Integer AVANZADO =3;
+
     /*String LUGAR = "idLugar";
     String LUGAR = "idLugar";
     String LUGAR = "idLugar";
@@ -66,21 +72,32 @@ public interface constante {
     String LUGAR = "idLugar";*/
 
 
-
+    /**Asignaturas**/
     Integer PRACTICAS = 1;
     Integer DESAFIOS = 2;
+    /**estatus Notificaciones*/
     Integer ENVIADO = 1;
     Integer RECIBIDO = 2;
-    Integer ACEPTADO = 3;
-    Integer RECHAZADO = 4;
-    Integer ACTIVO = 1;
+    /** Estatus de Postulaciones*/
+
+    Integer ACEPTADO = 2;
+    Integer RECHAZADO = 3;
+    Integer ELIMINADO = 4;
+
+    /**Estatus Usuario*/
     Integer INACTIVO = 0;
+    Integer ACTIVO = 1;
+    /**Tipos de Persona*/
     Integer ESTUDIANTE = 1;
     Integer EMPRESA = 2;
     Integer UNIVERSIDAD = 3;
     Integer ADMINISTRADOR_MOSI = 4;
 
     String TITULO_NOTIFICACION_POSTULACION = " se ha postulado a ";
+    String TITULO_NOTIFICACION_SELECCION = " te ha SELECCIONADO a ";
+
+
+
 
 
 }

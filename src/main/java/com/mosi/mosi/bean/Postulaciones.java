@@ -55,10 +55,15 @@ public class Postulaciones {
     @Basic
     @Column(name = "POS_Estatus")
     private Integer posEstatus;
+
+
+    @Basic
+    @Column(name = "POS_Compatibilidad")
+    private Integer Compatibilidad;
+
     public Integer getPosEstatus() {
         return posEstatus;
     }
-
     public void setPosEstatus(Integer posEstatus) {
         this.posEstatus = posEstatus;
     }
@@ -93,5 +98,13 @@ public class Postulaciones {
 
     public void setDetalleEstudiante(DetalleEstudiante detalleEstudiante) {
         this.detalleEstudiante = detalleEstudiante;
+    }
+
+    public Integer getCompatibilidad() {
+        return Compatibilidad;
+    }
+
+    public void setCompatibilidad(Integer compatibilidad) {
+        Compatibilidad = compatibilidad;
     }
 }
