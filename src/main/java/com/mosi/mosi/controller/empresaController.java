@@ -18,10 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.mosi.mosi.constantes.constante.*;
 
@@ -106,21 +103,17 @@ public class empresaController {
                 ? Integer.valueOf(params.get(TIPO_ASI).toString()) : null;
         Integer empId 	= (params.containsKey(ID_EMPRESA) && params.get(ID_EMPRESA) != null && !params.get(ID_EMPRESA).toString().isEmpty())
                 ? Integer.valueOf(params.get(ID_EMPRESA).toString()) : null;
-        /*parametros para caracteristicas de estudiante deseado*/
-        String descripcion = (params.containsKey(DESCRIPCION_EST) && params.get(DESCRIPCION_EST) != null && !params.get(DESCRIPCION_EST).toString().isEmpty())
-                ? params.get(DESCRIPCION_EST).toString() : null;
-        Integer pais 	= (params.containsKey(PAIS_ID) && params.get(PAIS_ID) != null && !params.get(PAIS_ID).toString().isEmpty())
-                ? Integer.valueOf(params.get(PAIS_ID).toString()) : null;
-        Integer semestre = (params.containsKey(SEMESTRE) && params.get(SEMESTRE) != null && !params.get(SEMESTRE).toString().isEmpty())
-                ? Integer.valueOf(params.get(SEMESTRE).toString()) : null;
-        Integer carrera = (params.containsKey(CARRERA_ID) && params.get(CARRERA_ID) != null && !params.get(CARRERA_ID).toString().isEmpty())
-                ? Integer.valueOf(params.get(CARRERA_ID).toString()) : null;
-        Integer universidad = (params.containsKey(UNIVERSIDAD_ID) && params.get(UNIVERSIDAD_ID) != null && !params.get(UNIVERSIDAD_ID).toString().isEmpty())
-                ? Integer.valueOf(params.get(UNIVERSIDAD_ID).toString()) : null;
-        List<?> deporte = (params.containsKey(DEPORTE_ID) &&  params.get(DEPORTE_ID) != null) ? UserService.convertObjectToList(params.get(DEPORTE_ID)) : null;
-        List<?> idioma = (params.containsKey(IDIOMAS) &&  params.get(IDIOMAS) != null) ? UserService.convertObjectToList(params.get(IDIOMAS)) : null;
-        List<?> softYTecn = (params.containsKey(SOFTWARE_TECNOLOGIA) &&  params.get(SOFTWARE_TECNOLOGIA) != null) ? UserService.convertObjectToList(params.get(SOFTWARE_TECNOLOGIA)) : null;
-        List<?> hablidadesB = (params.containsKey(HABILIDADES) &&  params.get(HABILIDADES) != null) ? UserService.convertObjectToList(params.get(HABILIDADES)) : null;
+        List<?> caracteristicas_Estudiante = (params.containsKey(CARACTERISTICAS) &&  params.get(CARACTERISTICAS) != null) ? UserService.convertObjectToList(params.get(CARACTERISTICAS)) : null;
+
+                String descripcion  ="";
+                Integer pais 	    =0;
+                Integer semestre    =0;
+                Integer carrera     =0;
+                Integer universidad =0;
+                List<?> deporte     =new ArrayList<>();
+                List<?> idioma      =new ArrayList<>();
+                List<?> softYTecn   =new ArrayList<>();
+                List<?> hablidadesB =new ArrayList<>();
 
         Asignatura asignatura = new Asignatura();
         Preguntas pregunta_asi = new Preguntas();
@@ -132,45 +125,63 @@ public class empresaController {
         List<Object> pregList = new ArrayList<>();
         HashMap<String,Object> listDetEst = new HashMap<>();
         asignatura.setAsiTitulo(titulo);
-        if (descripcion!=null){
-            asignatura.setAsiDescripcion(descripcion);
+        if (descripcion_asi!=null){
+            asignatura.setAsiDescripcion(descripcion_asi);
         }
         asignatura.setAsiLugar(lugar);
         asignatura.setAsiTipo(tipo);
         asignatura.setEmpresa(empresaService.buscarEmpresaporId(empId));
-        asignatura = asignaturaRepository.save(asignatura);
+       asignatura = asignaturaRepository.save(asignatura);
         listAsi.put("Asignatura",asignatura);
-        if (asignatura!=null){
-            for (int i=0; i<preguntas.size();i++){
-                HashMap<String,String> p = (HashMap<String, String>) preguntas.get(i);
+        if (asignatura!=null && preguntas!=null && preguntas.size()>0) {
+            for (int i = 0; i < preguntas.size(); i++) {
+                HashMap<String, String> p = (HashMap<String, String>) preguntas.get(i);
                 pregunta_asi.setDecripcion(p.get("titulo"));
                 pregunta_asi.setAsignatura(asignatura);
                 pregunta_asi = preguntasRepository.save(pregunta_asi);
                 pregList.add(pregunta_asi);
                 pregunta_asi = new Preguntas();
             }
-            for (int j=1;j<pregList.size();j++){
-                listpreg.put("preguntas_" +j , pregList.get(j));
-            }
-            estudiante = empresaService.guardarEstudiante(pais,deporte,empId,asignatura.getAsiId(),idioma,universidad,carrera,semestre,descripcion,softYTecn,hablidadesB);
-            listDetEst.put("caracteristicas",estudiante);
-            result.add(listAsi);
-            result.add(listDetEst);
-            result.add(listpreg);
-        }
 
+            for (int j = 0; j < pregList.size(); j++) {
+                listpreg.put("preguntas_" + j, pregList.get(j));
+            }
+        }
+            if (caracteristicas_Estudiante.size()>0){
+                for(int i=0; i<caracteristicas_Estudiante.size();i++){
+                    LinkedHashMap caract = (LinkedHashMap) caracteristicas_Estudiante.get(i);
+                    descripcion  = (caract.get(DESCRIPCION_EST)!=null) ? caract.get(DESCRIPCION_EST).toString() : null;
+                    pais 	     = Integer.valueOf(caract.get(PAIS_ID).toString()) ;
+                    semestre    = (caract.get(SEMESTRE)!=null) ? Integer.valueOf(caract.get(SEMESTRE).toString())  : null;
+                    carrera     = Integer.valueOf(caract.get(CARRERA_ID).toString());
+                    universidad = (caract.get(UNIVERSIDAD_ID)!=null) ? Integer.valueOf(caract.get(UNIVERSIDAD_ID).toString()): null;
+                    deporte     = (caract.get(DEPORTE_ID)!=null) ? UserService.convertObjectToList(caract.get(DEPORTE_ID)): null  ;
+                    idioma      = (caract.get(IDIOMAS)!=null) ? UserService.convertObjectToList(caract.get(IDIOMAS)): null  ;
+                    softYTecn   = (caract.get(SOFTWARE_TECNOLOGIA)!=null) ? UserService.convertObjectToList(caract.get(SOFTWARE_TECNOLOGIA)): null  ;
+                    hablidadesB = (caract.get(HABILIDADES)!=null) ? UserService.convertObjectToList(caract.get(HABILIDADES)): null  ;
+                    estudiante = empresaService.guardarEstudiante(pais,deporte,empId,asignatura.getAsiId(),idioma,universidad,carrera,semestre,descripcion,softYTecn,hablidadesB);
+                    listDetEst.put("caracteristicas",estudiante);
+                    listDetEst = new HashMap<>();
+                    result.add(listDetEst);
+
+                }
+            }
+
+            result.add(listAsi);
+
+            result.add(listpreg);
         return result;
     }
 
     @PostMapping("/verDesafio_Practica")
-    public HashMap<String,Object> verDesafio_Practica(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
+    public List<HashMap<String,Object>> verDesafio_Practica(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
 
         Integer asignatura = (params.containsKey(ASIGNATURA) && params.get(ASIGNATURA) != null && !params.get(ASIGNATURA).toString().isEmpty())
                 ? Integer.valueOf(params.get(ASIGNATURA).toString()) : null;
 
 
-        HashMap<String,Object> result = empresaService.verDetallePractDesaf(asignatura);
+        List<HashMap<String,Object>> result = empresaService.verDetallePractDesaf(asignatura);
 
         return result;
     }
@@ -180,7 +191,6 @@ public class empresaController {
 
         Integer asignatura = (params.containsKey(ASIGNATURA) && params.get(ASIGNATURA) != null && !params.get(ASIGNATURA).toString().isEmpty())
                 ? Integer.valueOf(params.get(ASIGNATURA).toString()) : null;
-
 
         List<HashMap<String,Object>> result = empresaService.verPostulante(asignatura);
 

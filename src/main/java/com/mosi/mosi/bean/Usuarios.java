@@ -8,17 +8,13 @@ import java.util.Date;
 
 @Entity
 @Table(name= "USU_Usuarios")
-public class Users implements Serializable {
+public class Usuarios implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiObjectField(description = "Id del Usuario", required = true)
     @Column(name="USU_Id")
     private Integer id;
-
-    @ApiObjectField(description = "Nombre de Usuario", required = true)
-    @Column(name="USU_Nombre_Usuario")
-    private String nombre;
 
     @ApiObjectField(description = "Email", required = true)
     @Column(name="USU_email")
@@ -44,13 +40,53 @@ public class Users implements Serializable {
     @Column(name="USU_Token")
     private String token;
 
+    @OneToOne
+    @JoinColumn(name="IMG_Id")
+    private Imagen imagen;
 
-    public Integer getId() {
-        return id;
+    @OneToOne
+    @JoinColumn(name="ROL_Id")
+    private Roles roles;
+
+    @Column(name="USU_Nombre")
+    private String nombre;
+    @Column(name="USU_Apellido")
+    private String apellido;
+    @Column(name="USU_Telefono")
+    private String telefono;
+    @Column(name="USU_CODPAIS")
+    private String codigoPais;
+
+    public String getTelefono() {
+        return telefono;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public String getCodigoPais() {
+        return codigoPais;
+    }
+
+    public void setCodigoPais(String codigoPais) {
+        this.codigoPais = codigoPais;
+    }
+
+    public Imagen getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(Imagen imagen) {
+        this.imagen = imagen;
+    }
+
+    public Roles getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Roles roles) {
+        this.roles = roles;
     }
 
     public String getNombre() {
@@ -60,6 +96,25 @@ public class Users implements Serializable {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
+
+
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
 
     public String getEmail() {
         return email;
@@ -109,13 +164,8 @@ public class Users implements Serializable {
         this.token = token;
     }
 
-    @Override
-    public String toString() {
-        return "Users{" +
-                ", usuario='" + nombre + '\'' +
-                ", email=" + email +
-                '}';
-    }
+
+
 
 
 

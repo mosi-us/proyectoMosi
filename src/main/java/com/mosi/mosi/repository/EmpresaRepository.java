@@ -1,7 +1,7 @@
 package com.mosi.mosi.repository;
 
 import com.mosi.mosi.bean.Empresa;
-import com.mosi.mosi.bean.Users;
+import com.mosi.mosi.bean.Usuarios;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,5 +17,5 @@ public interface EmpresaRepository extends JpaRepository<Empresa,Integer> {
     Object consultarempresa(@Param("idUsu") Integer idUsu);
 
     Optional<Empresa> findById(Integer idEmp);
-    Empresa findByUsers(Users user);
+    Empresa findByUsers(Usuarios user);
 }

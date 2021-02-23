@@ -139,7 +139,7 @@ public class  Empresa {
 
     @OneToOne
     @JoinColumn(name = "USU_Id")
-    private Users users;
+    private Usuarios users;
 
     public RubRubro getRubro() {
         return rubro;
@@ -157,11 +157,11 @@ public class  Empresa {
         this.pais = pais;
     }
 
-    public Users getUsers() {
+    public Usuarios getUsers() {
         return users;
     }
 
-    public void setUsers(Users users) {
+    public void setUsers(Usuarios users) {
         this.users = users;
     }
 }

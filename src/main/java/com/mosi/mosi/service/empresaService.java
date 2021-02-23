@@ -128,23 +128,27 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
     return empresa;
     }
 
-    public HashMap<String,Object> verDetallePractDesaf(Integer idAsig){
+    public List<HashMap<String,Object>> verDetallePractDesaf(Integer idAsig){
         Asignatura asignatura;
         List<Idioma> idionaL = new ArrayList<>();
         List<Deporte> deporteL = new ArrayList<>();
         List<HabilidadesBlandas> habilidadesL = new ArrayList<>();
         List<SoftwareTecnologias> sytL = new ArrayList<>();
-        HashMap<String,Object> result = new HashMap<>();
+        HashMap<String,Object> listCaract = new HashMap<>();
+        List<Object> caracteristicas = new ArrayList<>();
+        List<HashMap<String,Object>> result = new ArrayList<>();
         asignatura= asignaturaRepository.findByAsiId(idAsig);
-        result.put("asignatura",asignatura);
-        DetalleEstudiante estudiante = detalleEstudianteRepository.findByAsignatura(asignatura);
-        result.put("detalleEstudiante",estudiante);
-        List<Object> caracteristicas = estudianteService.consultaCaracteristicas(null,estudiante,EMPRESA);
-        result.put("Idioma",caracteristicas.get(1));
-        result.put("deporte",caracteristicas.get(2));
-        result.put("habilidades",caracteristicas.get(3));
-        result.put("syt",caracteristicas.get(5));
-
+        List<DetalleEstudiante> estudiante = detalleEstudianteRepository.findByAsignaturaAndEmpresa(asignatura,asignatura.getEmpresa());
+        for (int i=0; i<estudiante.size();i++){
+        caracteristicas = estudianteService.consultaCaracteristicas(null,estudiante.get(i),EMPRESA);
+            listCaract.put("caracteristicas",estudiante.get(i));
+            listCaract.put("deporte",caracteristicas.get(1));
+            listCaract.put("idioma",caracteristicas.get(2));
+            listCaract.put("habilidades",caracteristicas.get(3));
+            listCaract.put("syt",caracteristicas.get(5));
+        result.add(listCaract);
+            listCaract = new HashMap<>();
+        }
         return result;
     }
     public List<HashMap<String,Object>>verPostulante(Integer idAsig) {

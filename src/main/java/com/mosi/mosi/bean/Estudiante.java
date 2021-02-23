@@ -49,7 +49,7 @@ public class Estudiante implements Serializable {
     @OneToOne
     @ApiObjectField(description = "id del usuario", required = true)
     @JoinColumn(name="USU_Id")
-    private Users usuario;
+    private Usuarios usuario;
 
     @ApiObjectField(description = "Semestre", required = true)
     @Column(name="EST_Sem")
@@ -200,11 +200,11 @@ public class Estudiante implements Serializable {
         this.ciudad = ciudad;
     }
 
-    public Users getUsuario() {
+    public Usuarios getUsuario() {
         return usuario;
     }
 
-    public void setUsuario(Users usuario) {
+    public void setUsuario(Usuarios usuario) {
         this.usuario = usuario;
     }
 }

@@ -1,7 +1,7 @@
 package com.mosi.mosi.repository;
 
 import com.mosi.mosi.bean.Estudiante;
-import com.mosi.mosi.bean.Users;
+import com.mosi.mosi.bean.Usuarios;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -75,5 +75,5 @@ public interface EstudianteRepository extends CrudRepository<Estudiante,Integer>
     @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTE_ACTIVO)
     Estudiante consultaPerfilActivo(@Param("idUsu") Integer usuId);
 
-    Estudiante findByUsuario(Users user);
+    Estudiante findByUsuario(Usuarios user);
 }

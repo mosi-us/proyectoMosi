@@ -2,6 +2,7 @@ package com.mosi.mosi.repository;
 
 import com.mosi.mosi.bean.Asignatura;
 import com.mosi.mosi.bean.DetalleEstudiante;
+import com.mosi.mosi.bean.Empresa;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,4 +25,6 @@ public interface DetalleEstudianteRepository extends JpaRepository<DetalleEstudi
     Integer consultaLugarTrabajo (@Param("asiId") Integer asiId);
 
     DetalleEstudiante findByAsignatura (Asignatura asignatura);
+
+    List<DetalleEstudiante> findByAsignaturaAndEmpresa (Asignatura asignatura, Empresa empresa);
 }

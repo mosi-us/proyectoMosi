@@ -34,6 +34,7 @@ public interface constante {
     String ID_EMPRESA = "idEmpresa";
     String LUGAR = "idLugar";
     String RESPUESTAS="respuestas";
+    String CARACTERISTICAS = "Caracteristicas";
 
     String TITULO_ASI ="titulo";
     String DESCRIPCION_ASI ="descripcion_asignatura";
@@ -60,18 +61,6 @@ public interface constante {
     Integer INTERMEDIO = 2;
     Integer AVANZADO =3;
 
-    /*String LUGAR = "idLugar";
-    String LUGAR = "idLugar";
-    String LUGAR = "idLugar";
-    String LUGAR = "idLugar";
-    String LUGAR = "idLugar";
-    String LUGAR = "idLugar";
-    String LUGAR = "idLugar";
-    String LUGAR = "idLugar";
-    String LUGAR = "idLugar";
-    String LUGAR = "idLugar";*/
-
-
     /**Asignaturas**/
     Integer PRACTICAS = 1;
     Integer DESAFIOS = 2;
@@ -79,7 +68,6 @@ public interface constante {
     Integer ENVIADO = 1;
     Integer RECIBIDO = 2;
     /** Estatus de Postulaciones*/
-
     Integer ACEPTADO = 2;
     Integer RECHAZADO = 3;
     Integer ELIMINADO = 4;

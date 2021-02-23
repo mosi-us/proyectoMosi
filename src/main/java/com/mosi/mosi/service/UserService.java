@@ -2,7 +2,7 @@ package com.mosi.mosi.service;
 
 import com.mosi.mosi.bean.Empresa;
 import com.mosi.mosi.bean.Estudiante;
-import com.mosi.mosi.bean.Users;
+import com.mosi.mosi.bean.Usuarios;
 import com.mosi.mosi.repository.EmpresaRepository;
 import com.mosi.mosi.repository.EstudianteRepository;
 import com.mosi.mosi.repository.UserRepository;
@@ -37,7 +37,7 @@ public class UserService {
 
         Boolean validar_clave = false;
         Empresa perfil = new Empresa();
-        Users usuario= userRepository.findByEmail(email);
+        Usuarios usuario= userRepository.findByEmail(email);
         if (usuario!= null ){
             Integer estatus = usuario.getEstatus();
             String claveUsu = usuario.getPassword();
@@ -74,7 +74,7 @@ public class UserService {
 
     public Object signIn(String clave, String email ){
         Object objectResult = null;
-        Users nuevoUsu = new Users();
+        Usuarios nuevoUsu = new Usuarios();
         String existEmail = userRepository.buscarEmail(email);
         if ((existEmail==null)){
                 nuevoUsu.setEmail(email);
@@ -133,8 +133,8 @@ public class UserService {
         }
         return list;
     }
-    public Users findUsersbyId(Integer id) {
-        Optional<Users> users = null;
+    public Usuarios findUsersbyId(Integer id) {
+        Optional<Usuarios> users = null;
         try {
             users = userRepository.findById(id);
         } catch (Exception e) {
