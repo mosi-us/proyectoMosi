@@ -282,31 +282,33 @@ public List<Object> consultaEstudiante(Integer usuario){
         Postulaciones postulado = new Postulaciones();
         Asignatura asi = asignaturaRepository.findByAsiId(idAsi);
         Estudiante est = this.buscarEstudianteporId(IdEst);
-        postulaciones.setAsignatura(asi);
-        postulaciones.setEmpresa(empresaService.buscarEmpresaporId(idEmp));
-        postulaciones.setEstudiante(est);
-        postulaciones.setPosFecha(new Date());
-        postulaciones.setPosEstatus(ENVIADO); // 1 : Enviado
-        postulaciones.setCompatibilidad(afinidad);
-        postulado = postulacionesRepository.save(postulaciones);
-        /*guardo respuestas*/
-        Respuestas respuestas = new Respuestas();
-        for (int i=0;i<resp.size();i++){
-            HashMap<String,String> r = (HashMap<String, String>) resp.get(i);
-            respuestas.setResRespuestas(r.get("respuestas"));
-            Integer idPre =Integer.valueOf(String.valueOf(r.get("idPregunta")));
-            Preguntas preguntas = preguntasRepository.findById(idPre).get();
-            respuestas.setPregunta(preguntas);
-            respuestas.setAsignatura(asi);
-            respuestas.setEstudiante(est);
-            respuestas.setPostulaciones(postulado);
-            respuestas = respuestaRepository.save(respuestas);
-            respuestas = new Respuestas();
+        Integer numPre = preguntasRepository.questionCount(asi.getAsiId(),est.getCarrera().getId());
+        if (numPre == resp.size()) {
+            postulaciones.setAsignatura(asi);
+            postulaciones.setEmpresa(empresaService.buscarEmpresaporId(idEmp));
+            postulaciones.setEstudiante(est);
+            postulaciones.setPosFecha(new Date());
+            postulaciones.setPosEstatus(ENVIADO); //
+            postulaciones.setCompatibilidad(afinidad);
+            postulado = postulacionesRepository.save(postulaciones);
+            /*guardo respuestas*/
+            Respuestas respuestas = new Respuestas();
+            for (int i = 0; i < resp.size(); i++) {
+                HashMap<String, String> r = (HashMap<String, String>) resp.get(i);
+                respuestas.setResRespuestas(r.get("respuestas"));
+                Integer idPre = Integer.valueOf(String.valueOf(r.get("idPregunta")));
+                Preguntas preguntas = preguntasRepository.findById(idPre).get();
+                respuestas.setPregunta(preguntas);
+                respuestas.setAsignatura(asi);
+                respuestas.setEstudiante(est);
+                respuestas.setPostulaciones(postulado);
+                respuestas = respuestaRepository.save(respuestas);
+                respuestas = new Respuestas();
+            }
+
+            Boolean not = this.notificar(est.getId(), asi, TITULO_NOTIFICACION_POSTULACION, ENVIADO, idEmp, ESTUDIANTE);
         }
-
-    Boolean not = this.notificar(est.getId(),asi,TITULO_NOTIFICACION_POSTULACION,ENVIADO,idEmp,ESTUDIANTE);
-
-        if ((postulado != null) && (not != null)){
+        if (postulado != null){
             respu = "Se ha postulado Exitosamente";
         }else{
             respu = "Ha ocurrido un error";

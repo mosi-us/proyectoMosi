@@ -7,10 +7,6 @@ import java.util.Objects;
 @Table(name = "PRE_Preguntas", schema = "dbo", catalog = "MOSI")
 public class Preguntas {
 
-
-
-
-
     @javax.persistence.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PRE_Id")
@@ -39,8 +35,8 @@ public class Preguntas {
     private Asignatura asignatura;
 
     @OneToOne
-    @JoinColumn(name = "EMP_Id")
-    private  Empresa empresa;
+    @JoinColumn(name = "DET_Id")
+    private  DetalleEstudiante detalleEstudiante;
 
     public Asignatura getAsignatura() {
         return asignatura;
@@ -50,12 +46,12 @@ public class Preguntas {
         this.asignatura = asignatura;
     }
 
-    public Empresa getEmpresa() {
-        return empresa;
+    public DetalleEstudiante getDetalleEstudiante() {
+        return detalleEstudiante;
     }
 
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
+    public void setDetalleEstudiante(DetalleEstudiante detalleEstudiante) {
+        this.detalleEstudiante = detalleEstudiante;
     }
 
     @Override
@@ -66,11 +62,11 @@ public class Preguntas {
         return Id == preguntas.Id &&
                 Objects.equals(decripcion, preguntas.decripcion) &&
                 Objects.equals(asignatura, preguntas.asignatura) &&
-                Objects.equals(empresa, preguntas.empresa);
+                Objects.equals(detalleEstudiante, preguntas.detalleEstudiante);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(Id, decripcion, asignatura, empresa);
+        return Objects.hash(Id, decripcion, asignatura, detalleEstudiante);
     }
 }

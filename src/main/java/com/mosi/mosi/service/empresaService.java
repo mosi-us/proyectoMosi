@@ -14,6 +14,9 @@ import static com.mosi.mosi.constantes.constante.EMPRESA;
 
 @Service
 public class empresaService {
+
+    @Autowired
+    PreguntasRepository preguntasRepository;
     @Autowired
     RespuestaRepository respuestaRepository;
     @Autowired
@@ -86,15 +89,18 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
     }
 
 
-    public DetalleEstudiante guardarEstudiante(Integer pais, List<?> deporte, Integer empId, Integer asignatura, List<?> idioma,
-                                                      Integer universidad, Integer carrera, Integer semestre, String descripcion, List<?> softYTecn, List<?> hablidadesB){
+    public DetalleEstudiante guardarEstudiante(Integer pais, List<?> deporte, Integer empId, Integer idAsi, List<?> idioma,
+                                               Integer universidad, Integer carrera, Integer semestre, String descripcion, List<?> softYTecn, List<?> hablidadesB, List<?> preguntas){
         DetalleEstudiante detEstudiante = new DetalleEstudiante();
         DetalleEstudiante estudiante = new DetalleEstudiante();
+
+        Asignatura asignatura =asignaturaRepository.findByAsiId(idAsi);
+
         try {
             if (descripcion!=null) {
                 estudiante.setDetDescripcion(descripcion);
             }
-            estudiante.setAsignatura(asignaturaRepository.findByAsiId(asignatura));
+            estudiante.setAsignatura(asignatura);
             estudiante.setEmpresa(empresaRepository.findById(empId).get());
             estudiante.setPais(paisesRepository.findById(pais).get());
             if (semestre != null) {
@@ -108,6 +114,7 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
             estudiante = detalleEstudianteRepository.save(estudiante);
 
             Boolean saveCaracteristicas = estudianteService.guardarcaracteristicas(idioma,deporte,null, hablidadesB, softYTecn, null, estudiante, EMPRESA);
+
             if (saveCaracteristicas==true){
                 String si = "si";
             }

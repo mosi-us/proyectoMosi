@@ -87,7 +87,35 @@ public class empresaController {
         return perfil;
 
     }*/
-
+   /**
+    * parametros:
+     {"titulo" : "",
+     "descripcion_asignatura": "",
+     "tipo":,
+     "idLugar": ,
+     "idEmpresa":,
+     "Caracteristicas":[{
+     "descripcion_estudiante":"",
+    "paisId":,
+     "semestre":,
+     "carID":2,
+     "depId":,
+     "Idiomas":[{"idIdioma":,"nivel":},{"idIdioma":,"nivel":}],
+     "sytId":[{"idSyt":,"nivel":},{"idSyt":,"nivel":},{"idSyt":,"nivel":}],
+     "hamId":[]
+     },{
+     "descripcion_estudiante":"",
+     "paisId":,
+     "semestre":,
+     "carID":,
+     "depId":[],
+     "Idiomas":[{"idIdioma":,"nivel":},{"idIdioma":,"nivel":}],
+     "sytId":[{"idSyt":,"nivel":},{"idSyt":,"nivel":},{"idSyt":,"nivel":}],
+     "hamId":[],
+    "preguntas":[{"titulo":""},{"titulo":""}]
+     }]
+     }
+    * */
     @PostMapping("/AgregarDesafio_Practica")
     public List<HashMap<String,Object>> AgregarDesafio_Practica(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
@@ -98,7 +126,7 @@ public class empresaController {
                 ? params.get(DESCRIPCION_ASI).toString() : null;
         Integer lugar 	= (params.containsKey(LUGAR) && params.get(LUGAR) != null && !params.get(LUGAR).toString().isEmpty())
                 ? Integer.valueOf(params.get(LUGAR).toString()) : null;
-        List<?> preguntas = (params.containsKey(PREGUNTAS) &&  params.get(PREGUNTAS) != null) ? UserService.convertObjectToList(params.get(PREGUNTAS)) : null;
+        //List<?> preguntas = (params.containsKey(PREGUNTAS) &&  params.get(PREGUNTAS) != null) ? UserService.convertObjectToList(params.get(PREGUNTAS)) : null;
         Integer tipo 	= (params.containsKey(TIPO_ASI) && params.get(TIPO_ASI) != null && !params.get(TIPO_ASI).toString().isEmpty())
                 ? Integer.valueOf(params.get(TIPO_ASI).toString()) : null;
         Integer empId 	= (params.containsKey(ID_EMPRESA) && params.get(ID_EMPRESA) != null && !params.get(ID_EMPRESA).toString().isEmpty())
@@ -114,15 +142,16 @@ public class empresaController {
                 List<?> idioma      =new ArrayList<>();
                 List<?> softYTecn   =new ArrayList<>();
                 List<?> hablidadesB =new ArrayList<>();
-
+                List<?> preguntas   =new ArrayList<>();
         Asignatura asignatura = new Asignatura();
         Preguntas pregunta_asi = new Preguntas();
+        List<Object> pregList = new ArrayList<>();
+        HashMap<String,Object> listpreg = new HashMap<>();
+
         DetalleEstudiante estudiante = new DetalleEstudiante();
 
         List<HashMap<String,Object>> result = new ArrayList<>();
         HashMap<String,Object> listAsi = new HashMap<>();
-        HashMap<String,Object> listpreg = new HashMap<>();
-        List<Object> pregList = new ArrayList<>();
         HashMap<String,Object> listDetEst = new HashMap<>();
         asignatura.setAsiTitulo(titulo);
         if (descripcion_asi!=null){
@@ -133,40 +162,43 @@ public class empresaController {
         asignatura.setEmpresa(empresaService.buscarEmpresaporId(empId));
        asignatura = asignaturaRepository.save(asignatura);
         listAsi.put("Asignatura",asignatura);
-        if (asignatura!=null && preguntas!=null && preguntas.size()>0) {
-            for (int i = 0; i < preguntas.size(); i++) {
-                HashMap<String, String> p = (HashMap<String, String>) preguntas.get(i);
-                pregunta_asi.setDecripcion(p.get("titulo"));
-                pregunta_asi.setAsignatura(asignatura);
-                pregunta_asi = preguntasRepository.save(pregunta_asi);
-                pregList.add(pregunta_asi);
-                pregunta_asi = new Preguntas();
-            }
-
-            for (int j = 0; j < pregList.size(); j++) {
-                listpreg.put("preguntas_" + j, pregList.get(j));
-            }
-        }
             if (caracteristicas_Estudiante.size()>0){
                 for(int i=0; i<caracteristicas_Estudiante.size();i++){
                     LinkedHashMap caract = (LinkedHashMap) caracteristicas_Estudiante.get(i);
-                    descripcion  = (caract.get(DESCRIPCION_EST)!=null) ? caract.get(DESCRIPCION_EST).toString() : null;
+                    descripcion  = ((caract.containsKey(DESCRIPCION_EST))&&(caract.get(DESCRIPCION_EST))!=null) ? caract.get(DESCRIPCION_EST).toString() : null;
                     pais 	     = Integer.valueOf(caract.get(PAIS_ID).toString()) ;
-                    semestre    = (caract.get(SEMESTRE)!=null) ? Integer.valueOf(caract.get(SEMESTRE).toString())  : null;
+                    semestre    = ((caract.containsKey(SEMESTRE))&&(caract.get(SEMESTRE)!=null)) ? Integer.valueOf(caract.get(SEMESTRE).toString())  : null;
                     carrera     = Integer.valueOf(caract.get(CARRERA_ID).toString());
-                    universidad = (caract.get(UNIVERSIDAD_ID)!=null) ? Integer.valueOf(caract.get(UNIVERSIDAD_ID).toString()): null;
-                    deporte     = (caract.get(DEPORTE_ID)!=null) ? UserService.convertObjectToList(caract.get(DEPORTE_ID)): null  ;
-                    idioma      = (caract.get(IDIOMAS)!=null) ? UserService.convertObjectToList(caract.get(IDIOMAS)): null  ;
-                    softYTecn   = (caract.get(SOFTWARE_TECNOLOGIA)!=null) ? UserService.convertObjectToList(caract.get(SOFTWARE_TECNOLOGIA)): null  ;
-                    hablidadesB = (caract.get(HABILIDADES)!=null) ? UserService.convertObjectToList(caract.get(HABILIDADES)): null  ;
-                    estudiante = empresaService.guardarEstudiante(pais,deporte,empId,asignatura.getAsiId(),idioma,universidad,carrera,semestre,descripcion,softYTecn,hablidadesB);
+                    universidad = ((caract.containsKey(UNIVERSIDAD_ID))&&(caract.get(UNIVERSIDAD_ID)!=null)) ? Integer.valueOf(caract.get(UNIVERSIDAD_ID).toString()): null;
+                    deporte     = ((caract.containsKey(DEPORTE_ID))&&(caract.get(DEPORTE_ID)!=null)) ? UserService.convertObjectToList(caract.get(DEPORTE_ID)): null  ;
+                    idioma      = ((caract.containsKey(IDIOMAS))&&(caract.get(IDIOMAS)!=null)) ? UserService.convertObjectToList(caract.get(IDIOMAS)): null  ;
+                    softYTecn   = ((caract.containsKey(SOFTWARE_TECNOLOGIA))&&(caract.get(SOFTWARE_TECNOLOGIA)!=null)) ? UserService.convertObjectToList(caract.get(SOFTWARE_TECNOLOGIA)): null  ;
+                    hablidadesB = ((caract.containsKey(HABILIDADES))&&(caract.get(HABILIDADES)!=null)) ? UserService.convertObjectToList(caract.get(HABILIDADES)): null  ;
+                    preguntas   =((caract.containsKey(PREGUNTAS))&&(caract.get(PREGUNTAS)!=null)) ? UserService.convertObjectToList(caract.get(PREGUNTAS)):null;
+                    estudiante = empresaService.guardarEstudiante(pais,deporte,empId,asignatura.getAsiId(),idioma,universidad,carrera,semestre,descripcion,softYTecn,hablidadesB,preguntas);
                     listDetEst.put("caracteristicas",estudiante);
                     listDetEst = new HashMap<>();
                     result.add(listDetEst);
+                /*preguntas*/
+                if (asignatura!=null && preguntas!=null && preguntas.size()>0) {
+                    for (int j = 0; j < preguntas.size(); j++) {
+                        HashMap<String, String> p = (HashMap<String, String>) preguntas.get(j);
+                        pregunta_asi.setDecripcion(p.get("titulo"));
+                        pregunta_asi.setAsignatura(asignatura);
+                        pregunta_asi.setDetalleEstudiante(estudiante);
+                        pregunta_asi = preguntasRepository.save(pregunta_asi);
+                        pregList.add(pregunta_asi);
+                        pregunta_asi = new Preguntas();
+                    }
+
+                    for (int j = 0; j < pregList.size(); j++) {
+                        listpreg.put("preguntas " + (j+1), pregList.get(j));
+                    }
+                }
+
+                    }
 
                 }
-            }
-
             result.add(listAsi);
 
             result.add(listpreg);

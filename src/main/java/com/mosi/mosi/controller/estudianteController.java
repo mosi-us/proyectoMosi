@@ -190,6 +190,16 @@ public class estudianteController {
         List<Ciudades> ListCiudades= ciudadesRepository.findByIdGreaterThan(0);
         return ListCiudades;
     }
+    /**
+     * Parametros:
+     {"idAsignatura" : ,
+     "idEmpresa": ,
+     "idEstudiante":,
+     "respuestas":[
+     {"respuestas":"","idPregunta":},
+     {"respuestas":"","idPregunta":}
+     ]}
+    * */
     @PostMapping("postularEstudiante")
     public String postularEstudiante(HttpServletRequest request, HttpServletResponse response,
                                      @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
