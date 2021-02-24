@@ -24,7 +24,7 @@ public interface DetalleEstudianteRepository extends JpaRepository<DetalleEstudi
     @Query(nativeQuery = true,value = SQL_CONSULTAR_LUGAR_TRABAJO)
     Integer consultaLugarTrabajo (@Param("asiId") Integer asiId);
 
-    DetalleEstudiante findByAsignatura (Asignatura asignatura);
+    List<DetalleEstudiante> findByAsignatura (Asignatura asignatura);
 
     List<DetalleEstudiante> findByAsignaturaAndEmpresa (Asignatura asignatura, Empresa empresa);
 }

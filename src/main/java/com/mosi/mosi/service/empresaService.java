@@ -15,6 +15,7 @@ import static com.mosi.mosi.constantes.constante.EMPRESA;
 @Service
 public class empresaService {
 
+
     @Autowired
     PreguntasRepository preguntasRepository;
     @Autowired
@@ -198,5 +199,51 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
     Asignatura asignatura= asignaturaRepository.findByAsiId(idAsignatura);
     List<Postulaciones> listSelec = postulacionesRepository.findByAsignaturaAndPosEstatus(asignatura,ACEPTADO);
         return listSelec;
+    }
+
+    public HashMap<String, Object> buscarPreguntasYRespuestas(Estudiante estudiante, Postulaciones postulaciones) {
+        Preguntas preguntas = new Preguntas();
+        Respuestas resp = new Respuestas();
+        HashMap<String, Object> pregYresp = new HashMap<>();
+        List<Respuestas> respuestas = new ArrayList<>();
+
+        respuestas= respuestaRepository.findByEstudianteAndAsignatura(estudiante,postulaciones.getAsignatura());
+
+        for (Respuestas r:respuestas
+             ) {
+            preguntas = preguntasRepository.findById(r.getPregunta().getId()).get();
+            pregYresp.put(preguntas.getDecripcion().toString(),r.getResRespuestas());
+        }
+        return pregYresp;
+    }
+
+    public List<HashMap<String, Object>> sugerirEstudiante(Integer idAsignatura) {
+
+    Asignatura asignatura = asignaturaRepository.findByAsiId(idAsignatura);
+        List<DetalleEstudiante> detalle = detalleEstudianteRepository.findByAsignatura(asignatura);
+        List<Integer> carrera = new ArrayList<>();
+        List<Integer> semestre = new ArrayList<>();
+        List<Integer> pais = new ArrayList<>();
+        List<Integer> lugar = new ArrayList<>();
+        List<Integer> univ = new ArrayList<>();
+
+        for (DetalleEstudiante det:detalle
+             ) {
+            carrera.add(det.getCarrera().getId());
+            if (det.getDetSem()!=null){
+            semestre.add(det.getDetSem());
+            }
+            pais.add(det.getPais().getId());
+            lugar.add(asignatura.getAsiLugar());
+            if (det.getUniversidad().getId()!=null){
+                univ.add(det.getUniversidad().getId());
+            }
+        }
+
+        List<Estudiante> estudiantes = estudianteService.consultaEstudiantesSugeridos(carrera,semestre,pais,lugar,univ);
+
+
+
+        return null;
     }
 }

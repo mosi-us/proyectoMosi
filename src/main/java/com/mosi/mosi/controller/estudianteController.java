@@ -75,6 +75,27 @@ public class estudianteController {
     @Autowired
     PaisesRepository paisesRepository;
 
+    /** Parametros: **
+     {"idUser":,
+     "Nombres":"",
+     "Apellidos":"",
+     "fecha":,
+     "paisId":,
+     "ciudadId":,
+     "telefono":"",
+     "codigo_pais": "",
+     "correo":"",
+     "semestre":,
+     "depId":[],
+     "Idiomas":[{},{},{}],
+     "uniId":,
+     "carID":,
+     "descripcion_estudiante":"",
+     "idPasatiempo":[],
+     "sytId":[{},{}],
+     "hamId":[],
+     "idLugar":}
+    * */
     @PostMapping("/guardarPerfilEstudiante")
     public Estudiante guardarPerfilEstudiante(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
 
@@ -118,6 +139,10 @@ public class estudianteController {
         return estudiante;
 
     }
+    /**
+     * Parametros:
+     {"idUser":}
+     * */
     @PostMapping("/consultarEstudiante")
     public  List<Object> consultarEstudiante(
             @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
@@ -206,7 +231,7 @@ public class estudianteController {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         String resp = "";
         Integer idAsignatura = (params.containsKey(ID_ASIGNATURA) && params.get(ID_ASIGNATURA) != null) ? Integer.valueOf(params.get(ID_ASIGNATURA).toString()): null;
-        Integer idEmpresa = (params.containsKey(ID_EMPRESA) && params.get(ID_EMPRESA) != null) ? Integer.valueOf(params.get(ID_EMPRESA).toString()) : null;
+        //Integer idEmpresa = (params.containsKey(ID_EMPRESA) && params.get(ID_EMPRESA) != null) ? Integer.valueOf(params.get(ID_EMPRESA).toString()) : null;
         Integer idEstudiante = (params.containsKey(ID_ESTUDIANTE) && params.get(ID_ESTUDIANTE) != null) ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
         List<?> respuestas = (params.containsKey(RESPUESTAS) &&  params.get(RESPUESTAS) != null) ? UserService.convertObjectToList(params.get(RESPUESTAS)) : null;
 
@@ -214,8 +239,8 @@ public class estudianteController {
         List<List<HashMap<String, Object>>> compatibilidad =estudianteService.consultarAfinidad(idEstudiante,idAsignatura);
         Integer afinidad = Integer.valueOf(compatibilidad.get(0).get(1).get("afinidad").toString());
 
-        if (idAsignatura!=null && idEmpresa!=null && idEstudiante!=null && afinidad!=null && respuestas!=null){
-            resp = estudianteService.postular(idAsignatura,idEmpresa,idEstudiante,afinidad,respuestas);
+        if (idAsignatura!=null  && idEstudiante!=null && afinidad!=null && respuestas!=null){
+            resp = estudianteService.postular(idAsignatura,idEstudiante,afinidad,respuestas);
         }else {
             resp = "Se ha postulado Exitosamente";
         }
@@ -231,6 +256,9 @@ public class estudianteController {
 
         return asignatura;
     }
+    /** Parametros: idEstudiante : id del estudiante que cambiara a principal
+     {"idUser":18,"idEstudiante":104}
+     * */
     @PostMapping("cambiarPerfilPrincipal")
     public Estudiante cambiarPerfilPrincipal(HttpServletRequest request, HttpServletResponse response,
                                              @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
@@ -249,7 +277,17 @@ public class estudianteController {
 
         return perfilPrinc;
     }
+    /**
+     Parametros:
+     {
+     "idUser":,
+     "uniId":,
+     "carID":,
+     "semestre":,
+     "idLugar":
+     }
 
+     * */
     @PostMapping("agregarPerfilPrincipal")
     public Estudiante agregarPerfilPrincipal(HttpServletRequest request, HttpServletResponse response,
                                              @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
@@ -298,9 +336,7 @@ public class estudianteController {
         newPerfil.setEstPrincipal(0);
         newPerfil.setUsuario(userService.findUsersbyId(usuario));
         Estudiante result = estudianteRepository.save(newPerfil);
-        // Estudiante result = new Estudiante();
         Boolean caracteristica = estudianteService.guardar_Dep_idi_hab_syt(list_Dep,list_Idi,list_Hab,list_Syt,list_Pasatiempo,result.getId(),ESTUDIANTE);
-        //Estudiante result = new Estudiante();
 
 
         return result;
@@ -331,12 +367,16 @@ public class estudianteController {
 
         return syt;
     }
+    /**
+     *{"idEstudiante":"103","asignatura":"50"}
+     * */
     @PostMapping("consultarPreguntas")
     public List<Preguntas> consultarPreguntas(HttpServletRequest request, HttpServletResponse response,
                                               @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         Integer asignatura = (params.containsKey(ASIGNATURA) && params.get(ASIGNATURA) != null) ? Integer.valueOf(params.get(ASIGNATURA).toString()) : null;
-        List<Preguntas> preguntas = estudianteService.consultarPreguntas(asignatura);
+        Integer estudiante = (params.containsKey(ID_ESTUDIANTE) && params.get(ID_ESTUDIANTE) != null) ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
+        List<Preguntas> preguntas = estudianteService.consultarPreguntas(asignatura,estudiante);
         return preguntas;
     }
 }

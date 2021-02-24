@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface RespuestaRepository extends JpaRepository<Respuestas,Integer> {
     List<Respuestas> findByEstudianteAndAsignatura(Estudiante estudiante, Asignatura asignatura);
+    List<Respuestas> findByEstudiante(Estudiante estudiante);
 }

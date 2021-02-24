@@ -11,9 +11,10 @@ import java.util.List;
 public interface PreguntasRepository extends JpaRepository<Preguntas,Integer> {
     List<Preguntas> findByAsignatura(Asignatura asignatura);
 
-    String SQL_COUNT_QUESTION = "select count(PRE_Id) from PRE_Preguntas pre " +
-            "inner join DET_Estudiante DE on PRE.ASI_Id = DE.ASI_Id " +
+    String SQL_COUNT_QUESTION = "select pre.* from PRE_Preguntas pre " +
+            "inner join DET_Estudiante DE on PRE.ASI_Id = DE.ASI_Id and pre.DET_Id = de.DET_ID " +
             "where pre.ASI_Id = :idAsi and de.CAR_Id =:carId ";
     @Query(nativeQuery = true, value = SQL_COUNT_QUESTION)
-    Integer questionCount(@Param("idAsi") Integer idAsi,@Param("carId") Integer carId);
+    List<Preguntas> consultarPreguntas(@Param("idAsi") Integer idAsi,@Param("carId") Integer carId);
+
 }

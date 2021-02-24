@@ -270,7 +270,7 @@ public List<Object> consultaEstudiante(Integer usuario){
         return errorMessage;
     }
 
-    public String postular(Integer idAsi, Integer idEmp, Integer IdEst,Integer afinidad,List<?> resp){
+    public String postular(Integer idAsi, Integer IdEst,Integer afinidad,List<?> resp){
 
     /**
      * Agregar logica:
@@ -282,11 +282,21 @@ public List<Object> consultaEstudiante(Integer usuario){
         Postulaciones postulado = new Postulaciones();
         Asignatura asi = asignaturaRepository.findByAsiId(idAsi);
         Estudiante est = this.buscarEstudianteporId(IdEst);
-        Integer numPre = preguntasRepository.questionCount(asi.getAsiId(),est.getCarrera().getId());
-        if (numPre == resp.size()) {
+        List<Preguntas> numPre = preguntasRepository.consultarPreguntas(asi.getAsiId(),est.getCarrera().getId());
+        List<DetalleEstudiante> det = detalleEstudianteRepository.findByAsignatura(asi);
+        DetalleEstudiante detalleEstudiante = new DetalleEstudiante();
+        for (DetalleEstudiante d:det
+             ) {
+            if (d.getCarrera().getId()==est.getCarrera().getId()){
+                detalleEstudiante = d;
+            }
+        }
+        Empresa empresa = asi.getEmpresa();
+        if (numPre.size() == resp.size()) {
             postulaciones.setAsignatura(asi);
-            postulaciones.setEmpresa(empresaService.buscarEmpresaporId(idEmp));
+            postulaciones.setEmpresa(empresa);
             postulaciones.setEstudiante(est);
+            postulaciones.setDetalleEstudiante(detalleEstudiante);
             postulaciones.setPosFecha(new Date());
             postulaciones.setPosEstatus(ENVIADO); //
             postulaciones.setCompatibilidad(afinidad);
@@ -306,7 +316,7 @@ public List<Object> consultaEstudiante(Integer usuario){
                 respuestas = new Respuestas();
             }
 
-            Boolean not = this.notificar(est.getId(), asi, TITULO_NOTIFICACION_POSTULACION, ENVIADO, idEmp, ESTUDIANTE);
+            Boolean not = this.notificar(est.getId(), asi, TITULO_NOTIFICACION_POSTULACION, ENVIADO, empresa.getId(), ESTUDIANTE);
         }
         if (postulado != null){
             respu = "Se ha postulado Exitosamente";
@@ -749,9 +759,6 @@ public List<Object> consultaEstudiante(Integer usuario){
             List<HashMap<String,Object>> list = this.listarDetalleEstudiantes(det_estudiante);
             List<List<HashMap<String, Object>>> asigList = this.compatibilidad(list,perfil);
 
-
-
-
            result = asigList;
 
         }else {
@@ -853,18 +860,24 @@ public List<Object> consultaEstudiante(Integer usuario){
         Estudiante perfil = estudianteRepository.findById(idEstudiante).get();
         List<Object> perfilcompletoEstudiante = this.consultaCaracteristicas(perfil,null,ESTUDIANTE);
         Asignatura asignaturaObj= asignaturaRepository.findByAsiId(idAsignatura);
-        DetalleEstudiante estudianteEmpresa = detalleEstudianteRepository.findByAsignatura(asignaturaObj);
+        List<DetalleEstudiante> estudianteEmpresa = detalleEstudianteRepository.findByAsignatura(asignaturaObj);
         List<DetalleEstudiante> perfilEstudianteEmpresa = new ArrayList();
-        perfilEstudianteEmpresa.add(estudianteEmpresa);
+        for (DetalleEstudiante detalle: estudianteEmpresa
+             ) {
+            if (perfil.getCarrera().getId()==detalle.getCarrera().getId()){
+                perfilEstudianteEmpresa.add(detalle);
+            }
+        }
         List<HashMap<String,Object>> perfilEstudianteEmpresaCompleto = this.listarDetalleEstudiantes(perfilEstudianteEmpresa);
         List<List<HashMap<String, Object>>> compatibilidad = this.compatibilidad(perfilEstudianteEmpresaCompleto,perfilcompletoEstudiante);
 
         return compatibilidad;
     }
-    public List<Preguntas> consultarPreguntas(Integer idAsi){
+    public List<Preguntas> consultarPreguntas(Integer idAsi, Integer idEst){
         List<Preguntas> preguntas = new ArrayList<>();
         Asignatura asignatura = asignaturaRepository.findByAsiId(idAsi);
-        preguntas = preguntasRepository.findByAsignatura(asignatura);
+        Estudiante estudiante = estudianteRepository.findById(idEst).get();
+        preguntas = preguntasRepository.consultarPreguntas(asignatura.getAsiId(),estudiante.getCarrera().getId());
         return preguntas;
 
     }
@@ -878,5 +891,11 @@ public List<Object> consultaEstudiante(Integer usuario){
             lugar_Trabajo="Remoto o Presencial";
         }
         return lugar_Trabajo;
+    }
+
+    public List<Estudiante> consultaEstudiantesSugeridos(List<Integer> carrera, List<Integer> semestre, List<Integer> pais, List<Integer> lugar, List<Integer> univ) {
+
+        List<Estudiante> estudiantes = estudianteRepository.consultarEstudiantesSugeridos(carrera,semestre,pais,lugar,univ);
+    return null;
     }
 }

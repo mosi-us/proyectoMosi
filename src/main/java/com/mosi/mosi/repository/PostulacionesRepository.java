@@ -1,6 +1,7 @@
 package com.mosi.mosi.repository;
 
 import com.mosi.mosi.bean.Asignatura;
+import com.mosi.mosi.bean.Estudiante;
 import com.mosi.mosi.bean.Postulaciones;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -21,4 +22,6 @@ public interface PostulacionesRepository extends JpaRepository<Postulaciones,Int
     int seleccionarEstudiante(@Param("idEstudiante") int idEstudiante, @Param("idAsignatura") int idAsignatura, @Param("Estatus") int Estatus);
 
     List<Postulaciones> findByAsignaturaAndPosEstatus(Asignatura asignatura, Integer aceptado);
+
+    Postulaciones findByEstudianteAndAsignatura(Estudiante estudiante, Asignatura asignatura);
 }

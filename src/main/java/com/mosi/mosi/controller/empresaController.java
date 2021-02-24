@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mosi.mosi.bean.*;
 import com.mosi.mosi.repository.AsignaturaRepository;
 import com.mosi.mosi.repository.EstudianteRepository;
+import com.mosi.mosi.repository.PostulacionesRepository;
 import com.mosi.mosi.repository.PreguntasRepository;
 import com.mosi.mosi.service.EstudianteService;
 import com.mosi.mosi.service.UserService;
@@ -24,6 +25,8 @@ import static com.mosi.mosi.constantes.constante.*;
 
 @RestController
 public class empresaController {
+    @Autowired
+    PostulacionesRepository postulacionesRepository;
     @Autowired
     empresaService empresaService;
     @Autowired
@@ -234,11 +237,15 @@ public class empresaController {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         Integer idEstudiante = (params.containsKey(ID_ESTUDIANTE) && params.get(ID_ESTUDIANTE) != null && !params.get(ID_ESTUDIANTE).toString().isEmpty())
                 ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
+        Integer asignatura = (params.containsKey(ASIGNATURA) && params.get(ASIGNATURA) != null && !params.get(ASIGNATURA).toString().isEmpty())
+                ? Integer.valueOf(params.get(ASIGNATURA).toString()) : null;
         HashMap<String,Object> result = new HashMap<>();
         Estudiante perfil = estudianteRepository.findById(idEstudiante).get();
+        Asignatura asig = asignaturaRepository.findByAsiId(asignatura);
        // HashMap<String,Object> Estudiante =estudianteService.consultaEstudiante()
         List<Object> caracteristicas= estudianteService.consultaCaracteristicas(perfil,null,ESTUDIANTE);
         Estudiante estudiante = ((Estudiante) caracteristicas.get(0));
+        Postulaciones postulaciones = postulacionesRepository.findByEstudianteAndAsignatura(estudiante,asig);
         String nombres = ((Estudiante) caracteristicas.get(0)).getNombre().toString();
         String apellidos = ((Estudiante) caracteristicas.get(0)).getApellido().toString();
         Integer dia, mes, año;
@@ -252,14 +259,22 @@ public class empresaController {
         result.put("Pais",estudiante.getPais().getNombrePais());
         result.put("Ciudad",estudiante.getCiudad().getCiuNombre());
         String forma_de_trabajo = estudianteService.forma_de_trabajo(estudiante.getLugar());
+        HashMap<String,Object> pregyResp= empresaService.buscarPreguntasYRespuestas(estudiante,postulaciones);
+        result.put("Descripcion: ", estudiante.getDescripcion());
         result.put("Forma de Trabajo",forma_de_trabajo);
-        result.put("Informacion de Contanto:", estudiante.getCorreo().substring(0,4) + "*********.com -" + estudiante.getTelefono().substring(0,4) + "*******" );
+
+        if (postulaciones.getPosEstatus()==ACEPTADO){
+            result.put("Informacion de Contacto:", estudiante.getCorreo() + " - " + estudiante.getTelefono());
+        }else{
+        result.put("Informacion de Contacto:", estudiante.getCorreo().substring(0,4) + "*********.com -" + estudiante.getTelefono().substring(0,4) + "*******" );
+        }
         result.put("Semestre",estudiante.getSemestre());
         result.put("Deportes",caracteristicas.get(1));
         result.put("Idiomas",caracteristicas.get(2));
         result.put("Habilidades",caracteristicas.get(3));
         result.put("Pasatiempo",caracteristicas.get(4));
         result.put("Software y Tecnologias",caracteristicas.get(5));
+        result.put("Preguntas:",pregyResp);
 
         return result;
     }
@@ -296,5 +311,16 @@ public class empresaController {
 
         return listaEstudiantesSeleccionados;
     }
+    @PostMapping("/sugerirEstudiantes")
+    public List<HashMap<String,Object>> sugerirEstudiantes(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException, ParseException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idAsignatura = (params.containsKey(ID_ASIGNATURA) && params.get(ID_ASIGNATURA) != null && !params.get(ID_ASIGNATURA).toString().isEmpty())
+                ? Integer.valueOf(params.get(ID_ASIGNATURA).toString()) : null;
+
+        List<HashMap<String,Object>> result = empresaService.sugerirEstudiante(idAsignatura);
+        return result;
+
+    }
+
 
     }

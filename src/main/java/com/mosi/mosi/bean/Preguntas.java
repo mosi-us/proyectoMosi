@@ -38,7 +38,7 @@ public class Preguntas {
     @JoinColumn(name = "DET_Id")
     private  DetalleEstudiante detalleEstudiante;
 
-    public Asignatura getAsignatura() {
+    private Asignatura getAsignatura() {
         return asignatura;
     }
 
@@ -46,7 +46,7 @@ public class Preguntas {
         this.asignatura = asignatura;
     }
 
-    public DetalleEstudiante getDetalleEstudiante() {
+    private DetalleEstudiante getDetalleEstudiante() {
         return detalleEstudiante;
     }
 

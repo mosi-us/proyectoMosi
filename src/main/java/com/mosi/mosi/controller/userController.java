@@ -92,7 +92,9 @@ public class userController {
     * */
 
 
-
+    /** Parametros
+     *{"clave":"","email":""}
+     * */
     @PostMapping("signInEstudiante")
     public Object signInEstudiante(HttpServletRequest request, HttpServletResponse response,
                                            @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
@@ -114,7 +116,9 @@ public class userController {
     }
 
 
-
+    /** Parametros
+     {"email":"","clave":""}
+     * */
     @PostMapping("userLogin")
     public HashMap<String,String> loginUser(HttpServletRequest request, HttpServletResponse response,
                                             @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
