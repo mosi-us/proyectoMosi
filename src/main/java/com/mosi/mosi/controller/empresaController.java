@@ -338,12 +338,13 @@ public class empresaController {
         return listaEstudiantesSeleccionados;
     }
     @PostMapping("/sugerirEstudiantes")
-    public List<Estudiante> sugerirEstudiantes(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException, ParseException {
+    public List<HashMap<String,Object>> sugerirEstudiantes(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException, ParseException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         Integer idAsignatura = (params.containsKey(ID_ASIGNATURA) && params.get(ID_ASIGNATURA) != null && !params.get(ID_ASIGNATURA).toString().isEmpty())
                 ? Integer.valueOf(params.get(ID_ASIGNATURA).toString()) : null;
 
-        List<Estudiante> result = empresaService.sugerirEstudiante(idAsignatura);
+        List<HashMap<String,Object>> result = empresaService.sugerirEstudiante(idAsignatura);
+
         return result;
 
     }

@@ -231,7 +231,6 @@ public class estudianteController {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         String resp = "";
         Integer idAsignatura = (params.containsKey(ID_ASIGNATURA) && params.get(ID_ASIGNATURA) != null) ? Integer.valueOf(params.get(ID_ASIGNATURA).toString()): null;
-        //Integer idEmpresa = (params.containsKey(ID_EMPRESA) && params.get(ID_EMPRESA) != null) ? Integer.valueOf(params.get(ID_EMPRESA).toString()) : null;
         Integer idEstudiante = (params.containsKey(ID_ESTUDIANTE) && params.get(ID_ESTUDIANTE) != null) ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
         List<?> respuestas = (params.containsKey(RESPUESTAS) &&  params.get(RESPUESTAS) != null) ? UserService.convertObjectToList(params.get(RESPUESTAS)) : null;
 

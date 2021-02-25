@@ -77,7 +77,7 @@ public interface EstudianteRepository extends CrudRepository<Estudiante,Integer>
 
     Estudiante findByUsuario(Usuarios user);
 
-    String SQL_CONSULTA_ESTUDIANTE_SUGERIDO= "select * from EST_Estudiantes EST" +
+    String SQL_CONSULTA_ESTUDIANTE_SUGERIDO= "select * from EST_Estudiantes EST " +
             "where est.CAR_Id in (:carrera) and est.PAI_Id in (:pais) and EST_Principal = 1 ";
     @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTE_SUGERIDO)
     List<Estudiante> consultarEstudiantesSugeridos(@Param("carrera") List<Integer> carrera,@Param("pais") List<Integer> pais );

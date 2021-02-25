@@ -567,7 +567,7 @@ public List<Object> consultaEstudiante(Integer usuario){
         return estudiante;
 
     }
-    public List<List<HashMap<String,Object>>> compatibilidad(List<HashMap<String,Object>>listadoCompleto,List<Object> perfil){
+    public List<List<HashMap<String,Object>>> compatibilidad(List<HashMap<String,Object>>listadoCompleto/*detalle*/,List<Object> perfil /*estudiante*/ ,Integer tipoPersona){
         List<List<HashMap<String,Object>>> result = new ArrayList<>();
         List<HashMap<String,Object>> asigList = new ArrayList<>();
 
@@ -590,9 +590,10 @@ public List<Object> consultaEstudiante(Integer usuario){
         Integer uniId_empresa = 0;
         for (int e = 0; e < listadoCompleto.size(); e++) {
 
-            /*LISTADO DE PRACTICAS/ DESAFIOS*/
+            /**LISTADO DE ASIGNATURAS (PRACTICAS-DESAFIOS) */
             DetalleEstudiante estEmpresa = (DetalleEstudiante) listadoCompleto.get(e).get("estudiante");
-            Object[] listAsig = asignaturaRepository.consultaDetalleAsignatura(estEmpresa.getAsignatura().getAsiId());
+            Integer idAsig=estEmpresa.getAsignatura().getAsiId();
+            Object[] listAsig = asignaturaRepository.consultaDetalleAsignatura(idAsig);
             HashMap<String, Object> asignaturaEmpresa = new HashMap<>();
             asignaturaEmpresa.put("asignatura", listAsig);
             asigList.add(asignaturaEmpresa);
@@ -627,12 +628,13 @@ public List<Object> consultaEstudiante(Integer usuario){
                 }
                 if (lugarEst == lugarEmp) {
                     atributosEstudiante = atributosEstudiante + 1;
+
                     if ((lugarEst == PRESENCIAL)) {
                         datosCompatibles.put("lugar", "Presencial");
                     } else if (lugarEst == REMOTO) {
                         datosCompatibles.put("lugar", "Remoto");
                     } else if (lugarEst == AMBOS) {
-                        datosCompatibles.put("lugar", "Ambos");
+                        datosCompatibles.put("lugar", "Remoto o Presencial");
                     }
                 }
 
@@ -766,7 +768,7 @@ public List<Object> consultaEstudiante(Integer usuario){
             List<DetalleEstudiante> det_estudiante = new ArrayList<DetalleEstudiante>();
             det_estudiante = detalleEstudianteRepository.consultar_estudiantes_empresa(idCar, idPais, semestre, tipo);
             List<HashMap<String,Object>> list = this.listarDetalleEstudiantes(det_estudiante);
-            List<List<HashMap<String, Object>>> asigList = this.compatibilidad(list,perfil);
+            List<List<HashMap<String, Object>>> asigList = this.compatibilidad(list,perfil,ESTUDIANTE);
 
            result = asigList;
 
@@ -884,7 +886,7 @@ public List<Object> consultaEstudiante(Integer usuario){
             }
         }
         List<HashMap<String,Object>> perfilEstudianteEmpresaCompleto = this.listarDetalleEstudiantes(perfilEstudianteEmpresa);
-        List<List<HashMap<String, Object>>> compatibilidad = this.compatibilidad(perfilEstudianteEmpresaCompleto,perfilcompletoEstudiante);
+        List<List<HashMap<String, Object>>> compatibilidad = this.compatibilidad(perfilEstudianteEmpresaCompleto,perfilcompletoEstudiante,ESTUDIANTE);
 
         return compatibilidad;
     }
@@ -908,7 +910,7 @@ public List<Object> consultaEstudiante(Integer usuario){
         return lugar_Trabajo;
     }
 
-    public List<Estudiante> consultaEstudiantesSugeridos(List<Integer> carrera, List<Integer> semestre, List<Integer> pais, List<Integer> lugar, List<Integer> univ) {
+    public List<Estudiante> consultaEstudiantesSugeridos(List<Integer> carrera, List<Integer> pais) {
 
         List<Estudiante> estudiantes = estudianteRepository.consultarEstudiantesSugeridos(carrera,pais);
 
