@@ -239,44 +239,70 @@ public class empresaController {
                 ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
         Integer asignatura = (params.containsKey(ASIGNATURA) && params.get(ASIGNATURA) != null && !params.get(ASIGNATURA).toString().isEmpty())
                 ? Integer.valueOf(params.get(ASIGNATURA).toString()) : null;
-        HashMap<String,Object> result = new HashMap<>();
+        HashMap<String, Object> result = new HashMap<>();
         Estudiante perfil = estudianteRepository.findById(idEstudiante).get();
         Asignatura asig = asignaturaRepository.findByAsiId(asignatura);
-       // HashMap<String,Object> Estudiante =estudianteService.consultaEstudiante()
-        List<Object> caracteristicas= estudianteService.consultaCaracteristicas(perfil,null,ESTUDIANTE);
+        // HashMap<String,Object> Estudiante =estudianteService.consultaEstudiante()
+        List<Object> caracteristicas = estudianteService.consultaCaracteristicas(perfil, null, ESTUDIANTE);
         Estudiante estudiante = ((Estudiante) caracteristicas.get(0));
-        Postulaciones postulaciones = postulacionesRepository.findByEstudianteAndAsignatura(estudiante,asig);
+        Postulaciones postulaciones = postulacionesRepository.findByEstudianteAndAsignatura(estudiante, asig);
         String nombres = ((Estudiante) caracteristicas.get(0)).getNombre().toString();
         String apellidos = ((Estudiante) caracteristicas.get(0)).getApellido().toString();
-        Integer dia, mes, año;
-        año = Integer.valueOf((estudiante.getFechaNac().toString()).substring(0,4));
-        mes =Integer.valueOf((estudiante.getFechaNac().toString()).substring(4,6));
-        dia =Integer.valueOf((estudiante.getFechaNac().toString()).substring(6,8));
-        Period edad = Period.between(LocalDate.of(año,mes,dia),LocalDate.now());
-        result.put("Nombre y Apellido",nombres + " " + apellidos);
-        result.put("Fecha de NAcimiento",dia+"/"+mes+"/"+año);
-        result.put("Edad",edad.getYears());
-        result.put("Pais",estudiante.getPais().getNombrePais());
-        result.put("Ciudad",estudiante.getCiudad().getCiuNombre());
-        String forma_de_trabajo = estudianteService.forma_de_trabajo(estudiante.getLugar());
-        HashMap<String,Object> pregyResp= empresaService.buscarPreguntasYRespuestas(estudiante,postulaciones);
-        result.put("Descripcion: ", estudiante.getDescripcion());
-        result.put("Forma de Trabajo",forma_de_trabajo);
-
-        if (postulaciones.getPosEstatus()==ACEPTADO){
-            result.put("Informacion de Contacto:", estudiante.getCorreo() + " - " + estudiante.getTelefono());
-        }else{
-        result.put("Informacion de Contacto:", estudiante.getCorreo().substring(0,4) + "*********.com -" + estudiante.getTelefono().substring(0,4) + "*******" );
+        Integer dia = null, mes = null, año = null;
+        Period edad;
+        if (estudiante.getFechaNac() != null) {
+            año = Integer.valueOf((estudiante.getFechaNac().toString()).substring(0, 4));
+            mes = Integer.valueOf((estudiante.getFechaNac().toString()).substring(4, 6));
+            dia = Integer.valueOf((estudiante.getFechaNac().toString()).substring(6, 8));
+            edad = Period.between(LocalDate.of(año, mes, dia), LocalDate.now());
+            result.put("Fecha de NAcimiento", dia + "/" + mes + "/" + año);
+            result.put("Edad", edad.getYears());
         }
-        result.put("Semestre",estudiante.getSemestre());
-        result.put("Deportes",caracteristicas.get(1));
-        result.put("Idiomas",caracteristicas.get(2));
-        result.put("Habilidades",caracteristicas.get(3));
-        result.put("Pasatiempo",caracteristicas.get(4));
-        result.put("Software y Tecnologias",caracteristicas.get(5));
-        result.put("Preguntas:",pregyResp);
+        result.put("Nombre y Apellido", nombres + " " + apellidos);
+        result.put("Pais", estudiante.getPais().getNombrePais());
+        if (estudiante.getCiudad() != null) {
+            result.put("Ciudad", estudiante.getCiudad().getCiuNombre());
+        }
+        String forma_de_trabajo = estudianteService.forma_de_trabajo(estudiante.getLugar());
+        HashMap<String, Object> pregyResp = empresaService.buscarPreguntasYRespuestas(estudiante, postulaciones);
+        if (estudiante.getDescripcion() != null) {
+            result.put("Descripcion: ", estudiante.getDescripcion());
+        }
+        result.put("Forma de Trabajo", forma_de_trabajo);
 
-        return result;
+        if (postulaciones.getPosEstatus() == ACEPTADO) {
+            if (estudiante.getTelefono()!=null){
+                result.put("Informacion de Contacto:", estudiante.getCorreo() + estudiante.getTelefono());
+            }else{
+                result.put("Informacion de Contacto:", estudiante.getCorreo());
+            }
+        } else {
+            if (estudiante.getTelefono()!=null){
+            result.put("Informacion de Contacto:", estudiante.getCorreo().substring(0, 4) + "*********.com -" + estudiante.getTelefono().substring(0, 4) + "*******");
+            }else{
+                result.put("Informacion de Contacto:", estudiante.getCorreo().substring(0, 4)+ "*********.com -");
+            }
+        }
+        result.put("Semestre", estudiante.getSemestre());
+        if (caracteristicas.get(1) != null) {
+            result.put("Deportes", caracteristicas.get(1));
+        }
+        if (caracteristicas.get(2) != null) {
+            result.put("Idiomas", caracteristicas.get(2));
+            if (caracteristicas.get(3) != null) {
+                result.put("Habilidades", caracteristicas.get(3));
+            }
+            if (caracteristicas.get(4) != null) {
+                result.put("Pasatiempo", caracteristicas.get(4));
+            }
+            if (caracteristicas.get(5) != null) {
+                result.put("Software y Tecnologias", caracteristicas.get(5));
+            }
+            if (pregyResp != null) {
+                result.put("Preguntas:", pregyResp);
+            }
+        }
+            return result;
     }
 
     @PostMapping("/seleccionarEstudiante")
@@ -312,12 +338,12 @@ public class empresaController {
         return listaEstudiantesSeleccionados;
     }
     @PostMapping("/sugerirEstudiantes")
-    public List<HashMap<String,Object>> sugerirEstudiantes(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException, ParseException {
+    public List<Estudiante> sugerirEstudiantes(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException, ParseException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         Integer idAsignatura = (params.containsKey(ID_ASIGNATURA) && params.get(ID_ASIGNATURA) != null && !params.get(ID_ASIGNATURA).toString().isEmpty())
                 ? Integer.valueOf(params.get(ID_ASIGNATURA).toString()) : null;
 
-        List<HashMap<String,Object>> result = empresaService.sugerirEstudiante(idAsignatura);
+        List<Estudiante> result = empresaService.sugerirEstudiante(idAsignatura);
         return result;
 
     }

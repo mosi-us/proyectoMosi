@@ -301,14 +301,16 @@ public class estudianteController {
         // primero consulto perfil estudiante activo actualmente y cambio estatus a inactivo
         Estudiante perfilPrinc =estudianteRepository.consultaPerfilActivo(usuario);
         String nombre,apellido,telf,codpais,descripcion,correo;
-        Integer fechaN,pais,ciudad;
+        Integer fechaN,pais,ciudad = null;
         nombre = perfilPrinc.getNombre();
         apellido= perfilPrinc.getApellido();
         fechaN= perfilPrinc.getFechaNac();
         pais=perfilPrinc.getPais().getId();
         telf=perfilPrinc.getTelefono();
         codpais=perfilPrinc.getCodigoPais();
-        ciudad=perfilPrinc.getCiudad().getId();
+        if(perfilPrinc.getCiudad()!=null) {
+            ciudad = perfilPrinc.getCiudad().getId();
+        }
         descripcion= perfilPrinc.getDescripcion();
         correo=perfilPrinc.getCorreo();
         Integer idEst = perfilPrinc.getId();
@@ -324,14 +326,22 @@ public class estudianteController {
         newPerfil.setApellido(apellido);
         newPerfil.setFechaNac(fechaN);
         newPerfil.setPais(paisService.findPaisbyId(pais));
-        newPerfil.setTelefono(telf);
+        if (telf!=null) {
+            newPerfil.setTelefono(telf);
         newPerfil.setCodigoPais(codpais);
-        newPerfil.setCiudad(ciudadService.findCiudadById(ciudad));
+        }
+        if (ciudad!=null) {
+            newPerfil.setCiudad(ciudadService.findCiudadById(ciudad));
+        }
         newPerfil.setCarrera(carreraService.findCarreraById(carrera));
-        newPerfil.setUniversidad(universidadService.findUniversidadById(universidad));
+        if (universidad!=null) {
+            newPerfil.setUniversidad(universidadService.findUniversidadById(universidad));
+        }
         newPerfil.setSemestre(semestre);
         newPerfil.setLugar(lugar);
-        newPerfil.setDescripcion(descripcion);
+        if (descripcion!=null) {
+            newPerfil.setDescripcion(descripcion);
+        }
         newPerfil.setCorreo(correo);
         newPerfil.setEstPrincipal(0);
         newPerfil.setUsuario(userService.findUsersbyId(usuario));

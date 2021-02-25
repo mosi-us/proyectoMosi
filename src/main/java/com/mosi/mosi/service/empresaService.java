@@ -217,7 +217,7 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
         return pregYresp;
     }
 
-    public List<HashMap<String, Object>> sugerirEstudiante(Integer idAsignatura) {
+    public List<Estudiante> sugerirEstudiante(Integer idAsignatura) {
 
     Asignatura asignatura = asignaturaRepository.findByAsiId(idAsignatura);
         List<DetalleEstudiante> detalle = detalleEstudianteRepository.findByAsignatura(asignatura);
@@ -244,6 +244,6 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
 
 
 
-        return null;
+        return estudiantes;
     }
 }

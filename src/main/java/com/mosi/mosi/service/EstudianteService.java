@@ -87,19 +87,27 @@ public Estudiante guardarEstudiante(String nombresEstudiante, String apellidosEs
     HabilidadesBlandasMaestro ham= new HabilidadesBlandasMaestro();
 
 
-    if ((!nombresEstudiante.isEmpty()) && (!apellidosEstudiante.isEmpty()) && (fechaNac != null)
+    if ((!nombresEstudiante.isEmpty()) && (!apellidosEstudiante.isEmpty())
             &&(pais != null) && (carrera != null) && (usuario!=null)){
         estudiante.setNombre(nombresEstudiante);
         estudiante.setApellido(apellidosEstudiante);
-        estudiante.setFechaNac(fechaNac);
+        if (fechaNac!=null) {
+            estudiante.setFechaNac(fechaNac);
+        }
         estudiante.setPais(paisService.findPaisbyId(pais));
         estudiante.setUsuario(userService.findUsersbyId(usuario));
         estudiante.setCarrera(carreraService.findCarreraById(carrera));
-        estudiante.setTelefono(tlf);
+        if (tlf!=null) {
+            estudiante.setTelefono(tlf);
         estudiante.setCodigoPais(codPais);
-        estudiante.setCiudad(ciudadService.findCiudadById(ciudad));
+        }
+        if (ciudad!=null) {
+            estudiante.setCiudad(ciudadService.findCiudadById(ciudad));
+        }
         estudiante.setCorreo(correo);
-        estudiante.setDescripcion(descripcion);
+        if (descripcion!=null) {
+            estudiante.setDescripcion(descripcion);
+        }
         if (universidad!=null) {
             estudiante.setUniversidad(universidadService.findUniversidadById(universidad));
         }
@@ -592,152 +600,153 @@ public List<Object> consultaEstudiante(Integer usuario){
                 semestreEmpresa = Integer.valueOf(estEmpresa.getDetSem());
                 atributosEmpresa = atributosEmpresa + 1;
             }
-            if (estEmpresa.getUniversidad() != null) {
-                uniId_empresa = Integer.valueOf(estEmpresa.getUniversidad().getId());
-                atributosEmpresa = atributosEmpresa + 1;
-            }
-
-            Integer empId = estEmpresa.getEmpresa().getId();
-            Integer lugarEmp = detalleEstudianteRepository.consultaLugarTrabajo(estEmpresa.getAsignatura().getAsiId());
-            if (lugarEmp!=null){
-                atributosEmpresa = atributosEmpresa + 1;
-            }
-            Integer lugarEst = Integer.valueOf(((Estudiante) perfil.get(0)).getLugar());
-
-
             if ((semestre == semestreEmpresa) || (semestre > semestreEmpresa)) {
 
                 atributosEstudiante = atributosEstudiante + 1;
-                datosCompatibles.put("semestre",semestre);
-            }
-            if (uniId_empresa == idUni) {
+                datosCompatibles.put("semestre", semestre);
 
-                atributosEstudiante = atributosEstudiante + 1;
-                Universidad uni = universidadService.findUniversidadById(idUni);
-                datosCompatibles.put("universidad",uni.getNombreUni());
-
-            }
-            if (lugarEst == lugarEmp) {
-                atributosEstudiante = atributosEstudiante + 1;
-                if ((lugarEst == PRESENCIAL)) {
-                    datosCompatibles.put("lugar", "Presencial");
-                } else if (lugarEst == REMOTO){
-                    datosCompatibles.put("lugar", "Remoto");
-                }else if (lugarEst==AMBOS){
-                    datosCompatibles.put("lugar", "Ambos");
-                }
-            }
-
-            HashMap<String,String> idiomasEmpresa =(HashMap) listadoCompleto.get(e).get("idioma");
-            if (idiomasEmpresa!= null && idiomasEmpresa.size() >0) {
-                int size_idioma = idiomasEmpresa.size() / 2;
-                for (int z = 0; z < size_idioma; z++) { // idiomas
-                    Integer idiomaEmpresa_list = Integer.valueOf(idiomasEmpresa.get("idIdi" + (z + 1)));
-                    Integer nivelIdiomaEmpresa = Integer.valueOf(idiomasEmpresa.get("nivel" + (z + 1)));
+                if (estEmpresa.getUniversidad() != null) {
+                    uniId_empresa = Integer.valueOf(estEmpresa.getUniversidad().getId());
                     atributosEmpresa = atributosEmpresa + 1;
-                    for (int x = 0; x < idiomasEstudiante.size(); x++) {
-                        Object idiomasObj = (Object) idiomasEstudiante.get(x).get("idioma");
-                        Integer idiomasEstudiante_list = ((Idioma) idiomasObj).getId().intValue();
-                        HashMap<String, ?> idiomas = (HashMap) idiomasEstudiante.get(0);
+                }
 
-                        Integer nivelIdiomaEstudiante = Integer.valueOf(idiomas.get("Nivel").toString());
-                        if ((idiomaEmpresa_list == idiomasEstudiante_list) && ((nivelIdiomaEstudiante == nivelIdiomaEmpresa) || (nivelIdiomaEstudiante > nivelIdiomaEmpresa))) {
-                            atributosEstudiante = atributosEstudiante + 1;
-                            Idioma idiomaDato = idiomaRepository.findById(idiomasEstudiante_list).get();
-                            if (nivelIdiomaEstudiante ==BASICO) {
-                                datosCompatibles.put("Idioma", idiomaDato.getNombreIdioma() +" " + "Basico");
-                            }else if (nivelIdiomaEstudiante ==INTERMEDIO){
-                                datosCompatibles.put("Idioma", idiomaDato.getNombreIdioma() +" "+ "Intermedio");
-                            }else if (nivelIdiomaEstudiante ==AVANZADO){
-                                datosCompatibles.put("Idioma", idiomaDato.getNombreIdioma() +" " + "Avanzado");
+                Integer empId = estEmpresa.getEmpresa().getId();
+                Integer lugarEmp = detalleEstudianteRepository.consultaLugarTrabajo(estEmpresa.getAsignatura().getAsiId());
+                if (lugarEmp != null) {
+                    atributosEmpresa = atributosEmpresa + 1;
+                }
+                Integer lugarEst = Integer.valueOf(((Estudiante) perfil.get(0)).getLugar());
+
+
+                if (uniId_empresa == idUni) {
+
+                    atributosEstudiante = atributosEstudiante + 1;
+                    Universidad uni = universidadService.findUniversidadById(idUni);
+                    datosCompatibles.put("universidad", uni.getNombreUni());
+
+                }
+                if (lugarEst == lugarEmp) {
+                    atributosEstudiante = atributosEstudiante + 1;
+                    if ((lugarEst == PRESENCIAL)) {
+                        datosCompatibles.put("lugar", "Presencial");
+                    } else if (lugarEst == REMOTO) {
+                        datosCompatibles.put("lugar", "Remoto");
+                    } else if (lugarEst == AMBOS) {
+                        datosCompatibles.put("lugar", "Ambos");
+                    }
+                }
+
+                HashMap<String, String> idiomasEmpresa = (HashMap) listadoCompleto.get(e).get("idioma");
+                if (idiomasEmpresa != null && idiomasEmpresa.size() > 0) {
+                    int size_idioma = idiomasEmpresa.size() / 2;
+                    for (int z = 0; z < size_idioma; z++) { // idiomas
+                        Integer idiomaEmpresa_list = Integer.valueOf(idiomasEmpresa.get("idIdi" + (z + 1)));
+                        Integer nivelIdiomaEmpresa = Integer.valueOf(idiomasEmpresa.get("nivel" + (z + 1)));
+                        atributosEmpresa = atributosEmpresa + 1;
+                        for (int x = 0; x < idiomasEstudiante.size(); x++) {
+                            Object idiomasObj = (Object) idiomasEstudiante.get(x).get("idioma");
+                            Integer idiomasEstudiante_list = ((Idioma) idiomasObj).getId().intValue();
+                            HashMap<String, ?> idiomas = (HashMap) idiomasEstudiante.get(0);
+
+                            Integer nivelIdiomaEstudiante = Integer.valueOf(idiomas.get("Nivel").toString());
+                            if ((idiomaEmpresa_list == idiomasEstudiante_list) && ((nivelIdiomaEstudiante == nivelIdiomaEmpresa) || (nivelIdiomaEstudiante > nivelIdiomaEmpresa))) {
+                                atributosEstudiante = atributosEstudiante + 1;
+                                Idioma idiomaDato = idiomaRepository.findById(idiomasEstudiante_list).get();
+                                if (nivelIdiomaEstudiante == BASICO) {
+                                    datosCompatibles.put("Idioma", idiomaDato.getNombreIdioma() + " " + "Basico");
+                                } else if (nivelIdiomaEstudiante == INTERMEDIO) {
+                                    datosCompatibles.put("Idioma", idiomaDato.getNombreIdioma() + " " + "Intermedio");
+                                } else if (nivelIdiomaEstudiante == AVANZADO) {
+                                    datosCompatibles.put("Idioma", idiomaDato.getNombreIdioma() + " " + "Avanzado");
+                                }
                             }
                         }
                     }
                 }
-            }
-            HashMap<String,String> deportesEmpresa =(HashMap) listadoCompleto.get(e).get("deporte");
-            if (deportesEmpresa!= null && deportesEmpresa.size() >0) {
-                int size_deporte = deportesEmpresa.size();
-                for (int z = 0; z < size_deporte; z++) { // deporte
-                    Integer DeporteEmpresa_list = Integer.valueOf(deportesEmpresa.get("idDep" + (z + 1)));
-                    atributosEmpresa = atributosEmpresa + 1;
-                    for (int x = 0; x < deportesEstudiante.size(); x++) {
-                        Object deporteObj = (Object) deportesEstudiante.get(x).get("deporte");
-                        Integer DeporteEstudiante_list = ((Deporte) deporteObj).getId();
-                        if (DeporteEmpresa_list == DeporteEstudiante_list) {
-                            atributosEstudiante = atributosEstudiante + 1;
-                            Deporte deporteDato = deporteRepository.findById(DeporteEmpresa_list).get();
-                            datosCompatibles.put("deporte", deporteDato.getNombreDeporte());
-                        }
-                    }
-                }
-            }
-
-
-            HashMap<String,String> habilidadesEmpresa = (HashMap) listadoCompleto.get(e).get("habilidades");
-            if (habilidadesEmpresa!= null && habilidadesEmpresa.size() >0) {
-                int size_habilidades = habilidadesEmpresa.size();
-                for (int z = 0; z < size_habilidades; z++) { // habilidades
-                    Integer HabilidadesEmpresa_list = Integer.valueOf(habilidadesEmpresa.get("idhab" + (z + 1)));
-                    atributosEmpresa = atributosEmpresa + 1;
-                    for (int x = 0; x < habilidadesEstudiante.size(); x++) {
-                        Object habilidadesObj = habilidadesEstudiante.get(x).get("Habilidades");
-                        Integer HabilidadesEstudiante_list = ((HabilidadesBlandas) habilidadesObj).getHabId();
-                        if (HabilidadesEmpresa_list == HabilidadesEstudiante_list) {
-                            atributosEstudiante = atributosEstudiante + 1;
-                            HabilidadesBlandas habilidadesDato = habilidadesBlandasRepository.findById(HabilidadesEstudiante_list).get();
-                            datosCompatibles.put("habilidades", habilidadesDato.getHabNombre());
-                        }
-                    }
-                }
-            }
-            HashMap<String,String> sytEmpresa = (HashMap) listadoCompleto.get(e).get("softYtecn");
-            if (sytEmpresa!= null && sytEmpresa.size() >0) {
-                int size_syt = sytEmpresa.size() / 2;
-                for (int z = 0; z < size_syt; z++) { // Software y Tecnologias
-                    Integer sytEmpresa_list = Integer.valueOf(sytEmpresa.get("idSyt" + (z + 1)));
-                    Integer nivelSytEmpresa = Integer.valueOf(sytEmpresa.get("nivel" + (z + 1)));
-                    atributosEmpresa = atributosEmpresa + 1;
-                    for (int x = 0; x < sytEstudiante.size(); x++) {
-                        Object sytObj = sytEstudiante.get(x).get("syt");
-                        Integer sytEstudiante_list = ((SoftwareTecnologias) sytObj).getSytId().intValue();
-                        HashMap<String, ?> syts = (HashMap) sytEstudiante.get(x);
-                        Integer nivelSytEstudiante = Integer.valueOf(syts.get("Nivel").toString());
-                        if ((sytEmpresa_list == sytEstudiante_list) && ((nivelSytEstudiante == nivelSytEstudiante) || (nivelSytEstudiante > nivelSytEmpresa))) {
-                            atributosEstudiante = atributosEstudiante + 1;
-                            SoftwareTecnologias sytDato= softwareTecnologiaRepository.findById(sytEstudiante_list).get();
-                            if (nivelSytEstudiante ==BASICO) {
-                                datosCompatibles.put("Syt", sytDato.getSytNombre() +" " + "Basico");
-                            }else if (nivelSytEstudiante ==INTERMEDIO){
-                                datosCompatibles.put("Syt", sytDato.getSytNombre() +" "+ "Intermedio");
-                            }else if (nivelSytEstudiante ==AVANZADO){
-                                datosCompatibles.put("Syt", sytDato.getSytNombre() +" " + "Avanzado");
+                HashMap<String, String> deportesEmpresa = (HashMap) listadoCompleto.get(e).get("deporte");
+                if (deportesEmpresa != null && deportesEmpresa.size() > 0) {
+                    int size_deporte = deportesEmpresa.size();
+                    for (int z = 0; z < size_deporte; z++) { // deporte
+                        Integer DeporteEmpresa_list = Integer.valueOf(deportesEmpresa.get("idDep" + (z + 1)));
+                        atributosEmpresa = atributosEmpresa + 1;
+                        for (int x = 0; x < deportesEstudiante.size(); x++) {
+                            Object deporteObj = (Object) deportesEstudiante.get(x).get("deporte");
+                            Integer DeporteEstudiante_list = ((Deporte) deporteObj).getId();
+                            if (DeporteEmpresa_list == DeporteEstudiante_list) {
+                                atributosEstudiante = atributosEstudiante + 1;
+                                Deporte deporteDato = deporteRepository.findById(DeporteEmpresa_list).get();
+                                datosCompatibles.put("deporte", deporteDato.getNombreDeporte());
                             }
                         }
                     }
                 }
+
+
+                HashMap<String, String> habilidadesEmpresa = (HashMap) listadoCompleto.get(e).get("habilidades");
+                if (habilidadesEmpresa != null && habilidadesEmpresa.size() > 0) {
+                    int size_habilidades = habilidadesEmpresa.size();
+                    for (int z = 0; z < size_habilidades; z++) { // habilidades
+                        Integer HabilidadesEmpresa_list = Integer.valueOf(habilidadesEmpresa.get("idhab" + (z + 1)));
+                        atributosEmpresa = atributosEmpresa + 1;
+                        for (int x = 0; x < habilidadesEstudiante.size(); x++) {
+                            Object habilidadesObj = habilidadesEstudiante.get(x).get("Habilidades");
+                            Integer HabilidadesEstudiante_list = ((HabilidadesBlandas) habilidadesObj).getHabId();
+                            if (HabilidadesEmpresa_list == HabilidadesEstudiante_list) {
+                                atributosEstudiante = atributosEstudiante + 1;
+                                HabilidadesBlandas habilidadesDato = habilidadesBlandasRepository.findById(HabilidadesEstudiante_list).get();
+                                datosCompatibles.put("habilidades", habilidadesDato.getHabNombre());
+                            }
+                        }
+                    }
+                }
+                HashMap<String, String> sytEmpresa = (HashMap) listadoCompleto.get(e).get("softYtecn");
+                if (sytEmpresa != null && sytEmpresa.size() > 0) {
+                    int size_syt = sytEmpresa.size() / 2;
+                    for (int z = 0; z < size_syt; z++) { // Software y Tecnologias
+                        Integer sytEmpresa_list = Integer.valueOf(sytEmpresa.get("idSyt" + (z + 1)));
+                        Integer nivelSytEmpresa = Integer.valueOf(sytEmpresa.get("nivel" + (z + 1)));
+                        atributosEmpresa = atributosEmpresa + 1;
+                        for (int x = 0; x < sytEstudiante.size(); x++) {
+                            Object sytObj = sytEstudiante.get(x).get("syt");
+                            Integer sytEstudiante_list = ((SoftwareTecnologias) sytObj).getSytId().intValue();
+                            HashMap<String, ?> syts = (HashMap) sytEstudiante.get(x);
+                            Integer nivelSytEstudiante = Integer.valueOf(syts.get("Nivel").toString());
+                            if ((sytEmpresa_list == sytEstudiante_list) && ((nivelSytEstudiante == nivelSytEstudiante) || (nivelSytEstudiante > nivelSytEmpresa))) {
+                                atributosEstudiante = atributosEstudiante + 1;
+                                SoftwareTecnologias sytDato = softwareTecnologiaRepository.findById(sytEstudiante_list).get();
+                                if (nivelSytEstudiante == BASICO) {
+                                    datosCompatibles.put("Syt", sytDato.getSytNombre() + " " + "Basico");
+                                } else if (nivelSytEstudiante == INTERMEDIO) {
+                                    datosCompatibles.put("Syt", sytDato.getSytNombre() + " " + "Intermedio");
+                                } else if (nivelSytEstudiante == AVANZADO) {
+                                    datosCompatibles.put("Syt", sytDato.getSytNombre() + " " + "Avanzado");
+                                }
+                            }
+                        }
+                    }
+                }
+                datosCompatibles.put("Pais", paisDato);
+                datosCompatibles.put("carrera", carreraDato);
+
+                Integer puntaje = (atributosEstudiante * 100) / atributosEmpresa;
+                afinidad.put("afinidad", puntaje.toString());
+                list_por_items.add(listadoCompleto.get(e));
+
+                list_por_items.add(afinidad);
+
+                listadoOrdenadoDetalle.add(list_por_items);
+                asigList.add(afinidad);
+                asigList.add(datosCompatibles);
+                result.add(asigList);
+                asigList = new ArrayList<>();
+                atributosEmpresa = 2;
+                atributosEstudiante = 2;
+                puntaje = 0;
+                afinidad = new HashMap<>();
+                list_por_items = new ArrayList<>();
             }
-            datosCompatibles.put("Pais", paisDato);
-            datosCompatibles.put("carrera", carreraDato);
+            }
 
-            Integer puntaje = (atributosEstudiante * 100) / atributosEmpresa;
-            afinidad.put("afinidad", puntaje.toString());
-            list_por_items.add(listadoCompleto.get(e));
-
-            list_por_items.add(afinidad);
-
-            listadoOrdenadoDetalle.add(list_por_items);
-            asigList.add(afinidad);
-            asigList.add(datosCompatibles);
-            result.add(asigList);
-            asigList = new ArrayList<>();
-            atributosEmpresa = 2;
-            atributosEstudiante = 2;
-            puntaje = 0;
-            afinidad = new HashMap<>();
-            list_por_items = new ArrayList<>();
-
-        }
 
         return result;
     }
@@ -787,36 +796,38 @@ public List<Object> consultaEstudiante(Integer usuario){
         HabilidadesBlandasMaestro habilidad = new HabilidadesBlandasMaestro();
         SoftwareTecnologiasMaestro syt = new SoftwareTecnologiasMaestro();
         PasatiempoMaestro pasatiempo = new PasatiempoMaestro();
+        if (list_Idi!=null) {
+            for (int i = 0; i < list_Idi.size(); i++) {
+                HashMap<String, Integer> idi = ((HashMap) list_Idi.get(i));
+                if (tipo == ESTUDIANTE) {
 
-        for (int i=0;i<list_Idi.size();i++){
-            HashMap<String,Integer> idi = ((HashMap) list_Idi.get(i));
-            if (tipo==ESTUDIANTE){
+                    idioma.setEstudiante(estudiante);
+                } else {
+                    idioma.setDetalleEstudiante(detalleEstudiante);
 
-            idioma.setEstudiante(estudiante);
-            }else{
-                idioma.setDetalleEstudiante(detalleEstudiante);
-
+                }
+                Integer idiomaId = idi.get("idIdioma");
+                Idioma idiomaObj = idiomaRepository.findById(idiomaId).get();
+                idioma.setIdioma(idiomaObj);
+                idioma.setNivel(Integer.valueOf(idi.get("nivel")));
+                idioma = idiomaMaestroRepository.save(idioma);
+                idioma = new IdiomaMaestro();
             }
-            Integer idiomaId=idi.get("idIdioma");
-            Idioma idiomaObj= idiomaRepository.findById(idiomaId).get();
-            idioma.setIdioma(idiomaObj);
-            idioma.setNivel(Integer.valueOf(idi.get("nivel")));
-            idioma= idiomaMaestroRepository.save(idioma);
-            idioma = new IdiomaMaestro();
         }
-        for (int i=0;i<list_Dep.size();i++){
-            Integer dep = ((Integer) list_Dep.get(i));
-            if (tipo==ESTUDIANTE) {
-                deporte.setEstudiante(estudiante);
-            }else {
-                deporte.setDetalleEstudiante(detalleEstudiante);
+        if (list_Dep!=null) {
+            for (int i = 0; i < list_Dep.size(); i++) {
+                Integer dep = ((Integer) list_Dep.get(i));
+                if (tipo == ESTUDIANTE) {
+                    deporte.setEstudiante(estudiante);
+                } else {
+                    deporte.setDetalleEstudiante(detalleEstudiante);
+                }
+                Deporte deporteObj = deporteRepository.findById(dep).get();
+                deporte.setDeporte(deporteObj);
+                deporte = deporteMaestroRepository.save(deporte);
+                deporte = new DeporteMaestro();
             }
-            Deporte  deporteObj = deporteRepository.findById(dep).get();
-            deporte.setDeporte(deporteObj);
-            deporte= deporteMaestroRepository.save(deporte);
-            deporte = new DeporteMaestro();
         }
-
         if (list_Pasatiempo!=null){
             for (int i=0;i<list_Pasatiempo.size();i++){
                 Integer pas = (Integer) list_Pasatiempo.get(i);
@@ -827,31 +838,35 @@ public List<Object> consultaEstudiante(Integer usuario){
                 pasatiempo = new PasatiempoMaestro();
             }
         }
-        for (int i=0;i<list_Hab.size();i++){
-            Integer hab = (Integer) list_Hab.get(i);
-            if (tipo==ESTUDIANTE) {
-                habilidad.setEstudiante(estudiante);
-            }else{
-                habilidad.setDetalleEstudiante(detalleEstudiante);
+        if (list_Hab!=null) {
+            for (int i = 0; i < list_Hab.size(); i++) {
+                Integer hab = (Integer) list_Hab.get(i);
+                if (tipo == ESTUDIANTE) {
+                    habilidad.setEstudiante(estudiante);
+                } else {
+                    habilidad.setDetalleEstudiante(detalleEstudiante);
+                }
+                HabilidadesBlandas habilidadesObj = habilidadesBlandasRepository.findById(hab).get();
+                habilidad.setHabilidadesBlandas(habilidadesObj);
+                habilidad = habilidadesBlandasMaestroRepository.save(habilidad);
+                habilidad = new HabilidadesBlandasMaestro();
             }
-            HabilidadesBlandas habilidadesObj = habilidadesBlandasRepository.findById(hab).get();
-            habilidad.setHabilidadesBlandas(habilidadesObj);
-            habilidad= habilidadesBlandasMaestroRepository.save(habilidad);
-            habilidad = new HabilidadesBlandasMaestro();
         }
-        for (int i=0;i<list_Syt.size();i++){
-            HashMap<String,Integer> syt_ = (HashMap) list_Syt.get(i);
-            if (tipo==ESTUDIANTE) {
-                syt.setEstudiante(estudiante);
-            }else {
-                syt.setDetalleEstudiante(detalleEstudiante);
+        if (list_Syt!=null) {
+            for (int i = 0; i < list_Syt.size(); i++) {
+                HashMap<String, Integer> syt_ = (HashMap) list_Syt.get(i);
+                if (tipo == ESTUDIANTE) {
+                    syt.setEstudiante(estudiante);
+                } else {
+                    syt.setDetalleEstudiante(detalleEstudiante);
+                }
+                Integer sytId = syt_.get("idSyt").intValue();
+                SoftwareTecnologias sytObj = softwareTecnologiaRepository.findById(sytId).get();
+                syt.setSoftwareTecnologias(sytObj);
+                syt.setNivel(syt_.get("nivel"));
+                syt = softwareTecnologiaMaestroRepository.save(syt);
+                syt = new SoftwareTecnologiasMaestro();
             }
-            Integer sytId = syt_.get("idSyt").intValue();
-            SoftwareTecnologias sytObj = softwareTecnologiaRepository.findById(sytId).get();
-            syt.setSoftwareTecnologias(sytObj);
-            syt.setNivel(syt_.get("nivel"));
-            syt= softwareTecnologiaMaestroRepository.save(syt);
-            syt = new SoftwareTecnologiasMaestro();
         }
 
     return true;
@@ -895,7 +910,8 @@ public List<Object> consultaEstudiante(Integer usuario){
 
     public List<Estudiante> consultaEstudiantesSugeridos(List<Integer> carrera, List<Integer> semestre, List<Integer> pais, List<Integer> lugar, List<Integer> univ) {
 
-        List<Estudiante> estudiantes = estudianteRepository.consultarEstudiantesSugeridos(carrera,semestre,pais,lugar,univ);
-    return null;
+        List<Estudiante> estudiantes = estudianteRepository.consultarEstudiantesSugeridos(carrera,pais);
+
+    return estudiantes;
     }
 }
