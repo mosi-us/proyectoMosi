@@ -11,8 +11,9 @@ import java.util.List;
 
 public interface DetalleEstudianteRepository extends JpaRepository<DetalleEstudiante, Integer> {
 
-    String SQL_CONSULTA_ESTUDIANTE_EMPRESA = "select * from DET_ESTUDIANTE " +
-            "            where ((CAR_Id = :idCar AND PAI_ID=:idPais) OR (DET_SEM= :semestre ) AND (DET_Tipo=:tipo))";
+    String SQL_CONSULTA_ESTUDIANTE_EMPRESA = "select * from DET_ESTUDIANTE DET" +
+            " inner join PAM_PaisMaestro pam on DET.DET_ID = pam.DET_Id " +
+            "            where ((DET.CAR_Id = :idCar AND PAM.PAI_ID = :idPais) OR (DET_SEM= :semestre ) AND (DET_Tipo=:tipo))";
     @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTE_EMPRESA)
     List<DetalleEstudiante> consultar_estudiantes_empresa(@Param("idCar") Integer idsCar,
                                                           @Param("idPais") Integer idPais,
@@ -25,6 +26,5 @@ public interface DetalleEstudianteRepository extends JpaRepository<DetalleEstudi
     Integer consultaLugarTrabajo (@Param("asiId") Integer asiId);
 
     List<DetalleEstudiante> findByAsignatura (Asignatura asignatura);
-
     List<DetalleEstudiante> findByAsignaturaAndEmpresa (Asignatura asignatura, Empresa empresa);
 }

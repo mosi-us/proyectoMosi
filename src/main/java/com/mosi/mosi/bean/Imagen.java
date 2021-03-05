@@ -1,7 +1,7 @@
 package com.mosi.mosi.bean;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -24,13 +24,13 @@ public class Imagen {
 
     @Basic
     @Column(name = "IMG_Ruta")
-    private Integer imgRuta;
+    private String imgRuta;
 
-    public Integer getImgRuta() {
+    public String getImgRuta() {
         return imgRuta;
     }
 
-    public void setImgRuta(Integer imgRuta) {
+    public void setImgRuta(String imgRuta) {
         this.imgRuta = imgRuta;
     }
 
@@ -72,36 +72,36 @@ public class Imagen {
 
     @Basic
     @Column(name = "IMG_FECHACREACION")
-    private Timestamp imgFechaCreacion;
+    private Date imgFechaCreacion;
 
-    public Timestamp getImgFechaCreacion() {
+    public Date getImgFechaCreacion() {
         return imgFechaCreacion;
     }
 
-    public void setImgFechaCreacion(Timestamp imgFechaCreacion) {
+    public void setImgFechaCreacion(Date imgFechaCreacion) {
         this.imgFechaCreacion = imgFechaCreacion;
     }
 
     @Basic
     @Column(name = "IMG_FECHAACTUALIZACION")
-    private Timestamp imgFechaActualizacion;
+    private Date imgFechaActualizacion;
 
-    public Timestamp getImgFechaActualizacion() {
+    public Date getImgFechaActualizacion() {
         return imgFechaActualizacion;
     }
 
-    public void setImgFechaActualizacion(Timestamp imgFechaActualizacion) {
+    public void setImgFechaActualizacion(Date imgFechaActualizacion) {
         this.imgFechaActualizacion = imgFechaActualizacion;
     }
 
     @Basic
     @Column(name = "IMG_FECHAELIMINACION")
-    private Timestamp imgFechaEliminacion;
-    public Timestamp getImgFechaEliminacion() {
+    private Date imgFechaEliminacion;
+    public Date getImgFechaEliminacion() {
         return imgFechaEliminacion;
     }
 
-    public void setImgFechaEliminacion(Timestamp imgFechaEliminacion) {
+    public void setImgFechaEliminacion(Date imgFechaEliminacion) {
         this.imgFechaEliminacion = imgFechaEliminacion;
     }
 

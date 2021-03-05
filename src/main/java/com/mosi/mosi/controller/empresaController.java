@@ -8,6 +8,7 @@ import com.mosi.mosi.repository.EstudianteRepository;
 import com.mosi.mosi.repository.PostulacionesRepository;
 import com.mosi.mosi.repository.PreguntasRepository;
 import com.mosi.mosi.service.EstudianteService;
+import com.mosi.mosi.service.GeneralService;
 import com.mosi.mosi.service.UserService;
 import com.mosi.mosi.service.empresaService;
 import org.jsondoc.core.annotation.ApiBodyObject;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.Period;
@@ -25,6 +28,8 @@ import static com.mosi.mosi.constantes.constante.*;
 
 @RestController
 public class empresaController {
+    @Autowired
+    GeneralService generalService;
     @Autowired
     PostulacionesRepository postulacionesRepository;
     @Autowired
@@ -38,6 +43,21 @@ public class empresaController {
     @Autowired
     private EstudianteService estudianteService;
 
+    /**PARAMETROS:
+     {"descripcion_empresa": " ",
+     "rubro":4 ,
+     "ubicacion": ,
+     "paisId":4 ,
+     "sitioWeb":"",
+     "codigo_pais": "",
+     "correo": "epacompania@gmail.com",
+     "nombreEmpresa":"EPA,C.A" ,
+     "razonSocial":"",
+     "telefono":"",
+     "mision":"",
+     "vision":"",
+     "idUser":22}
+     * */
     @PostMapping("/guardarPerfilEmpresa")
     public Empresa guardarPerfilEmpresa(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
@@ -64,8 +84,7 @@ public class empresaController {
         String vision = (params.containsKey(VISION) && params.get(VISION) != null && !params.get(VISION).toString().isEmpty())
                 ? params.get(VISION).toString() : null;
         Integer usuId= (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty() ? Integer.valueOf(params.get(ID_USER).toString()) : null );
-        if (descripcion!= null && rubro!= null && ubicacion!=null && pais!=null && sitioW!=null && codigoPais!=null && correo!=null && nombre!=null && razonSocial!=null
-                && telefono!=null && mision!=null && vision!=null){
+        if ( rubro!= null && pais!=null  && correo!=null && nombre!=null){
             emp = empresaService.guardarPerfilEmpresa(descripcion,rubro,ubicacion,pais,sitioW,codigoPais,correo,nombre,razonSocial,telefono,mision,vision,usuId);
         }
 
@@ -108,7 +127,7 @@ public class empresaController {
      "hamId":[]
      },{
      "descripcion_estudiante":"",
-     "paisId":,
+     "paisId":[],
      "semestre":,
      "carID":,
      "depId":[],
@@ -120,7 +139,7 @@ public class empresaController {
      }
     * */
     @PostMapping("/AgregarDesafio_Practica")
-    public List<HashMap<String,Object>> AgregarDesafio_Practica(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
+    public List<HashMap<String,Object>> AgregarDesafio_Practica(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
 
         String titulo = (params.containsKey(TITULO_ASI) && params.get(TITULO_ASI) != null && !params.get(TITULO_ASI).toString().isEmpty())
@@ -137,10 +156,10 @@ public class empresaController {
         List<?> caracteristicas_Estudiante = (params.containsKey(CARACTERISTICAS) &&  params.get(CARACTERISTICAS) != null) ? UserService.convertObjectToList(params.get(CARACTERISTICAS)) : null;
 
                 String descripcion  ="";
-                Integer pais 	    =0;
                 Integer semestre    =0;
                 Integer carrera     =0;
                 Integer universidad =0;
+                List<?> pais 	    =new ArrayList<>();
                 List<?> deporte     =new ArrayList<>();
                 List<?> idioma      =new ArrayList<>();
                 List<?> softYTecn   =new ArrayList<>();
@@ -169,10 +188,10 @@ public class empresaController {
                 for(int i=0; i<caracteristicas_Estudiante.size();i++){
                     LinkedHashMap caract = (LinkedHashMap) caracteristicas_Estudiante.get(i);
                     descripcion  = ((caract.containsKey(DESCRIPCION_EST))&&(caract.get(DESCRIPCION_EST))!=null) ? caract.get(DESCRIPCION_EST).toString() : null;
-                    pais 	     = Integer.valueOf(caract.get(PAIS_ID).toString()) ;
                     semestre    = ((caract.containsKey(SEMESTRE))&&(caract.get(SEMESTRE)!=null)) ? Integer.valueOf(caract.get(SEMESTRE).toString())  : null;
                     carrera     = Integer.valueOf(caract.get(CARRERA_ID).toString());
                     universidad = ((caract.containsKey(UNIVERSIDAD_ID))&&(caract.get(UNIVERSIDAD_ID)!=null)) ? Integer.valueOf(caract.get(UNIVERSIDAD_ID).toString()): null;
+                    pais 	     = ((caract.containsKey(PAISES))&&(caract.get(PAISES)!=null)) ? UserService.convertObjectToList(caract.get(PAISES)): null  ;
                     deporte     = ((caract.containsKey(DEPORTE_ID))&&(caract.get(DEPORTE_ID)!=null)) ? UserService.convertObjectToList(caract.get(DEPORTE_ID)): null  ;
                     idioma      = ((caract.containsKey(IDIOMAS))&&(caract.get(IDIOMAS)!=null)) ? UserService.convertObjectToList(caract.get(IDIOMAS)): null  ;
                     softYTecn   = ((caract.containsKey(SOFTWARE_TECNOLOGIA))&&(caract.get(SOFTWARE_TECNOLOGIA)!=null)) ? UserService.convertObjectToList(caract.get(SOFTWARE_TECNOLOGIA)): null  ;
@@ -198,13 +217,18 @@ public class empresaController {
                         listpreg.put("preguntas " + (j+1), pregList.get(j));
                     }
                 }
-
                     }
-
                 }
             result.add(listAsi);
-
             result.add(listpreg);
+        String asi = "";
+        if (asignatura.getAsiTipo()==PRACTICAS){
+            asi= "una Pasantia";
+        }else if (asignatura.getAsiTipo()==DESAFIOS){
+            asi= "un Desafio";
+        }
+            String msj ="Has subido "+ asi +" a tu perfil de MOSI, exitosamente";
+            estudianteService.enviarEmail(asignatura.getEmpresa().getCorreo(),msj);
         return result;
     }
 
@@ -240,12 +264,15 @@ public class empresaController {
         Integer asignatura = (params.containsKey(ASIGNATURA) && params.get(ASIGNATURA) != null && !params.get(ASIGNATURA).toString().isEmpty())
                 ? Integer.valueOf(params.get(ASIGNATURA).toString()) : null;
         HashMap<String, Object> result = new HashMap<>();
+        Postulaciones postulaciones = new Postulaciones();
         Estudiante perfil = estudianteRepository.findById(idEstudiante).get();
         Asignatura asig = asignaturaRepository.findByAsiId(asignatura);
         // HashMap<String,Object> Estudiante =estudianteService.consultaEstudiante()
         List<Object> caracteristicas = estudianteService.consultaCaracteristicas(perfil, null, ESTUDIANTE);
         Estudiante estudiante = ((Estudiante) caracteristicas.get(0));
-        Postulaciones postulaciones = postulacionesRepository.findByEstudianteAndAsignatura(estudiante, asig);
+        if (asig!=null) {
+            postulaciones = postulacionesRepository.findByEstudianteAndAsignatura(estudiante, asig);
+        }
         String nombres = ((Estudiante) caracteristicas.get(0)).getNombre().toString();
         String apellidos = ((Estudiante) caracteristicas.get(0)).getApellido().toString();
         Integer dia = null, mes = null, año = null;
@@ -270,7 +297,7 @@ public class empresaController {
         }
         result.put("Forma de Trabajo", forma_de_trabajo);
 
-        if (postulaciones.getPosEstatus() == ACEPTADO) {
+        if ((postulaciones.getPosEstatus() == ACEPTADO)) {
             if (estudiante.getTelefono()!=null){
                 result.put("Informacion de Contacto:", estudiante.getCorreo() + estudiante.getTelefono());
             }else{
@@ -305,8 +332,13 @@ public class empresaController {
             return result;
     }
 
+    /**
+     {"idAsignatura" :63 ,
+     "idEstudiante":108
+     }
+     * */
     @PostMapping("/seleccionarEstudiante")
-    public HashMap<String,Object> seleccionarEstudiante(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException, ParseException {
+    public HashMap<String,Object> seleccionarEstudiante(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         Integer idEstudiante = (params.containsKey(ID_ESTUDIANTE) && params.get(ID_ESTUDIANTE) != null && !params.get(ID_ESTUDIANTE).toString().isEmpty())
                 ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
@@ -324,9 +356,17 @@ public class empresaController {
             info_de_contacto_Estudiante.put("Telefono: ", estudiante.getCodigoPais()+"-"+estudiante.getTelefono());
             info_de_contacto_Estudiante.put("Correo: ", estudiante.getCorreo());
             info_de_contacto_Estudiante.put("Nombre: ", estudiante.getNombre()+" "+ estudiante.getApellido());
+            /*envio correo de notificacion*/
+            String mensaje_est = DETALLE_EMAIL_SELECCIONAR_ESTUDIANTE + asignatura.getEmpresa().getNombre();
+            estudianteService.enviarEmail(estudiante.getCorreo(),mensaje_est);
+            String mensaje_emp = DETALLE_EMAIL_SELECCIONAR_EMPRESA +estudiante.getNombre()+ " "+estudiante.getApellido()
+                    + ", ahora puedes comunicarte con él , sus datos de contacto son: Correo: " + estudiante.getCorreo()+ " Telefono: " + estudiante.getTelefono();
+            estudianteService.enviarEmail(asignatura.getEmpresa().getCorreo(), mensaje_emp);
+
         }
         return info_de_contacto_Estudiante;
     }
+
     @PostMapping("/verEstudiantesSeleccionados")
     public List<Postulaciones> verEstudiantesSeleccionados(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException, ParseException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
@@ -337,6 +377,9 @@ public class empresaController {
 
         return listaEstudiantesSeleccionados;
     }
+    /**Parametros**
+     {"idAsignatura":}
+     * */
     @PostMapping("/sugerirEstudiantes")
     public List<HashMap<String,Object>> sugerirEstudiantes(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException, ParseException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
@@ -348,6 +391,18 @@ public class empresaController {
         return result;
 
     }
+    /**
+     *Parametros:
+
+    */
+    @PostMapping("/rechazarEstudiante")
+    public String rechazarEstudiante(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer portulacion = (params.containsKey(POSTULACION) && params.get(POSTULACION) != null && !params.get(POSTULACION).toString().isEmpty())
+                ? Integer.valueOf(params.get(POSTULACION).toString()) : null;
 
 
+        String resp =  empresaService.rechazarEstudiante(portulacion);
+        return resp;
+    }
     }

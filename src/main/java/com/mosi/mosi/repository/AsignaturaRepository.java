@@ -1,9 +1,12 @@
 package com.mosi.mosi.repository;
 
 import com.mosi.mosi.bean.Asignatura;
+import com.mosi.mosi.bean.Empresa;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface AsignaturaRepository extends JpaRepository<Asignatura,String> {
     String SQL_DETALLE_ASIGNATURA = "select asi.ASI_id," +
@@ -20,4 +23,6 @@ public interface AsignaturaRepository extends JpaRepository<Asignatura,String> {
     Object[] consultaDetalleAsignatura(@Param("idAsi") Integer idAsi);
 
     Asignatura findByAsiId(Integer asiId);
+
+    List<Asignatura> findByEmpresa(Empresa empresa);
 }

@@ -5,6 +5,8 @@ import com.mosi.mosi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,8 +15,10 @@ import static com.mosi.mosi.constantes.constante.*;
 
 @Service
 public class empresaService {
-
-
+    @Autowired
+    GeneralService generalService;
+    @Autowired
+    PaisMaestroRepository paisMaestroRepository;
     @Autowired
     PreguntasRepository preguntasRepository;
     @Autowired
@@ -62,17 +66,31 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
                                      String nombre,String razonSocial,String telefono,String mision,String vision,Integer usuId){
     Empresa empresa = new Empresa();
 
+    if (descripcion != null) {
     empresa.setDescripcion(descripcion);
+    }
     empresa.setRubro(rubroRepository.findById(rubro).get());
-    empresa.setUbicacion(ubicacion);
+    if (ubicacion != null) {
+        empresa.setUbicacion(ubicacion);
+    }
     empresa.setPais(paisService.findPaisbyId(pais));
-    empresa.setSitioWeb(sitioW);
+    if (sitioW != null) {
+        empresa.setSitioWeb(sitioW);
+    }
     empresa.setCorreo(correo);
     empresa.setNombre(nombre);
-    empresa.setRazonsocial(razonSocial);
-    empresa.setTelefono(codigoPais + " " + telefono);
-    empresa.setMision(mision);
-    empresa.setVision(vision);
+    if (razonSocial != null) {
+        empresa.setRazonsocial(razonSocial);
+    }
+    if (telefono != null) {
+        empresa.setTelefono(codigoPais + " " + telefono);
+    }
+    if (mision != null) {
+        empresa.setMision(mision);
+    }
+    if (vision != null) {
+        empresa.setVision(vision);
+    }
     empresa.setUsers(userService.findUsersbyId(usuId));
 
     Empresa result = empresaRepository.save(empresa);
@@ -89,10 +107,11 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
     }
 
 
-    public DetalleEstudiante guardarEstudiante(Integer pais, List<?> deporte, Integer empId, Integer idAsi, List<?> idioma,
+    public DetalleEstudiante guardarEstudiante(List<?> pais, List<?> deporte, Integer empId, Integer idAsi, List<?> idioma,
                                                Integer universidad, Integer carrera, Integer semestre, String descripcion, List<?> softYTecn, List<?> hablidadesB, List<?> preguntas){
         DetalleEstudiante detEstudiante = new DetalleEstudiante();
         DetalleEstudiante estudiante = new DetalleEstudiante();
+        PaisMaestro paises = new PaisMaestro();
 
         Asignatura asignatura =asignaturaRepository.findByAsiId(idAsi);
 
@@ -102,7 +121,7 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
             }
             estudiante.setAsignatura(asignatura);
             estudiante.setEmpresa(empresaRepository.findById(empId).get());
-            estudiante.setPais(paisesRepository.findById(pais).get());
+
             if (semestre != null) {
                 estudiante.setDetSem(semestre);
             }
@@ -112,7 +131,12 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
             }
 
             estudiante = detalleEstudianteRepository.save(estudiante);
-
+            for(int i=0;i<pais.size();i++){
+            paises.setPaises(paisesRepository.findById(Integer.valueOf(pais.get(i).toString())).get());
+            paises.setDetalleEstudiante(estudiante);
+            paises =  paisMaestroRepository.save(paises);
+            paises = new PaisMaestro();
+            }
             Boolean saveCaracteristicas = estudianteService.guardarcaracteristicas(idioma,deporte,null, hablidadesB, softYTecn, null, estudiante, EMPRESA);
 
             if (saveCaracteristicas==true){
@@ -217,19 +241,24 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
     }
 
     public List<HashMap<String,Object>> sugerirEstudiante(Integer idAsignatura) {
-
+    List<Integer> idsPaises = new ArrayList<>();
     Asignatura asignatura = asignaturaRepository.findByAsiId(idAsignatura);
         List<DetalleEstudiante> detalle = detalleEstudianteRepository.findByAsignatura(asignatura);
-        List<Integer> carrera = new ArrayList<>();
-        List<Integer> pais = new ArrayList<>();
+        for (DetalleEstudiante det: detalle
+             ) {
+        List<PaisMaestro> paises = paisMaestroRepository.findByDetalleEstudiante(det);
+        for (int i=0;i<paises.size();i++){
+            idsPaises.add(paises.get(i).getPaises().getId());
+        }
 
+        }
+        List<Integer> carrera = new ArrayList<>();
         for (DetalleEstudiante det:detalle
              ) {
             carrera.add(det.getCarrera().getId());
-            pais.add(det.getPais().getId());
         }
 
-        List<Estudiante> estudiantes = estudianteService.consultaEstudiantesSugeridos(carrera,pais);
+        List<Estudiante> estudiantes = estudianteService.consultaEstudiantesSugeridos(carrera,idsPaises);
         List<HashMap<String,Object>> listEstudiantes = this.compatibilidadEstudiantes(detalle,estudiantes);
 
         return listEstudiantes;
@@ -404,5 +433,19 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
 
         }
     return ListEstudiantesCompatibles;
+    }
+
+    public String rechazarEstudiante(Integer portulacion) throws IOException, MessagingException {
+    Postulaciones estudiante = new Postulaciones();
+        Integer rechazar = postulacionesRepository.rechazarEstudiante(portulacion,RECHAZADO);
+        String mensaje = "";
+        if(rechazar==1){
+            estudiante = postulacionesRepository.findById(portulacion).get();
+            String email = estudiante.getEstudiante().getCorreo();
+            String msj = DETALLE_EMAIL_RECHAZA_ESTUDIANTE + estudiante.getEmpresa().getNombre();
+            generalService.enviarEmail(email,ASUNTO,msj);
+            mensaje ="Se ha rechazado el estudiante exitosamente!";
+        }
+        return mensaje;
     }
 }

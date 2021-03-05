@@ -57,6 +57,38 @@ public class Usuarios implements Serializable {
     @Column(name="USU_CODPAIS")
     private String codigoPais;
 
+    @Column(name = "USU_RESETEARCLAVETOKEN")
+    private String tokenReseteo;
+    @Column(name = "USU_FECHARESETEO")
+    private Date fechaReseteo;
+
+    @Column(name = "USU_INTENTOFALLIDO")
+    private Integer intentoFallido;
+
+    public Integer getIntentoFallido() {
+        return intentoFallido;
+    }
+
+    public void setIntentoFallido(Integer intentoFallido) {
+        this.intentoFallido = intentoFallido;
+    }
+
+    public String getTokenReseteo() {
+        return tokenReseteo;
+    }
+
+    public void setTokenReseteo(String tokenReseteo) {
+        this.tokenReseteo = tokenReseteo;
+    }
+
+    public Date getFechaReseteo() {
+        return fechaReseteo;
+    }
+
+    public void setFechaReseteo(Date fechaReseteo) {
+        this.fechaReseteo = fechaReseteo;
+    }
+
     public String getTelefono() {
         return telefono;
     }

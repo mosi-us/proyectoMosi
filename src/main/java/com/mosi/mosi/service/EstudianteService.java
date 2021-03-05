@@ -5,13 +5,17 @@ import com.mosi.mosi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.*;
 
 import static com.mosi.mosi.constantes.constante.*;
 
 @Service
 public class EstudianteService {
+    @Autowired
+    GeneralService generalService;
     @Autowired
     PreguntasRepository preguntasRepository;
     @Autowired
@@ -78,7 +82,7 @@ public class EstudianteService {
 public Estudiante guardarEstudiante(String nombresEstudiante, String apellidosEstudiante,
                                     Integer fechaNac, Integer pais,Integer ciudad,String tlf,String codPais,String correo, List<?>deporte,
                                     List<?> idioma, Integer universidad, Integer carrera, Integer usuario,Integer semestre,
-                                    List<?> pasatiempo,String descripcion,List<?>softTecn,List<?>habilidades, Integer lugar){
+                                    List<?> pasatiempo,String descripcion,List<?>softTecn,List<?>habilidades, Integer lugar) throws IOException, MessagingException {
     Estudiante estudiante = new Estudiante();
     DeporteMaestro dep =new DeporteMaestro();
     IdiomaMaestro idi =new IdiomaMaestro();
@@ -120,6 +124,8 @@ public Estudiante guardarEstudiante(String nombresEstudiante, String apellidosEs
         int est = estudiante.getId();
         if (estudiante.getId()!=null) {
             Boolean saveCaracteristicas = this.guardarcaracteristicas(idioma,deporte,pasatiempo,habilidades,softTecn,estudiante,null,ESTUDIANTE);
+            String mensaje="Has ingresado correctamente tu perfil a MOSI";
+            generalService.enviarEmail(estudiante.getCorreo(),ASUNTO,mensaje);
         }
 
     }
@@ -278,7 +284,7 @@ public List<Object> consultaEstudiante(Integer usuario){
         return errorMessage;
     }
 
-    public String postular(Integer idAsi, Integer IdEst,Integer afinidad,List<?> resp){
+    public String postular(Integer idAsi, Integer IdEst,Integer afinidad,List<?> resp) throws IOException, MessagingException {
 
     /**
      * Agregar logica:
@@ -334,18 +340,28 @@ public List<Object> consultaEstudiante(Integer usuario){
         return respu;
     }
 
-    public Boolean notificar( Integer remitente,Asignatura asi,String titulo,Integer estatus,Integer destino,Integer tipoPersona){
+    public Boolean notificar( Integer remitente,Asignatura asi,String titulo,Integer estatus,Integer destino,Integer tipoPersona) throws IOException, MessagingException {
         /*guardo notificacion*/
         String nombre = "";
+        String nombreAsig = asi.getAsiTitulo();
         Notificaciones not = new Notificaciones();
         if (tipoPersona==ESTUDIANTE){
             Estudiante rem = estudianteRepository.findById(remitente).get();
             nombre = rem.getNombre() + " " + rem.getApellido();
+            String msj_Est = "Has postulado exitosamente a"+ asi.getAsiTitulo() + " en la empresa "+ asi.getEmpresa().getNombre() + "., te deseamos ÉXITO!";
+            String asignatura = "";
+            if (asi.getAsiTipo()==PRACTICAS){
+                asignatura= " a la Pasantia";
+            }else if (asi.getAsiTipo()==DESAFIOS){
+                asignatura= "al Desafio";
+            }
+            String msj_Emp = rem.getNombre() + " " + rem.getApellido() +" ha postulado " + asignatura + " "+ asi.getAsiTitulo();
+            this.enviarEmail(rem.getCorreo(),msj_Est);
+            this.enviarEmail(asi.getEmpresa().getCorreo(),msj_Emp);
         }else if (tipoPersona==EMPRESA){
             Empresa rem = empresaRepository.findById(remitente).get();
             nombre = rem.getNombre();
         }
-        String nombreAsig = asi.getAsiTitulo();
         not.setNotTitulo(nombre + titulo + nombreAsig);
         not.setNotEstatus(ENVIADO);
         not.setNotFechaEnvio(new Date());
@@ -354,7 +370,14 @@ public List<Object> consultaEstudiante(Integer usuario){
         Notificaciones env_not = notificacionesRepository.save(not);
     return true;
     }
-   public List<HashMap<String,Object>> listarDetalleEstudiantes (List<DetalleEstudiante> det_estudiante){
+
+    public void enviarEmail(String correo,String msj) throws IOException, MessagingException {
+
+
+        generalService.enviarEmail(correo,ASUNTO,msj);
+    }
+
+    public List<HashMap<String,Object>> listarDetalleEstudiantes (List<DetalleEstudiante> det_estudiante){
        HashMap<String,String> detalleEstudianteEmp = new HashMap<>();
        List<Integer> idsDet = new ArrayList<>();
        HashMap<String,String> listaEspSemCarr = new HashMap<>();
@@ -765,7 +788,7 @@ public List<Object> consultaEstudiante(Integer usuario){
             Integer semestre =((Estudiante) perfil.get(0)).getSemestre();
 
             /**busqueda por carrera y pais*/
-            List<DetalleEstudiante> det_estudiante = new ArrayList<DetalleEstudiante>();
+            List<DetalleEstudiante> det_estudiante;
             det_estudiante = detalleEstudianteRepository.consultar_estudiantes_empresa(idCar, idPais, semestre, tipo);
             List<HashMap<String,Object>> list = this.listarDetalleEstudiantes(det_estudiante);
             List<List<HashMap<String, Object>>> asigList = this.compatibilidad(list,perfil,ESTUDIANTE);
@@ -915,5 +938,56 @@ public List<Object> consultaEstudiante(Integer usuario){
         List<Estudiante> estudiantes = estudianteRepository.consultarEstudiantesSugeridos(carrera,pais);
 
     return estudiantes;
+    }
+
+    public HashMap<String,Object> verPerfilEmpresas( Integer idEmp,Integer estId) {
+        Empresa empresa = empresaRepository.findById(idEmp).get();
+        Estudiante estudiante = estudianteRepository.findById(estId).get();
+        List<Asignatura> asignatura = asignaturaRepository.findByEmpresa(empresa);
+        List<DetalleEstudiante> listDetalle = new ArrayList<>();
+        List<Asignatura> listAsig = new ArrayList<>();
+        HashMap<String,Object> listAsigDet = new HashMap<>();
+        List<HashMap<String,Object>> listAsign = new ArrayList<>();
+        HashMap<String,Object> detalleEmpresa = new HashMap<>();
+        for (Asignatura asi: asignatura
+             ) {
+            listDetalle = detalleEstudianteRepository.findByAsignatura(asi);
+        }
+        for (DetalleEstudiante det: listDetalle
+             ) {
+            if (estudiante.getCarrera().getId()==det.getCarrera().getId()){
+                listAsig.add(det.getAsignatura());
+            }
+        }
+        for (Asignatura asignat: listAsig
+             ) {
+            listAsigDet.put("Titulo",asignat.getAsiTitulo());
+            if (asignat.getAsiDescripcion()!=null) {
+                listAsigDet.put("Descripcion", asignat.getAsiDescripcion());
+                listAsign.add(listAsigDet);
+            }
+
+        }
+        detalleEmpresa.put("Nombre:", empresa.getNombre());
+        if (empresa.getDescripcion()!=null) {
+            detalleEmpresa.put("Nombre:", empresa.getNombre());
+        }
+        if (empresa.getMision()!=null) {
+            detalleEmpresa.put("Mision:", empresa.getMision());
+        }
+        if (empresa.getVision()!=null) {
+            detalleEmpresa.put("Vision:", empresa.getVision());
+        }
+        if (empresa.getPais()!=null) {
+            detalleEmpresa.put("Pais:", empresa.getPais().getNombrePais());
+        }
+        if (empresa.getRubro()!=null) {
+            detalleEmpresa.put("Rubro:", empresa.getRubro());
+        }
+        if (empresa.getSitioWeb()!=null) {
+            detalleEmpresa.put("SitioWeb:", empresa.getSitioWeb());
+        }
+        detalleEmpresa.put("asignatura:", listAsign);
+        return detalleEmpresa;
     }
 }

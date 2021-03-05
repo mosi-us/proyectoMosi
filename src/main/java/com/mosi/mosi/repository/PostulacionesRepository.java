@@ -24,4 +24,10 @@ public interface PostulacionesRepository extends JpaRepository<Postulaciones,Int
     List<Postulaciones> findByAsignaturaAndPosEstatus(Asignatura asignatura, Integer aceptado);
 
     Postulaciones findByEstudianteAndAsignatura(Estudiante estudiante, Asignatura asignatura);
+
+    String SQL_UPDATE_RECHAZAR_ESTUDIANTE = "UPDATE POS_POSTULACIONES SET POS_ESTATUS = :Estatus where POS_ID =:idPos ";
+    @Transactional
+    @Modifying
+    @Query(value=SQL_UPDATE_RECHAZAR_ESTUDIANTE, nativeQuery=true)
+    Integer rechazarEstudiante(@Param("idPos") Integer portulacion,@Param("Estatus") int Estatus);
 }

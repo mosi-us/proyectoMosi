@@ -63,7 +63,15 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/verPostulantes","/consultarPreguntas",
 						"/verPostulantes","/verPerfilEstudiante",
 						"/seleccionarEstudiante","/verEstudiantesSeleccionados",
-						"/sugerirEstudiantes").permitAll()
+						"/sugerirEstudiantes",
+						"/rechazarEstudiante",
+						"/verPerfilEmpresaEstudiante",
+						"/EnviarEmail",
+						"/olvidarContrasena" ,
+						"/reset_password",
+						"/subirImagen",
+						"/getImagen",
+						"/subirVideo").permitAll()
 				.anyRequest().authenticated();
 	}
 }

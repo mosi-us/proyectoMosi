@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mosi.mosi.bean.*;
 import com.mosi.mosi.repository.*;
 import com.mosi.mosi.service.EstudianteService;
+import com.mosi.mosi.service.GeneralService;
 import com.mosi.mosi.service.UserService;
 import com.mosi.mosi.service.paisService;
 import org.jsondoc.core.annotation.ApiBodyObject;
@@ -13,8 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,8 +25,11 @@ import java.util.Map;
 
 import static com.mosi.mosi.constantes.constante.*;
 
+
 @RestController
 public class estudianteController {
+    @Autowired
+    GeneralService generalService;
     @Autowired
     EstudianteService estudianteService;
     @Autowired
@@ -96,8 +102,9 @@ public class estudianteController {
      "hamId":[],
      "idLugar":}
     * */
+
     @PostMapping("/guardarPerfilEstudiante")
-    public Estudiante guardarPerfilEstudiante(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
+    public Estudiante guardarPerfilEstudiante(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
 
         Estudiante estudiante = new Estudiante();
 
@@ -218,7 +225,6 @@ public class estudianteController {
     /**
      * Parametros:
      {"idAsignatura" : ,
-     "idEmpresa": ,
      "idEstudiante":,
      "respuestas":[
      {"respuestas":"","idPregunta":},
@@ -227,7 +233,7 @@ public class estudianteController {
     * */
     @PostMapping("postularEstudiante")
     public String postularEstudiante(HttpServletRequest request, HttpServletResponse response,
-                                     @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
+                                     @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         String resp = "";
         Integer idAsignatura = (params.containsKey(ID_ASIGNATURA) && params.get(ID_ASIGNATURA) != null) ? Integer.valueOf(params.get(ID_ASIGNATURA).toString()): null;
@@ -289,7 +295,7 @@ public class estudianteController {
      * */
     @PostMapping("agregarPerfilPrincipal")
     public Estudiante agregarPerfilPrincipal(HttpServletRequest request, HttpServletResponse response,
-                                             @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
+                                             @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         Integer usuario 	= (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty()) ? Integer.valueOf(params.get(ID_USER).toString()) : null;
         Integer carrera 	= (params.containsKey(CARRERA_ID) && params.get(CARRERA_ID) != null && !params.get(CARRERA_ID).toString().isEmpty()) ? Integer.valueOf(params.get(CARRERA_ID).toString()) : null;
@@ -346,7 +352,8 @@ public class estudianteController {
         newPerfil.setUsuario(userService.findUsersbyId(usuario));
         Estudiante result = estudianteRepository.save(newPerfil);
         Boolean caracteristica = estudianteService.guardar_Dep_idi_hab_syt(list_Dep,list_Idi,list_Hab,list_Syt,list_Pasatiempo,result.getId(),ESTUDIANTE);
-
+        String mensaje="Has ingresado correctamente tu perfil a MOSI";
+        generalService.enviarEmail(correo,ASUNTO,mensaje);
 
         return result;
     }
@@ -388,4 +395,20 @@ public class estudianteController {
         List<Preguntas> preguntas = estudianteService.consultarPreguntas(asignatura,estudiante);
         return preguntas;
     }
+    /** PARAMETROS
+     {"idEmpresa":3,"idEstudiante":112}
+     * */
+    @PostMapping("verPerfilEmpresaEstudiante")
+    public HashMap<String,Object> verPerfilEmpresaEstudiante(HttpServletRequest request, HttpServletResponse response,
+                                              @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idEmp = (params.containsKey(ID_EMPRESA) && params.get(ID_EMPRESA) != null && !params.get(ID_EMPRESA).toString().isEmpty())
+                ? Integer.valueOf(params.get(ID_EMPRESA).toString()) : null;
+        Integer idEstudiante = (params.containsKey(ID_ESTUDIANTE) && params.get(ID_ESTUDIANTE) != null && !params.get(ID_ESTUDIANTE).toString().isEmpty())
+                ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
+        HashMap<String,Object> empresa = estudianteService.verPerfilEmpresas(idEmp,idEstudiante);
+
+        return empresa;
+    }
+
 }

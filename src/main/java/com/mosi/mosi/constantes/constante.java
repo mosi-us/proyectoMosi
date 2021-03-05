@@ -5,16 +5,21 @@ public interface constante {
     String APELLIDOS = "Apellidos";
     String CARRERA_ID = "carID";
     String CLAVE = "clave";
+    String IDPERSONA ="IdPersona";
+    String IMAGEN64="imagen";
+    String VIDEOBASE64="video";
     String CODIGO_PAIS = "codigo_pais";
     String CORREO = "correo";
     String DEPORTE_ID = "depId";
     String DESCRIPCION_EST = "descripcion_estudiante";
     String EMAIL = "email";
+    String TOKEN = "token";
     String FECHA = "fecha";
     String IDIOMAS ="Idiomas";
     String ID_USER = "idUser";
     String NOMBRES = "Nombres";
     String PAIS_ID = "paisId";
+    String PAISES = "paises";
     String CIUDAD = "ciudadId";
     String TELEFONO = "telefono";
     String IDIOMA_ID = "idiId";
@@ -29,12 +34,15 @@ public interface constante {
     String USERNAME = "userName";
     String ASIGNATURA = "asignatura";
     String TIPO = "tipo";
+    String TIPO_PERSONA = "tipoPersona";
+    String SIZE = "size";
     String ID_ASIGNATURA = "idAsignatura";
     String ID_ESTUDIANTE = "idEstudiante";
     String ID_EMPRESA = "idEmpresa";
     String LUGAR = "idLugar";
     String RESPUESTAS="respuestas";
     String CARACTERISTICAS = "Caracteristicas";
+    String POSTULACION = "idPostulacion";
 
     String TITULO_ASI ="titulo";
     String DESCRIPCION_ASI ="descripcion_asignatura";
@@ -75,6 +83,7 @@ public interface constante {
     /**Estatus Usuario*/
     Integer INACTIVO = 0;
     Integer ACTIVO = 1;
+    Integer BLOQUEADO = 2;
     /**Tipos de Persona*/
     Integer ESTUDIANTE = 1;
     Integer EMPRESA = 2;
@@ -85,7 +94,22 @@ public interface constante {
     String TITULO_NOTIFICACION_SELECCION = " te ha SELECCIONADO a ";
 
 
+    String SERVER_STMP ="mail.smtp.host";
+    String REMITENTE_EMAIL = "mail.smtp.user";
+    String PASSWORD_EMAIL = "mail.smtp.clave";
+    String AUTH_STMP="mail.smtp.auth";
+    String STARTTLS ="mail.smtp.starttls.enable";
+    String PUERTO_STMP = "mail.smtp.port";
 
+    String ASUNTO = "Tienes una Notificacion de MOSI";
+    String RECUPERAR_CLAVE_ASUNTO = "Recupera tu Acceso a MOSI";
+    String ASUNTO_CONFIRMACION_DE_RECUPERACION_CLAVE = "Acabas de Restablecer tu contraseña";
+    String DETALLE_EMAIL_RECHAZA_ESTUDIANTE = "Se le informa que No ha sido seleccionado por la empresa ";
+    String DETALLE_EMAIL_SELECCIONAR_ESTUDIANTE = "Felicitaciones, has sido seleccionado por la empresa ";
+    String DETALLE_EMAIL_SELECCIONAR_EMPRESA= "Has seleccionado al estudiante ";
+    String DETALLE_EMAIL_RECUPERAR_CLAVE = "Estimado(a)\n" +
+            "Usted desea restaurar la contraseña de su cuenta asociada a :\n";
+    String DETALLE_REGISTRO_ESTUDIANTE = "BIENVENIDO, Te has registrado exitosamente en MOSI";
 
 
 }

@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 public interface UserRepository extends JpaRepository<Usuarios,Integer> {
     Usuarios findByEmail(String email);
 
+    Usuarios findByTokenReseteo(String token);
+
     Usuarios findById(int id);
     String SQL_EXIST_EMAIL = "SELECT top 1 USU_email FROM USU_USUARIOS WHERE USU_email = :email";
     @Query(nativeQuery = true, value = SQL_EXIST_EMAIL)
