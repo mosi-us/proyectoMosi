@@ -30,4 +30,8 @@ public interface PostulacionesRepository extends JpaRepository<Postulaciones,Int
     @Modifying
     @Query(value=SQL_UPDATE_RECHAZAR_ESTUDIANTE, nativeQuery=true)
     Integer rechazarEstudiante(@Param("idPos") Integer portulacion,@Param("Estatus") int Estatus);
+
+    String SQL_POSTULACIONES ="SELECT * FROM POS_POSTULACIONES WHERE EST_ID = :estId and POS_ESTATUS=1";
+    @Query(nativeQuery = true, value = SQL_POSTULACIONES)
+    List<Postulaciones> buscarPostulacionesEnviadas(@Param("estId") Integer estId);
 }

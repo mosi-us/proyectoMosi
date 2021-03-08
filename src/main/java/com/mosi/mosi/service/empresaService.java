@@ -16,6 +16,8 @@ import static com.mosi.mosi.constantes.constante.*;
 @Service
 public class empresaService {
     @Autowired
+    EstudianteRepository estudianteRepository;
+    @Autowired
     GeneralService generalService;
     @Autowired
     PaisMaestroRepository paisMaestroRepository;
@@ -211,10 +213,19 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
         return list;
     }
 
-    public int seleccionarEstudiante(Integer idEstudiante, Integer idAsignatura) {
+    public Postulaciones cambiarEstatusPostulacion(Integer idEstudiante, Integer idAsignatura, Integer estatus,Integer idPos) {
+        Postulaciones postulaciones = new Postulaciones();
+        if (idPos!=null){
+            postulaciones = postulacionesRepository.findById(idPos).get();
+        }else {
+            Asignatura asignatura = asignaturaRepository.findByAsiId(idAsignatura);
+            Estudiante estudiante = estudianteRepository.findById(idEstudiante).get();
+            postulaciones = postulacionesRepository.findByEstudianteAndAsignatura(estudiante, asignatura);
+        }
+            postulaciones.setPosEstatus(estatus);
+            postulacionesRepository.save(postulaciones);
 
-        int seleccionar =postulacionesRepository.seleccionarEstudiante(idEstudiante,idAsignatura,ACEPTADO);
-        return seleccionar;
+        return postulaciones;
     }
 
     public List<Postulaciones> verEstudiantesSeleccionados(Integer idAsignatura) {
@@ -435,13 +446,13 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
     return ListEstudiantesCompatibles;
     }
 
-    public String rechazarEstudiante(Integer portulacion) throws IOException, MessagingException {
+    public String rechazarEstudiante(Integer postulacion) throws IOException, MessagingException {
     Postulaciones estudiante = new Postulaciones();
-        Integer rechazar = postulacionesRepository.rechazarEstudiante(portulacion,RECHAZADO);
+
+        Postulaciones rechazar= this.cambiarEstatusPostulacion(null,null,RECHAZADO,postulacion);
         String mensaje = "";
-        if(rechazar==1){
-            estudiante = postulacionesRepository.findById(portulacion).get();
-            String email = estudiante.getEstudiante().getCorreo();
+        if(rechazar!=null){
+            String email = rechazar.getEstudiante().getCorreo();
             String msj = DETALLE_EMAIL_RECHAZA_ESTUDIANTE + estudiante.getEmpresa().getNombre();
             generalService.enviarEmail(email,ASUNTO,msj);
             mensaje ="Se ha rechazado el estudiante exitosamente!";

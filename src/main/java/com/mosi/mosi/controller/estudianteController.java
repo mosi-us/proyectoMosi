@@ -164,6 +164,10 @@ public class estudianteController {
         return perfilEstudianteDetallado;
 
     }
+    /**
+     *Parametros:
+     *
+     * */
     @PostMapping("buscar_Practica_desafio")
     public List<List<HashMap<String, Object>>> buscarPracticaDesafio(
             @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
@@ -244,10 +248,11 @@ public class estudianteController {
         List<List<HashMap<String, Object>>> compatibilidad =estudianteService.consultarAfinidad(idEstudiante,idAsignatura);
         Integer afinidad = Integer.valueOf(compatibilidad.get(0).get(1).get("afinidad").toString());
 
-        if (idAsignatura!=null  && idEstudiante!=null && afinidad!=null && respuestas!=null){
+        if (idAsignatura!=null  && idEstudiante!=null && afinidad!=null ){
             resp = estudianteService.postular(idAsignatura,idEstudiante,afinidad,respuestas);
         }else {
             resp = "Se ha postulado Exitosamente";
+
         }
         return resp;
     }
@@ -411,4 +416,84 @@ public class estudianteController {
         return empresa;
     }
 
+    @PostMapping("ModificarPerfilEstudiante")
+    public Estudiante ModificarPerfilEstudiante(HttpServletRequest request, HttpServletResponse response,
+                                                             @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        String nombresEstudiante 	= (params.containsKey(NOMBRES) && params.get(NOMBRES) != null) ? params.get(NOMBRES).toString() : null;
+        String apellidosEstudiante 	= (params.containsKey(APELLIDOS) && params.get(APELLIDOS) != null) ? params.get(APELLIDOS).toString() : null;
+        Integer fechaNac 	= (params.containsKey(FECHA) && params.get(FECHA) != null && !params.get(FECHA).toString().isEmpty())
+                ? Integer.valueOf(params.get(FECHA).toString()) : null;
+        Integer pais 	= (params.containsKey(PAIS_ID) && params.get(PAIS_ID) != null && !params.get(PAIS_ID).toString().isEmpty())
+                ? Integer.valueOf(params.get(PAIS_ID).toString()) : null;
+        Integer ciudad 	= (params.containsKey(CIUDAD) && params.get(CIUDAD) != null && !params.get(CIUDAD).toString().isEmpty())
+                ? Integer.valueOf(params.get(CIUDAD).toString()) : null;
+        String telefono 	= (params.containsKey(TELEFONO) && params.get(TELEFONO) != null && !params.get(TELEFONO).toString().isEmpty())
+                ? params.get(TELEFONO).toString() : null;
+        String codigoPais 	= (params.containsKey(CODIGO_PAIS) && params.get(CODIGO_PAIS) != null && !params.get(CODIGO_PAIS).toString().isEmpty())
+                ? params.get(CODIGO_PAIS).toString() : null;
+        String correo  = (params.containsKey(CORREO) && params.get(CORREO) != null && !params.get(CORREO).toString().isEmpty()) ? params.get(CORREO).toString() : null;
+        Integer usuario 	= (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty())
+                ? Integer.valueOf(params.get(ID_USER).toString()) : null;
+        Integer semestre = (params.containsKey(SEMESTRE) && params.get(SEMESTRE) != null && !params.get(SEMESTRE).toString().isEmpty())
+                ? Integer.valueOf(params.get(SEMESTRE).toString()) : null;
+        List<?> deporte = (params.containsKey(DEPORTE_ID) &&  params.get(DEPORTE_ID) != null) ? UserService.convertObjectToList(params.get(DEPORTE_ID)) : null;
+        Integer universidad = (params.containsKey(UNIVERSIDAD_ID) && params.get(UNIVERSIDAD_ID) != null && !params.get(UNIVERSIDAD_ID).toString().isEmpty())
+                ? Integer.valueOf(params.get(UNIVERSIDAD_ID).toString()) : null;
+        List<?> idioma = (params.containsKey(IDIOMAS) &&  params.get(IDIOMAS) != null) ? UserService.convertObjectToList(params.get(IDIOMAS)) : null;
+        Integer carrera = (params.containsKey(CARRERA_ID) && params.get(CARRERA_ID) != null && !params.get(CARRERA_ID).toString().isEmpty())
+                ? Integer.valueOf(params.get(CARRERA_ID).toString()) : null;
+        String descripcion = (params.containsKey(DESCRIPCION_EST) && params.get(DESCRIPCION_EST) != null && !params.get(DESCRIPCION_EST).toString().isEmpty())
+                ? params.get(DESCRIPCION_EST).toString() : null;
+        List<?> pasatiempo = (params.containsKey(PASATIEMPO) &&  params.get(PASATIEMPO) != null) ? UserService.convertObjectToList(params.get(PASATIEMPO)) : null;
+        List<?> softYTecn = (params.containsKey(SOFTWARE_TECNOLOGIA) &&  params.get(SOFTWARE_TECNOLOGIA) != null) ? UserService.convertObjectToList(params.get(SOFTWARE_TECNOLOGIA)) : null;
+        List<?> hablidadesB = (params.containsKey(HABILIDADES) &&  params.get(HABILIDADES) != null) ? UserService.convertObjectToList(params.get(HABILIDADES)) : null;
+        Integer lugar = (params.containsKey(LUGAR) && params.get(LUGAR) != null && !params.get(LUGAR).toString().isEmpty())
+                ? Integer.valueOf(params.get(LUGAR).toString()) : null;
+        Estudiante estudiante = new Estudiante();
+        estudiante = estudianteService.actualizarPerfilEstudiante(nombresEstudiante,apellidosEstudiante,fechaNac,pais,ciudad,telefono,codigoPais,correo,deporte,
+                idioma,universidad,carrera, usuario,semestre,pasatiempo,descripcion,softYTecn,hablidadesB,lugar);
+        return estudiante;
+    }
+
+    /**
+     *Parametros:
+     *{ "idEstudiante": 115}
+     * */
+    @PostMapping("listarPostulacionesEstudiante")
+    public List<Postulaciones> listarPostulacionesEstudiante(HttpServletRequest request, HttpServletResponse response,
+                                                @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idEst 	= (params.containsKey(ID_ESTUDIANTE) && params.get(ID_ESTUDIANTE) != null && !params.get(ID_ESTUDIANTE).toString().isEmpty())
+                ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
+
+        List<Postulaciones> listPos = estudianteService.listarPostulaciones(idEst);
+    return listPos;
+    }
+    /** Parametros_:
+     *{ "idPostulacion": 115}
+     * */
+    @PostMapping("rechazarPostulacion")
+    public String rechazarPostulacion(HttpServletRequest request, HttpServletResponse response,
+                                                             @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer postulacion 	= (params.containsKey(POSTULACION) && params.get(POSTULACION) != null && !params.get(POSTULACION).toString().isEmpty())
+                ? Integer.valueOf(params.get(POSTULACION).toString()) : null;
+
+        String listPos = estudianteService.rechazarPostulacion(postulacion);
+        return listPos;
+    }
+    /** Parametros_:
+     *{ "idPostulacion": 115}
+     * */
+    @PostMapping("eliminarPostulacion")
+    public String eliminarPostulacion(HttpServletRequest request, HttpServletResponse response,
+                                      @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer postulacion 	= (params.containsKey(POSTULACION) && params.get(POSTULACION) != null && !params.get(POSTULACION).toString().isEmpty())
+                ? Integer.valueOf(params.get(POSTULACION).toString()) : null;
+
+        String listPos = estudianteService.eliminarPostulacion(postulacion);
+        return listPos;
+    }
 }

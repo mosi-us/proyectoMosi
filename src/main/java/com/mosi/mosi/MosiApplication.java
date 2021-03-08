@@ -71,7 +71,11 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/reset_password",
 						"/subirImagen",
 						"/getImagen",
-						"/subirVideo").permitAll()
+						"/subirVideo",
+						"/ModificarPerfilEstudiante",
+						"/eliminarPostulacion",
+						"/listarPostulacionesEstudiante",
+						"/rechazarPostulacion").permitAll()
 				.anyRequest().authenticated();
 	}
 }

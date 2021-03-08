@@ -76,6 +76,7 @@ public interface constante {
     Integer ENVIADO = 1;
     Integer RECIBIDO = 2;
     /** Estatus de Postulaciones*/
+    Integer EN_ESPERA = 1;
     Integer ACEPTADO = 2;
     Integer RECHAZADO = 3;
     Integer ELIMINADO = 4;
@@ -110,6 +111,7 @@ public interface constante {
     String DETALLE_EMAIL_RECUPERAR_CLAVE = "Estimado(a)\n" +
             "Usted desea restaurar la contraseña de su cuenta asociada a :\n";
     String DETALLE_REGISTRO_ESTUDIANTE = "BIENVENIDO, Te has registrado exitosamente en MOSI";
+    String DETALLE_MENSJE_NO_POSTULA_ESTUDIANTE = "Se ha postulado Exitosamente, se recomienda volver a postular respondiendo las preguntas para que su postulacion tenga mas relevancia";
 
 
 }

@@ -296,47 +296,53 @@ public List<Object> consultaEstudiante(Integer usuario){
         Postulaciones postulado = new Postulaciones();
         Asignatura asi = asignaturaRepository.findByAsiId(idAsi);
         Estudiante est = this.buscarEstudianteporId(IdEst);
-        List<Preguntas> numPre = preguntasRepository.consultarPreguntas(asi.getAsiId(),est.getCarrera().getId());
-        List<DetalleEstudiante> det = detalleEstudianteRepository.findByAsignatura(asi);
-        DetalleEstudiante detalleEstudiante = new DetalleEstudiante();
-        for (DetalleEstudiante d:det
-             ) {
-            if (d.getCarrera().getId()==est.getCarrera().getId()){
-                detalleEstudiante = d;
+        if (resp!=null && resp.size()>0 ) {
+            List<Preguntas> numPre = preguntasRepository.consultarPreguntas(asi.getAsiId(), est.getCarrera().getId());
+            List<DetalleEstudiante> det = detalleEstudianteRepository.findByAsignatura(asi);
+            DetalleEstudiante detalleEstudiante = new DetalleEstudiante();
+            for (DetalleEstudiante d : det
+            ) {
+                if (d.getCarrera().getId() == est.getCarrera().getId()) {
+                    detalleEstudiante = d;
+                }
             }
-        }
-        Empresa empresa = asi.getEmpresa();
-        if (numPre.size() == resp.size()) {
-            postulaciones.setAsignatura(asi);
-            postulaciones.setEmpresa(empresa);
-            postulaciones.setEstudiante(est);
-            postulaciones.setDetalleEstudiante(detalleEstudiante);
-            postulaciones.setPosFecha(new Date());
-            postulaciones.setPosEstatus(ENVIADO); //
-            postulaciones.setCompatibilidad(afinidad);
-            postulado = postulacionesRepository.save(postulaciones);
-            /*guardo respuestas*/
-            Respuestas respuestas = new Respuestas();
-            for (int i = 0; i < resp.size(); i++) {
-                HashMap<String, String> r = (HashMap<String, String>) resp.get(i);
-                respuestas.setResRespuestas(r.get("respuestas"));
-                Integer idPre = Integer.valueOf(String.valueOf(r.get("idPregunta")));
-                Preguntas preguntas = preguntasRepository.findById(idPre).get();
-                respuestas.setPregunta(preguntas);
-                respuestas.setAsignatura(asi);
-                respuestas.setEstudiante(est);
-                respuestas.setPostulaciones(postulado);
-                respuestas = respuestaRepository.save(respuestas);
-                respuestas = new Respuestas();
-            }
+            Empresa empresa = asi.getEmpresa();
+            if (numPre.size() == resp.size()) {
+                postulaciones.setAsignatura(asi);
+                postulaciones.setEmpresa(empresa);
+                postulaciones.setEstudiante(est);
+                postulaciones.setDetalleEstudiante(detalleEstudiante);
+                postulaciones.setPosFecha(new Date());
+                postulaciones.setPosEstatus(EN_ESPERA); //
+                postulaciones.setCompatibilidad(afinidad);
+                postulado = postulacionesRepository.save(postulaciones);
+                /*guardo respuestas*/
+                Respuestas respuestas = new Respuestas();
+                for (int i = 0; i < resp.size(); i++) {
+                    HashMap<String, String> r = (HashMap<String, String>) resp.get(i);
+                    respuestas.setResRespuestas(r.get("respuestas"));
+                    Integer idPre = Integer.valueOf(String.valueOf(r.get("idPregunta")));
+                    Preguntas preguntas = preguntasRepository.findById(idPre).get();
+                    respuestas.setPregunta(preguntas);
+                    respuestas.setAsignatura(asi);
+                    respuestas.setEstudiante(est);
+                    respuestas.setPostulaciones(postulado);
+                    respuestas = respuestaRepository.save(respuestas);
+                    respuestas = new Respuestas();
+                }
 
-            Boolean not = this.notificar(est.getId(), asi, TITULO_NOTIFICACION_POSTULACION, ENVIADO, empresa.getId(), ESTUDIANTE);
-        }
-        if (postulado != null){
-            respu = "Se ha postulado Exitosamente";
+                Boolean not = this.notificar(est.getId(), asi, TITULO_NOTIFICACION_POSTULACION, ENVIADO, empresa.getId(), ESTUDIANTE);
+                respu = "Se ha postulado Exitosamente";
+            }else{
+                respu = "Se ha postulado Exitosamente";
+                this.enviarEmail(est.getCorreo(),DETALLE_MENSJE_NO_POSTULA_ESTUDIANTE);
+            }
         }else{
-            respu = "Ha ocurrido un error";
+            respu = "Se ha postulado Exitosamente";
+            this.enviarEmail(est.getCorreo(),DETALLE_MENSJE_NO_POSTULA_ESTUDIANTE);
+
         }
+
         return respu;
     }
 
@@ -348,13 +354,13 @@ public List<Object> consultaEstudiante(Integer usuario){
         if (tipoPersona==ESTUDIANTE){
             Estudiante rem = estudianteRepository.findById(remitente).get();
             nombre = rem.getNombre() + " " + rem.getApellido();
-            String msj_Est = "Has postulado exitosamente a"+ asi.getAsiTitulo() + " en la empresa "+ asi.getEmpresa().getNombre() + "., te deseamos ÉXITO!";
             String asignatura = "";
             if (asi.getAsiTipo()==PRACTICAS){
                 asignatura= " a la Pasantia";
             }else if (asi.getAsiTipo()==DESAFIOS){
                 asignatura= "al Desafio";
             }
+            String msj_Est = "Has postulado exitosamente "+asignatura+" "+ asi.getAsiTitulo() + " en la empresa "+ asi.getEmpresa().getNombre() + " , te deseamos ÉXITO!";
             String msj_Emp = rem.getNombre() + " " + rem.getApellido() +" ha postulado " + asignatura + " "+ asi.getAsiTitulo();
             this.enviarEmail(rem.getCorreo(),msj_Est);
             this.enviarEmail(asi.getEmpresa().getCorreo(),msj_Emp);
@@ -989,5 +995,86 @@ public List<Object> consultaEstudiante(Integer usuario){
         }
         detalleEmpresa.put("asignatura:", listAsign);
         return detalleEmpresa;
+    }
+
+    public Estudiante actualizarPerfilEstudiante(String nombresEstudiante, String apellidosEstudiante, Integer fechaNac, Integer pais, Integer ciudad, String telefono, String codigoPais, String correo, List<?> deporte, List<?> idioma, Integer universidad, Integer carrera, Integer usuario, Integer semestre, List<?> pasatiempo, String descripcion, List<?> softYTecn, List<?> hablidadesB, Integer lugar) throws IOException, MessagingException {
+        DeporteMaestro dep =new DeporteMaestro();
+        IdiomaMaestro idi =new IdiomaMaestro();
+        PasatiempoMaestro hom =new PasatiempoMaestro();
+        SoftwareTecnologiasMaestro syt = new SoftwareTecnologiasMaestro();
+        HabilidadesBlandasMaestro ham= new HabilidadesBlandasMaestro();
+
+        Usuarios usu = userService.findUsersbyId(usuario);
+        Estudiante est = estudianteRepository.findByUsuario(usu);
+        if ((nombresEstudiante!=null) && (est.getNombre()!=nombresEstudiante)){
+            est.setNombre(nombresEstudiante);
+        }
+        if ((est.getApellido()!=apellidosEstudiante) && (apellidosEstudiante!=null)) {
+            est.setApellido(apellidosEstudiante);
+        }
+            if ((fechaNac!=null) && ((est.getFechaNac()!=fechaNac))) {
+                est.setFechaNac(fechaNac);
+            }
+        if ((est.getPais().getId()!=pais) && (pais!=null)) {
+            est.setPais(paisService.findPaisbyId(pais));
+        }
+        if ((est.getCarrera().getId()!=carrera) && (carrera!=null)) {
+            est.setCarrera(carreraService.findCarreraById(carrera));
+        }
+            if ((telefono!=null) &&(est.getTelefono()!=telefono)) {
+                est.setTelefono(telefono);
+                est.setCodigoPais(codigoPais);
+            }
+            if ((ciudad!=null) && (est.getCiudad().getId()!=ciudad)) {
+                est.setCiudad(ciudadService.findCiudadById(ciudad));
+            }
+            if((correo!=null)&&(est.getCorreo()!=correo))
+            est.setCorreo(correo);
+
+            if ((descripcion!=null) && est.getDescripcion()!=descripcion) {
+                est.setDescripcion(descripcion);
+            }
+            if ((universidad!=null)&& (est.getUniversidad().getId()!=universidad)) {
+                est.setUniversidad(universidadService.findUniversidadById(universidad));
+            }
+
+            if ((semestre!=null)&&(est.getSemestre()!=semestre)) {
+                est.setSemestre(semestre);
+            }
+        if ((semestre!=null)&&(est.getLugar()!=lugar)) {
+            est.setLugar(lugar);
+        }
+
+            est = estudianteRepository.save(est);
+            int id = est.getId();
+                Boolean saveCaracteristicas = this.guardarcaracteristicas(idioma,deporte,pasatiempo,hablidadesB,softYTecn,est,null,ESTUDIANTE);
+                String mensaje="Haz modificado correctamente tu perfil en MOSI";
+                generalService.enviarEmail(est.getCorreo(),ASUNTO,mensaje);
+
+
+            return est;
+    }
+
+
+    public List<Postulaciones> listarPostulaciones(Integer idEst) {
+
+        List<Postulaciones> postulaciones =  postulacionesRepository.buscarPostulacionesEnviadas(idEst);
+        return postulaciones;
+    }
+
+    public String rechazarPostulacion(Integer postulacion) throws IOException, MessagingException {
+
+    Postulaciones rechazar= empresaService.cambiarEstatusPostulacion(null,null,RECHAZADO,postulacion);
+    String msj = "Se ha rechazado la propuesta con exito!";
+    this.enviarEmail(rechazar.getEstudiante().getCorreo(),msj);
+
+    return msj;
+    }
+
+    public String eliminarPostulacion(Integer postulacion) throws IOException, MessagingException {
+        Postulaciones rechazar= empresaService.cambiarEstatusPostulacion(null,null,ELIMINADO,postulacion);
+        String msj = "Se ha eliminado la Postulacion con exito!";
+        this.enviarEmail(rechazar.getEstudiante().getCorreo(),msj);
+    return msj;
     }
 }

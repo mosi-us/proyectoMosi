@@ -118,7 +118,7 @@ public class empresaController {
      "idEmpresa":,
      "Caracteristicas":[{
      "descripcion_estudiante":"",
-    "paisId":,
+    "paises":,
      "semestre":,
      "carID":2,
      "depId":,
@@ -127,7 +127,7 @@ public class empresaController {
      "hamId":[]
      },{
      "descripcion_estudiante":"",
-     "paisId":[],
+     "paises":[],
      "semestre":,
      "carID":,
      "depId":[],
@@ -299,7 +299,7 @@ public class empresaController {
 
         if ((postulaciones.getPosEstatus() == ACEPTADO)) {
             if (estudiante.getTelefono()!=null){
-                result.put("Informacion de Contacto:", estudiante.getCorreo() + estudiante.getTelefono());
+                result.put("Informacion de Contacto:", estudiante.getCorreo() + " " + estudiante.getCodigoPais() +" " +estudiante.getTelefono());
             }else{
                 result.put("Informacion de Contacto:", estudiante.getCorreo());
             }
@@ -346,9 +346,9 @@ public class empresaController {
                 ? Integer.valueOf(params.get(ID_ASIGNATURA).toString()) : null;
         HashMap<String,Object> info_de_contacto_Estudiante = new HashMap<>();
 
-        int seleccionar = empresaService.seleccionarEstudiante(idEstudiante,idAsignatura);
+        Postulaciones seleccionar = empresaService.cambiarEstatusPostulacion(idEstudiante,idAsignatura,ACEPTADO,null);
 
-        if (seleccionar==1){
+        if (seleccionar!=null){
 
             Estudiante estudiante=estudianteRepository.findById(idEstudiante).get();
             Asignatura asignatura = asignaturaRepository.findByAsiId(idAsignatura);
@@ -357,7 +357,8 @@ public class empresaController {
             info_de_contacto_Estudiante.put("Correo: ", estudiante.getCorreo());
             info_de_contacto_Estudiante.put("Nombre: ", estudiante.getNombre()+" "+ estudiante.getApellido());
             /*envio correo de notificacion*/
-            String mensaje_est = DETALLE_EMAIL_SELECCIONAR_ESTUDIANTE + asignatura.getEmpresa().getNombre();
+            String mensaje_est = DETALLE_EMAIL_SELECCIONAR_ESTUDIANTE + asignatura.getEmpresa().getNombre() +
+                    "\n Puedes rechazar la oferta haciendo click al siguiente enlace: http://localhost:8080/rechazarPostulacion?idPos=" + seleccionar.getPosId();
             estudianteService.enviarEmail(estudiante.getCorreo(),mensaje_est);
             String mensaje_emp = DETALLE_EMAIL_SELECCIONAR_EMPRESA +estudiante.getNombre()+ " "+estudiante.getApellido()
                     + ", ahora puedes comunicarte con él , sus datos de contacto son: Correo: " + estudiante.getCorreo()+ " Telefono: " + estudiante.getTelefono();
@@ -393,7 +394,7 @@ public class empresaController {
     }
     /**
      *Parametros:
-
+     {"idPostulacion" :74}
     */
     @PostMapping("/rechazarEstudiante")
     public String rechazarEstudiante(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
