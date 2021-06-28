@@ -10,9 +10,7 @@ import com.mosi.mosi.service.UserService;
 import com.mosi.mosi.service.paisService;
 import org.jsondoc.core.annotation.ApiBodyObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +23,7 @@ import java.util.Map;
 
 import static com.mosi.mosi.constantes.constante.*;
 
-
+@CrossOrigin(origins = {"http://localhost:4200","*"})
 @RestController
 public class estudianteController {
     @Autowired
@@ -181,47 +179,47 @@ public class estudianteController {
         return result;
 
     }
-    @PostMapping("consultarDeportes")
+    @GetMapping("consultarDeportes")
     public List<Deporte> consultarDeporte(HttpServletRequest request, HttpServletResponse response) {
         List<Deporte> listDeporte= deporteRepository.findAllByIdGreaterThan(0);
         return listDeporte;
     }
-    @PostMapping("consultarIdiomas")
+    @GetMapping("consultarIdiomas")
     public List<Idioma> consultarIdioma(HttpServletRequest request, HttpServletResponse response) {
         List<Idioma> listIdioma= idiomaRepository.findAllByIdGreaterThan(0);
         return listIdioma;
     }
-    @PostMapping("consultarCarreras")
+    @GetMapping("consultarCarreras")
     public List<Carrera> consultarCarrera(HttpServletRequest request, HttpServletResponse response) {
         List<Carrera> ListCarrera= carreraRepository.findAllByIdGreaterThan(0);
         return ListCarrera;
     }
-    @PostMapping("consultarUniversidades")
+    @GetMapping("consultarUniversidades")
     public List<Universidad> consultarUniversidad(HttpServletRequest request, HttpServletResponse response) {
         List<Universidad> ListUniversidad= universidadRepository.findAllByIdGreaterThan(0);
         return ListUniversidad;
     }
-    @PostMapping("consultarPaises")
+    @GetMapping("consultarPaises")
     public List<Paises> consultarPaises(HttpServletRequest request, HttpServletResponse response) {
         List<Paises> ListPaises= paisesRepository.findAllByIdGreaterThan(0);
         return ListPaises;
     }
-    @PostMapping("consultarPasatiempos")
+    @GetMapping("consultarPasatiempos")
     public List<Pasatiempo> consultarPasatiempo(HttpServletRequest request, HttpServletResponse response) {
         List<Pasatiempo> ListPasatiempo= pasatiempoRepository.findAllByIdGreaterThan(0);
         return ListPasatiempo;
     }
-    @PostMapping("consultarSyT")
+    @GetMapping("consultarSyT")
     public List<SoftwareTecnologias> consultarSyT(HttpServletRequest request, HttpServletResponse response) {
         List<SoftwareTecnologias> ListSyT= softwareTecnologiaRepository.findAllBySytIdGreaterThan(0);
         return ListSyT;
     }
-    @PostMapping("consultarHabilidadesBlandas")
+    @GetMapping("consultarHabilidadesBlandas")
     public List<HabilidadesBlandas> consultarHabilidadesBlandas(HttpServletRequest request, HttpServletResponse response) {
         List<HabilidadesBlandas> ListSyT = habilidadesBlandasRepository.findAllByHabIdGreaterThan(0);
         return ListSyT;
     }
-    @PostMapping("consultarCiudades")
+    @GetMapping("consultarCiudades")
     public List<Ciudades> consultarCiudades(HttpServletRequest request, HttpServletResponse response) {
         List<Ciudades> ListCiudades= ciudadesRepository.findByIdGreaterThan(0);
         return ListCiudades;

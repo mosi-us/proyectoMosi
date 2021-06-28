@@ -27,6 +27,7 @@ public class GeneralService {
         properties.put(AUTH_STMP,p.getProperty(AUTH_STMP));
         properties.put(STARTTLS,p.getProperty(STARTTLS));
         properties.put(PUERTO_STMP,587);
+        properties.put(SMTP_SSL, CERTIFICADO_SSL);
 
         return properties;
     }

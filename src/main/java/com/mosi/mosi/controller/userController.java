@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsondoc.core.annotation.ApiBodyObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,7 +30,7 @@ import java.util.Map;
 
 import static com.mosi.mosi.constantes.constante.*;
 
-
+@CrossOrigin(origins = {"http://localhost:4200","*"})
 @RestController
 public class userController {
     @Autowired
