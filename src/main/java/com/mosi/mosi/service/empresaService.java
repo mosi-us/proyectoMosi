@@ -187,8 +187,10 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
     public List<HashMap<String,Object>>verPostulante(Integer idAsig) {
         HashMap<String, Object> est = new HashMap<>();
         HashMap<String, Object> res = new HashMap<>();
+        HashMap<String, Object> pyr = new HashMap<>();
         List<Postulaciones> listPostulacions = postulacionesRepository.getByAsignatura(asignaturaRepository.findByAsiId(idAsig));
         List<HashMap<String,Object>>list = new ArrayList<>();
+        List<HashMap<String,Object>> resp = new ArrayList<>();
         for (Postulaciones p:listPostulacions) {
             est.put("nombreYapellido",p.getEstudiante().getNombre()+ " "+p.getEstudiante().getApellido());
             est.put("carrera",p.getEstudiante().getCarrera().getNombreCarrera());
@@ -200,11 +202,15 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
             for (Respuestas r: respu){
             res.put("Pregunta",r.getPregunta().getDecripcion());
             res.put("Respuesta",  r.getResRespuestas());
+            resp.add(res);
+            res = new HashMap<>();
             }
+
+            pyr.put("PreguntasYRespuestas",resp);
             List<List<HashMap<String, Object>>> compatibilidad =estudianteService.consultarAfinidad(p.getEstudiante().getId(),p.getAsignatura().getAsiId());
             list.add(compatibilidad.get(0).get(2));
             list.add(est);
-            list.add(res);
+            list.add(pyr);
             est = new HashMap<>();
             res = new HashMap<>();
 
