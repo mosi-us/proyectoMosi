@@ -38,15 +38,10 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/resgistroNuevoEstudiante",
 						"/userLogin",
 						"/signInEstudiante",
-						"/consultarEspecialidades",
 						"/buscar_Practica_desafio",
-						"/consultarDeportes",
 						"/postularEstudiante",
 						"/detalleAsignatura",
 						"/cambiarPerfilPrincipal",
-						"/consultarSyT",
-						"/consultarHabilidadesBlandas",
-						"/consultarCiudades",
 						"/agregarPerfilPrincipal",
 						"/agregarPasatiempos",
 						"/agregarSYT",
@@ -77,7 +72,12 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/consultarCarreras",
 						"/consultarUniversidades",
 						"/consultarPaises",
-						"/consultarPasatiempos").permitAll()
+						"/consultarPasatiempos",
+						"/consultarSyT",
+						"/consultarEspecialidades",
+						"/consultarDeportes",
+						"/consultarHabilidadesBlandas",
+						"/consultarCiudades").permitAll()
 				.anyRequest().authenticated();
 	}
 }

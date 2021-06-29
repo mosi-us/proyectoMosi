@@ -193,7 +193,8 @@ public class userController {
         Integer idUsuario = (params.containsKey(ID_USER) && params.get(ID_USER) != null) ? Integer.valueOf(params.get(ID_USER).toString()) : null;
         Integer tamaño = (params.containsKey(SIZE) && params.get(SIZE) != null) ? Integer.valueOf(params.get(SIZE).toString()): null;
         Integer sizeMax =6;
-        String path = "C:\\Users\\mbarrera\\Documents\\MOSI\\mosi\\src\\main\\resources\\file";
+        //String path = "C:\\Users\\mbarrera\\Documents\\MOSI\\mosi\\src\\main\\resources\\file";
+        String path = "C:\\Users\\Mariana\\Documents\\PRoyecto\\src\\main\\resources\\file"; /*ubicacion donde seran guardadas las imagenes*/
 
         String msj="";
         if (tamaño<sizeMax){
@@ -238,7 +239,7 @@ public class userController {
         Integer idUsuario = (params.containsKey(ID_USER) && params.get(ID_USER) != null) ? Integer.valueOf(params.get(ID_USER).toString()) : null;
         String video 	= (params.containsKey(VIDEOBASE64) && params.get(VIDEOBASE64) != null) ? params.get(VIDEOBASE64).toString() : null;
 
-        String path = "C:\\Users\\mbarrera\\Documents\\MOSI\\mosi\\src\\main\\resources\\file";
+        String path = "C:\\Users\\Mariana\\Documents\\PRoyecto\\src\\main\\resources\\file"; /*ubicacion donde seran guardadas las imagenes*/
 
         String msj="";
 

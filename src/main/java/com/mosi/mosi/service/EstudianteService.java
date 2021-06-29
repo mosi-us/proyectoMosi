@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.Array;
 import java.util.*;
 
 import static com.mosi.mosi.constantes.constante.*;
@@ -667,6 +668,7 @@ public List<Object> consultaEstudiante(Integer usuario){
                     }
                 }
 
+                ArrayList<String> idiString = new ArrayList<>();
                 HashMap<String, String> idiomasEmpresa = (HashMap) listadoCompleto.get(e).get("idioma");
                 if (idiomasEmpresa != null && idiomasEmpresa.size() > 0) {
                     int size_idioma = idiomasEmpresa.size() / 2;
@@ -684,16 +686,19 @@ public List<Object> consultaEstudiante(Integer usuario){
                                 atributosEstudiante = atributosEstudiante + 1;
                                 Idioma idiomaDato = idiomaRepository.findById(idiomasEstudiante_list).get();
                                 if (nivelIdiomaEstudiante == BASICO) {
-                                    datosCompatibles.put("Idioma", idiomaDato.getNombreIdioma() + " " + "Basico");
+                                    idiString.add(idiomaDato.getNombreIdioma() + " " + "Basico");
                                 } else if (nivelIdiomaEstudiante == INTERMEDIO) {
-                                    datosCompatibles.put("Idioma", idiomaDato.getNombreIdioma() + " " + "Intermedio");
+                                    idiString.add(idiomaDato.getNombreIdioma() + " " + "Intermedio");
                                 } else if (nivelIdiomaEstudiante == AVANZADO) {
-                                    datosCompatibles.put("Idioma", idiomaDato.getNombreIdioma() + " " + "Avanzado");
+                                    idiString.add(idiomaDato.getNombreIdioma() + " " + "Avanzado");
                                 }
                             }
                         }
                     }
                 }
+                datosCompatibles.put("Idioma", idiString);
+
+                ArrayList<String> depString = new ArrayList<>();
                 HashMap<String, String> deportesEmpresa = (HashMap) listadoCompleto.get(e).get("deporte");
                 if (deportesEmpresa != null && deportesEmpresa.size() > 0) {
                     int size_deporte = deportesEmpresa.size();
@@ -706,13 +711,14 @@ public List<Object> consultaEstudiante(Integer usuario){
                             if (DeporteEmpresa_list == DeporteEstudiante_list) {
                                 atributosEstudiante = atributosEstudiante + 1;
                                 Deporte deporteDato = deporteRepository.findById(DeporteEmpresa_list).get();
-                                datosCompatibles.put("deporte", deporteDato.getNombreDeporte());
+                                depString.add(deporteDato.getNombreDeporte());
                             }
                         }
                     }
                 }
+                datosCompatibles.put("deporte", depString);
 
-
+                ArrayList<String> habString = new ArrayList<>();
                 HashMap<String, String> habilidadesEmpresa = (HashMap) listadoCompleto.get(e).get("habilidades");
                 if (habilidadesEmpresa != null && habilidadesEmpresa.size() > 0) {
                     int size_habilidades = habilidadesEmpresa.size();
@@ -725,11 +731,15 @@ public List<Object> consultaEstudiante(Integer usuario){
                             if (HabilidadesEmpresa_list == HabilidadesEstudiante_list) {
                                 atributosEstudiante = atributosEstudiante + 1;
                                 HabilidadesBlandas habilidadesDato = habilidadesBlandasRepository.findById(HabilidadesEstudiante_list).get();
-                                datosCompatibles.put("habilidades", habilidadesDato.getHabNombre());
+                                habString.add(habilidadesDato.getHabNombre());
                             }
                         }
                     }
                 }
+                datosCompatibles.put("habilidades", habString);
+
+
+                ArrayList<String> sytString = new ArrayList<>();
                 HashMap<String, String> sytEmpresa = (HashMap) listadoCompleto.get(e).get("softYtecn");
                 if (sytEmpresa != null && sytEmpresa.size() > 0) {
                     int size_syt = sytEmpresa.size() / 2;
@@ -746,16 +756,20 @@ public List<Object> consultaEstudiante(Integer usuario){
                                 atributosEstudiante = atributosEstudiante + 1;
                                 SoftwareTecnologias sytDato = softwareTecnologiaRepository.findById(sytEstudiante_list).get();
                                 if (nivelSytEstudiante == BASICO) {
-                                    datosCompatibles.put("Syt", sytDato.getSytNombre() + " " + "Basico");
+                                    sytString.add(sytDato.getSytNombre() + " " + "Basico");
+                                    //datosCompatibles.put("Syt" + sytDato.getSytId(), sytDato.getSytNombre() + " " + "Basico");
                                 } else if (nivelSytEstudiante == INTERMEDIO) {
-                                    datosCompatibles.put("Syt", sytDato.getSytNombre() + " " + "Intermedio");
+                                    sytString.add(sytDato.getSytNombre() + " " + "Intermedio");
+                                    //datosCompatibles.put("Syt"+ sytDato.getSytId(), sytDato.getSytNombre() + " " + "Intermedio");
                                 } else if (nivelSytEstudiante == AVANZADO) {
-                                    datosCompatibles.put("Syt", sytDato.getSytNombre() + " " + "Avanzado");
+                                    sytString.add(sytDato.getSytNombre() + " " + "Avanzado");
+                                    //datosCompatibles.put("Syt"+ sytDato.getSytId(), sytDato.getSytNombre() + " " + "Avanzado");
                                 }
                             }
                         }
                     }
                 }
+                datosCompatibles.put("Syt",sytString );
                 datosCompatibles.put("Pais", paisDato);
                 datosCompatibles.put("carrera", carreraDato);
 

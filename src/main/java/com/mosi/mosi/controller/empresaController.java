@@ -148,7 +148,6 @@ public class empresaController {
                 ? params.get(DESCRIPCION_ASI).toString() : null;
         Integer lugar 	= (params.containsKey(LUGAR) && params.get(LUGAR) != null && !params.get(LUGAR).toString().isEmpty())
                 ? Integer.valueOf(params.get(LUGAR).toString()) : null;
-        //List<?> preguntas = (params.containsKey(PREGUNTAS) &&  params.get(PREGUNTAS) != null) ? UserService.convertObjectToList(params.get(PREGUNTAS)) : null;
         Integer tipo 	= (params.containsKey(TIPO_ASI) && params.get(TIPO_ASI) != null && !params.get(TIPO_ASI).toString().isEmpty())
                 ? Integer.valueOf(params.get(TIPO_ASI).toString()) : null;
         Integer empId 	= (params.containsKey(ID_EMPRESA) && params.get(ID_EMPRESA) != null && !params.get(ID_EMPRESA).toString().isEmpty())
@@ -244,6 +243,9 @@ public class empresaController {
 
         return result;
     }
+    /**Parametros:
+     { "asignatura": 84}
+     * */
     @PostMapping("/verPostulantes")
     public List<HashMap<String,Object>> verPostulantes(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
