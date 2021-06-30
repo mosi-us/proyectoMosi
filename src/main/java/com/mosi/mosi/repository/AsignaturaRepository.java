@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface AsignaturaRepository extends JpaRepository<Asignatura,String> {
+public interface AsignaturaRepository extends JpaRepository<Asignatura,Integer> {
     String SQL_DETALLE_ASIGNATURA = "select asi.ASI_id," +
             "       asi.ASI_Titulo," +
             "       asi.ASI_Descripcion," +

@@ -189,15 +189,18 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
         HashMap<String, Object> res = new HashMap<>();
         HashMap<String, Object> pyr = new HashMap<>();
         List<Postulaciones> listPostulacions = postulacionesRepository.getByAsignatura(asignaturaRepository.findByAsiId(idAsig));
+        Asignatura asig = asignaturaRepository.getById(idAsig);
         List<HashMap<String,Object>>list = new ArrayList<>();
         List<HashMap<String,Object>> resp = new ArrayList<>();
         for (Postulaciones p:listPostulacions) {
+            est.put("IdEstudiante",p.getEstudiante().getId());
             est.put("nombreYapellido",p.getEstudiante().getNombre()+ " "+p.getEstudiante().getApellido());
             est.put("carrera",p.getEstudiante().getCarrera().getNombreCarrera());
             est.put("universidad",p.getEstudiante().getUniversidad().getNombreUni());
             est.put("pais",p.getEstudiante().getPais().getNombrePais());
             est.put("ciudad",p.getEstudiante().getCiudad().getCiuNombre());
             est.put("afinidad",p.getCompatibilidad().toString());
+            est.put("Asignatura",asig);
             List<Respuestas> respu = respuestaRepository.findByEstudianteAndAsignatura(p.getEstudiante(),p.getAsignatura());
             for (Respuestas r: respu){
             res.put("Pregunta",r.getPregunta().getDecripcion());
