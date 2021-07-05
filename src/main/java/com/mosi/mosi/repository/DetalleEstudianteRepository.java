@@ -13,7 +13,7 @@ public interface DetalleEstudianteRepository extends JpaRepository<DetalleEstudi
 
     String SQL_CONSULTA_ESTUDIANTE_EMPRESA = "select * from DET_ESTUDIANTE DET" +
             " inner join PAM_PaisMaestro pam on DET.DET_ID = pam.DET_Id " +
-            "            where ((DET.CAR_Id = :idCar AND PAM.PAI_ID = :idPais) OR (DET_SEM= :semestre ) AND (DET_Tipo=:tipo))";
+            "            where ((DET.CAR_Id = :idCar AND PAM.PAI_ID = :idPais) AND (DET_SEM= :semestre ) AND (DET_Tipo=:tipo))";
     @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTE_EMPRESA)
     List<DetalleEstudiante> consultar_estudiantes_empresa(@Param("idCar") Integer idsCar,
                                                           @Param("idPais") Integer idPais,

@@ -43,6 +43,7 @@ public interface constante {
     String RESPUESTAS="respuestas";
     String CARACTERISTICAS = "Caracteristicas";
     String POSTULACION = "idPostulacion";
+    String PERFILES = "carreras";
 
     String TITULO_ASI ="titulo";
     String DESCRIPCION_ASI ="descripcion_asignatura";

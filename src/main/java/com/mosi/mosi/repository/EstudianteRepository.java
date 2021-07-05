@@ -75,10 +75,20 @@ public interface EstudianteRepository extends CrudRepository<Estudiante,Integer>
     @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTE_ACTIVO)
     Estudiante consultaPerfilActivo(@Param("idUsu") Integer usuId);
 
-    Estudiante findByUsuario(Usuarios user);
+    List<Estudiante> findByUsuario(Usuarios user);
 
     String SQL_CONSULTA_ESTUDIANTE_SUGERIDO= "select * from EST_Estudiantes EST " +
             "where est.CAR_Id in (:carrera) and est.PAI_Id in (:pais) and EST_Principal = 1 ";
     @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTE_SUGERIDO)
     List<Estudiante> consultarEstudiantesSugeridos(@Param("carrera") List<Integer> carrera,@Param("pais") List<Integer> pais );
+
+    String SQL_CONSULTA_ESTUDIANTE_POR_USUARIO= "select * from EST_Estudiantes EST " +
+            "where USU_ID = :usuId ";
+    @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTE_POR_USUARIO)
+    List<Estudiante> findEstudianteByUsuario(@Param("usuId") Integer idUser);
+
+    String SQL_CONSULTA_ESTUDIANTE_POR_CARRERA= "select * from EST_Estudiantes EST " +
+            "where CAR_ID in (:carIds) and usu_id= :usuId";
+    @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTE_POR_CARRERA)
+    List<Estudiante> consultarEstudiantesPorCarreras(@Param("carIds")List<?> perfiles, @Param("usuId") Integer usuId);
 }

@@ -52,7 +52,7 @@ public class UserService {
                     validar_clave = true;
                     /*validar sesion en uso pendiente*/
                     if (tipo_persona == ESTUDIANTE) {/*Estudiante*/
-                        Estudiante estudiante = estudianteRepository.findByUsuario(usuario);
+                        Estudiante estudiante = estudianteRepository.consultaPerfilActivo(usuario.getId());
                     }else if (tipo_persona==EMPRESA){/*agregar else para Empresa y Universidad*/
                         perfil = empresaService.consultaPerfilEmpresa(idUsu);
                     }

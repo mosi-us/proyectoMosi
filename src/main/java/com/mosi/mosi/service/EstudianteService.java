@@ -297,7 +297,7 @@ public List<Object> consultaEstudiante(Integer usuario){
         Postulaciones postulado = new Postulaciones();
         Asignatura asi = asignaturaRepository.findByAsiId(idAsi);
         Estudiante est = this.buscarEstudianteporId(IdEst);
-        if (resp!=null && resp.size()>0 ) {
+        //if (resp!=null && resp.size()>0 ) {
             List<Preguntas> numPre = preguntasRepository.consultarPreguntas(asi.getAsiId(), est.getCarrera().getId());
             List<DetalleEstudiante> det = detalleEstudianteRepository.findByAsignatura(asi);
             DetalleEstudiante detalleEstudiante = new DetalleEstudiante();
@@ -308,7 +308,7 @@ public List<Object> consultaEstudiante(Integer usuario){
                 }
             }
             Empresa empresa = asi.getEmpresa();
-            if (numPre.size() == resp.size()) {
+            if ((numPre.size() == resp.size()) || numPre==null) {
                 postulaciones.setAsignatura(asi);
                 postulaciones.setEmpresa(empresa);
                 postulaciones.setEstudiante(est);
@@ -338,11 +338,11 @@ public List<Object> consultaEstudiante(Integer usuario){
                 respu = "Se ha postulado Exitosamente";
                 this.enviarEmail(est.getCorreo(),DETALLE_MENSJE_NO_POSTULA_ESTUDIANTE);
             }
-        }else{
+       /* }else{
             respu = "Se ha postulado Exitosamente";
             this.enviarEmail(est.getCorreo(),DETALLE_MENSJE_NO_POSTULA_ESTUDIANTE);
 
-        }
+        }*/
 
         return respu;
     }
@@ -1011,7 +1011,10 @@ public List<Object> consultaEstudiante(Integer usuario){
         return detalleEmpresa;
     }
 
-    public Estudiante actualizarPerfilEstudiante(String nombresEstudiante, String apellidosEstudiante, Integer fechaNac, Integer pais, Integer ciudad, String telefono, String codigoPais, String correo, List<?> deporte, List<?> idioma, Integer universidad, Integer carrera, Integer usuario, Integer semestre, List<?> pasatiempo, String descripcion, List<?> softYTecn, List<?> hablidadesB, Integer lugar) throws IOException, MessagingException {
+    public Estudiante actualizarPerfilEstudiante(String nombresEstudiante, String apellidosEstudiante, Integer fechaNac,
+                                                 Integer pais, Integer ciudad, String telefono, String codigoPais,
+                                                 String correo, List<?> deporte, List<?> idioma, Integer usuario, List<?> pasatiempo,
+                                                 String descripcion,List<?> softYTecn, List<?> hablidadesB) throws IOException, MessagingException {
         DeporteMaestro dep =new DeporteMaestro();
         IdiomaMaestro idi =new IdiomaMaestro();
         PasatiempoMaestro hom =new PasatiempoMaestro();
@@ -1019,54 +1022,61 @@ public List<Object> consultaEstudiante(Integer usuario){
         HabilidadesBlandasMaestro ham= new HabilidadesBlandasMaestro();
 
         Usuarios usu = userService.findUsersbyId(usuario);
-        Estudiante est = estudianteRepository.findByUsuario(usu);
-        if ((nombresEstudiante!=null) && (est.getNombre()!=nombresEstudiante)){
-            est.setNombre(nombresEstudiante);
-        }
-        if ((est.getApellido()!=apellidosEstudiante) && (apellidosEstudiante!=null)) {
-            est.setApellido(apellidosEstudiante);
-        }
-            if ((fechaNac!=null) && ((est.getFechaNac()!=fechaNac))) {
+        //Estudiante est = estudianteRepository.consultaPerfilActivo(usu.getId());
+        List<Estudiante> perfiles = estudianteRepository.findByUsuario(usu);
+        for (Estudiante est: perfiles
+             ) {
+
+
+            if ((nombresEstudiante != null) && (est.getNombre() != nombresEstudiante)) {
+                est.setNombre(nombresEstudiante);
+            }
+            if ((est.getApellido() != apellidosEstudiante) && (apellidosEstudiante != null)) {
+                est.setApellido(apellidosEstudiante);
+            }
+            if ((fechaNac != null) && ((est.getFechaNac() != fechaNac))) {
                 est.setFechaNac(fechaNac);
             }
-        if ((est.getPais().getId()!=pais) && (pais!=null)) {
-            est.setPais(paisService.findPaisbyId(pais));
-        }
-        if ((est.getCarrera().getId()!=carrera) && (carrera!=null)) {
+            if ((est.getPais().getId() != pais) && (pais != null)) {
+                est.setPais(paisService.findPaisbyId(pais));
+            }
+       /* if ((est.getCarrera().getId()!=carrera) && (carrera!=null)) {
             est.setCarrera(carreraService.findCarreraById(carrera));
-        }
-            if ((telefono!=null) &&(est.getTelefono()!=telefono)) {
+        }*/
+            if ((telefono != null) && (est.getTelefono() != telefono)) {
                 est.setTelefono(telefono);
                 est.setCodigoPais(codigoPais);
             }
-            if ((ciudad!=null) && (est.getCiudad().getId()!=ciudad)) {
+            if ((ciudad != null) && (est.getCiudad().getId() != ciudad)) {
                 est.setCiudad(ciudadService.findCiudadById(ciudad));
             }
-            if((correo!=null)&&(est.getCorreo()!=correo))
-            est.setCorreo(correo);
+            if ((correo != null) && (est.getCorreo() != correo))
+                est.setCorreo(correo);
 
-            if ((descripcion!=null) && est.getDescripcion()!=descripcion) {
+            if ((descripcion != null) && est.getDescripcion() != descripcion) {
                 est.setDescripcion(descripcion);
             }
-            if ((universidad!=null)&& (est.getUniversidad().getId()!=universidad)) {
+           /* if ((universidad!=null)&& (est.getUniversidad().getId()!=universidad)) {
                 est.setUniversidad(universidadService.findUniversidadById(universidad));
-            }
+            }*/
 
-            if ((semestre!=null)&&(est.getSemestre()!=semestre)) {
+           /* if ((semestre!=null)&&(est.getSemestre()!=semestre)) {
                 est.setSemestre(semestre);
             }
         if ((semestre!=null)&&(est.getLugar()!=lugar)) {
             est.setLugar(lugar);
-        }
+        }*/
 
             est = estudianteRepository.save(est);
-            int id = est.getId();
+
+
                 Boolean saveCaracteristicas = this.guardarcaracteristicas(idioma,deporte,pasatiempo,hablidadesB,softYTecn,est,null,ESTUDIANTE);
+        }
                 String mensaje="Haz modificado correctamente tu perfil en MOSI";
-                generalService.enviarEmail(est.getCorreo(),ASUNTO,mensaje);
+                generalService.enviarEmail(perfiles.get(0).getCorreo(),ASUNTO,mensaje);
 
 
-            return est;
+            return perfiles.get(0);
     }
 
 
@@ -1079,10 +1089,13 @@ public List<Object> consultaEstudiante(Integer usuario){
     public String rechazarPostulacion(Integer postulacion) throws IOException, MessagingException {
 
     Postulaciones rechazar= empresaService.cambiarEstatusPostulacion(null,null,RECHAZADO,postulacion);
-    String msj = "Se ha rechazado la propuesta con exito!";
-    this.enviarEmail(rechazar.getEstudiante().getCorreo(),msj);
+    String msjEst = "Se ha rechazado la propuesta con exito!";
+    String msjEmp = "Se le notifica que el Estudiante ha rechazado la postulacion";
+    this.enviarEmail(rechazar.getEstudiante().getCorreo(),msjEst);
+    this.enviarEmail(rechazar.getEmpresa().getCorreo(),msjEmp);
 
-    return msj;
+
+    return msjEst;
     }
 
     public String eliminarPostulacion(Integer postulacion) throws IOException, MessagingException {
@@ -1090,5 +1103,37 @@ public List<Object> consultaEstudiante(Integer usuario){
         String msj = "Se ha eliminado la Postulacion con exito!";
         this.enviarEmail(rechazar.getEstudiante().getCorreo(),msj);
     return msj;
+    }
+
+    public ArrayList<Object> obtenerCarrerasPorEstudiante(Integer usuId) {
+        List<Estudiante> perfiles = estudianteRepository.findEstudianteByUsuario(usuId);
+    ArrayList<Object> carreras = new ArrayList<>();
+
+        for (Estudiante car: perfiles
+             ) {
+            carreras.add(car.getCarrera());
+        }
+    return carreras;
+    }
+
+    public Estudiante actualizarPerfilEstudianteDatosAcademicos(Integer semestre, Integer universidad, Integer lugar,
+                                                                Integer carrera,Integer usu, Integer perfil) {
+
+        Estudiante est = estudianteRepository.consultaPerfilActivo(usu);
+        if ((est.getCarrera().getId()!=carrera) && (carrera!=null)) {
+            est.setCarrera(carreraService.findCarreraById(carrera));
+        }
+        if ((universidad!=null)&& (est.getUniversidad().getId()!=universidad)) {
+            est.setUniversidad(universidadService.findUniversidadById(universidad));
+        }
+        if ((semestre!=null)&&(est.getSemestre()!=semestre)) {
+            est.setSemestre(semestre);
+        }
+        if ((semestre!=null)&&(est.getLugar()!=lugar)) {
+            est.setLugar(lugar);
+        }
+     est = estudianteRepository.save(est);
+
+    return est;
     }
 }

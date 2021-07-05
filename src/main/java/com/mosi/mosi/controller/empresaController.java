@@ -369,7 +369,9 @@ public class empresaController {
         }
         return info_de_contacto_Estudiante;
     }
-
+    /**Parametros**
+     {"idAsignatura":}
+     * */
     @PostMapping("/verEstudiantesSeleccionados")
     public List<Postulaciones> verEstudiantesSeleccionados(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException, ParseException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
@@ -408,4 +410,5 @@ public class empresaController {
         String resp =  empresaService.rechazarEstudiante(portulacion);
         return resp;
     }
+
     }

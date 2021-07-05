@@ -99,6 +99,25 @@ public class estudianteController {
      "sytId":[{},{}],
      "hamId":[],
      "idLugar":}
+     {"idUser":1032,
+     "Nombres":"pedro",
+     "Apellidos":"perez",
+     "fecha":20011201,
+     "paisId":4,
+     "ciudadId":1,
+     "telefono":"000000000",
+     "codigo_pais": "+56",
+     "correo":"lalalalala",
+     "semestre":8,
+     "depId":[5,6,7,8,9],
+     "Idiomas":[{"idIdioma":14,"nivel":2},{"idIdioma":2,"nivel":3}],
+     "uniId":14,
+     "carID":8,
+     "descripcion_estudiante":"descripcion de estudiante",
+     "idPasatiempo":[1,2,3,4,5],
+     "sytId":[{"idSyt":3,"nivel":3},{"idSyt":1,"nivel":1},{"idSyt":2,"nivel":1}],
+     "hamId":[2,9,15,16,22],
+     "idLugar":2}
     * */
 
     @PostMapping("/guardarPerfilEstudiante")
@@ -414,8 +433,49 @@ public class estudianteController {
         return empresa;
     }
 
-    @PostMapping("ModificarPerfilEstudiante")
-    public Estudiante ModificarPerfilEstudiante(HttpServletRequest request, HttpServletResponse response,
+    /**
+     {"idUser":1031,
+     "semestre":8,
+     "uniId":8,
+     "carID":14,
+     "idLugar":1}
+
+    * */
+    @PostMapping("ModificarPerfilEstudianteDatosAcademicos")
+    public Estudiante ModificarPerfilEstudianteDatosAcademicos(HttpServletRequest request, HttpServletResponse response,
+                                                              @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer semestre = (params.containsKey(SEMESTRE) && params.get(SEMESTRE) != null && !params.get(SEMESTRE).toString().isEmpty())
+           ? Integer.valueOf(params.get(SEMESTRE).toString()) : null;
+         Integer universidad = (params.containsKey(UNIVERSIDAD_ID) && params.get(UNIVERSIDAD_ID) != null && !params.get(UNIVERSIDAD_ID).toString().isEmpty())
+                ? Integer.valueOf(params.get(UNIVERSIDAD_ID).toString()) : null;
+        Integer lugar = (params.containsKey(LUGAR) && params.get(LUGAR) != null && !params.get(LUGAR).toString().isEmpty())
+                  ? Integer.valueOf(params.get(LUGAR).toString()) : null;
+         Integer carrera = (params.containsKey(CARRERA_ID) && params.get(CARRERA_ID) != null && !params.get(CARRERA_ID).toString().isEmpty())
+                 ? Integer.valueOf(params.get(CARRERA_ID).toString()) : null;
+        Integer usuario 	= (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty())
+                ? Integer.valueOf(params.get(ID_USER).toString()) : null;
+        Integer perfil = (params.containsKey(PERFILES) &&  params.get(PERFILES) != null) ?Integer.valueOf(params.get(PERFILES).toString()) : null;
+
+        Estudiante estudiante = estudianteService.actualizarPerfilEstudianteDatosAcademicos(semestre,universidad,lugar,carrera,usuario,perfil);
+
+         return estudiante;
+    }
+   /**  solo enviar datos que se vayan a cambiar
+    {"idUser":1031,
+            "depId":[1,2,5],
+        "Idiomas":[{"idIdioma":14,"nivel":2},{"idIdioma":2,"nivel":3}{"idIdioma":8,"nivel":2},{"idIdioma":5,"nivel":1}],
+        "descripcion":"facil adaptacion al cambio",
+            "idPasatiempo":[1,5],
+        "sytId":[{"idSyt":3,"nivel":3},{"idSyt":4,"nivel":1}],
+        "hamId":[12,25],
+        "paisId":4,
+            "ciudadId":9,
+            "telefono":"123456789"
+    }
+**/
+    @PostMapping("ModificarPerfilEstudianteDatosGenerales")
+    public Estudiante ModificarPerfilEstudianteDatosGenerales(HttpServletRequest request, HttpServletResponse response,
                                                              @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         String nombresEstudiante 	= (params.containsKey(NOMBRES) && params.get(NOMBRES) != null) ? params.get(NOMBRES).toString() : null;
@@ -433,24 +493,24 @@ public class estudianteController {
         String correo  = (params.containsKey(CORREO) && params.get(CORREO) != null && !params.get(CORREO).toString().isEmpty()) ? params.get(CORREO).toString() : null;
         Integer usuario 	= (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty())
                 ? Integer.valueOf(params.get(ID_USER).toString()) : null;
-        Integer semestre = (params.containsKey(SEMESTRE) && params.get(SEMESTRE) != null && !params.get(SEMESTRE).toString().isEmpty())
-                ? Integer.valueOf(params.get(SEMESTRE).toString()) : null;
+        //Integer semestre = (params.containsKey(SEMESTRE) && params.get(SEMESTRE) != null && !params.get(SEMESTRE).toString().isEmpty())
+             //   ? Integer.valueOf(params.get(SEMESTRE).toString()) : null;
         List<?> deporte = (params.containsKey(DEPORTE_ID) &&  params.get(DEPORTE_ID) != null) ? UserService.convertObjectToList(params.get(DEPORTE_ID)) : null;
-        Integer universidad = (params.containsKey(UNIVERSIDAD_ID) && params.get(UNIVERSIDAD_ID) != null && !params.get(UNIVERSIDAD_ID).toString().isEmpty())
-                ? Integer.valueOf(params.get(UNIVERSIDAD_ID).toString()) : null;
+       // Integer universidad = (params.containsKey(UNIVERSIDAD_ID) && params.get(UNIVERSIDAD_ID) != null && !params.get(UNIVERSIDAD_ID).toString().isEmpty())
+        //        ? Integer.valueOf(params.get(UNIVERSIDAD_ID).toString()) : null;
         List<?> idioma = (params.containsKey(IDIOMAS) &&  params.get(IDIOMAS) != null) ? UserService.convertObjectToList(params.get(IDIOMAS)) : null;
-        Integer carrera = (params.containsKey(CARRERA_ID) && params.get(CARRERA_ID) != null && !params.get(CARRERA_ID).toString().isEmpty())
-                ? Integer.valueOf(params.get(CARRERA_ID).toString()) : null;
+       // Integer carrera = (params.containsKey(CARRERA_ID) && params.get(CARRERA_ID) != null && !params.get(CARRERA_ID).toString().isEmpty())
+       //         ? Integer.valueOf(params.get(CARRERA_ID).toString()) : null;
         String descripcion = (params.containsKey(DESCRIPCION_EST) && params.get(DESCRIPCION_EST) != null && !params.get(DESCRIPCION_EST).toString().isEmpty())
                 ? params.get(DESCRIPCION_EST).toString() : null;
         List<?> pasatiempo = (params.containsKey(PASATIEMPO) &&  params.get(PASATIEMPO) != null) ? UserService.convertObjectToList(params.get(PASATIEMPO)) : null;
         List<?> softYTecn = (params.containsKey(SOFTWARE_TECNOLOGIA) &&  params.get(SOFTWARE_TECNOLOGIA) != null) ? UserService.convertObjectToList(params.get(SOFTWARE_TECNOLOGIA)) : null;
         List<?> hablidadesB = (params.containsKey(HABILIDADES) &&  params.get(HABILIDADES) != null) ? UserService.convertObjectToList(params.get(HABILIDADES)) : null;
-        Integer lugar = (params.containsKey(LUGAR) && params.get(LUGAR) != null && !params.get(LUGAR).toString().isEmpty())
-                ? Integer.valueOf(params.get(LUGAR).toString()) : null;
+      //  Integer lugar = (params.containsKey(LUGAR) && params.get(LUGAR) != null && !params.get(LUGAR).toString().isEmpty())
+      //          ? Integer.valueOf(params.get(LUGAR).toString()) : null;
         Estudiante estudiante = new Estudiante();
         estudiante = estudianteService.actualizarPerfilEstudiante(nombresEstudiante,apellidosEstudiante,fechaNac,pais,ciudad,telefono,codigoPais,correo,deporte,
-                idioma,universidad,carrera, usuario,semestre,pasatiempo,descripcion,softYTecn,hablidadesB,lugar);
+                idioma, usuario,pasatiempo,descripcion,softYTecn,hablidadesB);
         return estudiante;
     }
 
@@ -493,5 +553,14 @@ public class estudianteController {
 
         String listPos = estudianteService.eliminarPostulacion(postulacion);
         return listPos;
+    }
+
+    @PostMapping("getCarreraByEstudents")
+    public  ArrayList<Object> getCarreraByEstudents(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer usuId= (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty() ? Integer.valueOf(params.get(ID_USER).toString()) : null );
+        ArrayList<Object> carreras = estudianteService.obtenerCarrerasPorEstudiante(usuId);
+
+        return carreras;
     }
 }

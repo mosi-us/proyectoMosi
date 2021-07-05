@@ -150,6 +150,10 @@ public class userController {
         }
         return objectResult;
     }
+
+    /**
+    {"email":"daniela.toro@usach.cl"}
+    * */
     @PostMapping("olvidarContrasena")
     public String olvidarContrasena(HttpServletRequest request, HttpServletResponse response,
                                             @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
@@ -165,7 +169,7 @@ public class userController {
 
         return msj;
     }
-    @PostMapping("reset_password")
+        @PostMapping("reset_password")
     public String reset_password(HttpServletRequest request, HttpServletResponse response,
                                     @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
