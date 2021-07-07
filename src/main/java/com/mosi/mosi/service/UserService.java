@@ -2,13 +2,16 @@ package com.mosi.mosi.service;
 
 import com.mosi.mosi.bean.Empresa;
 import com.mosi.mosi.bean.Estudiante;
+import com.mosi.mosi.bean.PerfilesBloqueados;
 import com.mosi.mosi.bean.Usuarios;
 import com.mosi.mosi.repository.EmpresaRepository;
 import com.mosi.mosi.repository.EstudianteRepository;
+import com.mosi.mosi.repository.PerfilesBloqueadosRepository;
 import com.mosi.mosi.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Service;
@@ -35,25 +38,27 @@ public class UserService {
     EmpresaRepository empresaRepository;
     @Autowired
     empresaService empresaService;
+    @Autowired
+    PerfilesBloqueadosRepository perfilesBloqueadosRepository;
 
-    public  HashMap<String,String>  userlogin(String email, String clave){
-        HashMap<String,String> objectResult = new HashMap<>();
+    public HashMap<String, String> userlogin(String email, String clave) {
+        HashMap<String, String> objectResult = new HashMap<>();
 
         Boolean validar_clave = false;
         Empresa perfil = new Empresa();
-        Usuarios usuario= userRepository.findByEmail(email);
-        if (usuario!= null ){
+        Usuarios usuario = userRepository.findByEmail(email);
+        if (usuario != null) {
             Integer estatus = usuario.getEstatus();
             String claveUsu = usuario.getPassword();
             Integer idUsu = usuario.getId();
             Integer tipo_persona = usuario.getTipo_persona();
-            if (estatus ==ACTIVO) {
+            if (estatus == ACTIVO) {
                 if (claveUsu.equals(clave)) {// clave viene encriptada desde front
                     validar_clave = true;
                     /*validar sesion en uso pendiente*/
                     if (tipo_persona == ESTUDIANTE) {/*Estudiante*/
                         Estudiante estudiante = estudianteRepository.consultaPerfilActivo(usuario.getId());
-                    }else if (tipo_persona==EMPRESA){/*agregar else para Empresa y Universidad*/
+                    } else if (tipo_persona == EMPRESA) {/*agregar else para Empresa y Universidad*/
                         perfil = empresaService.consultaPerfilEmpresa(idUsu);
                     }
                     /*genero Token*/
@@ -64,66 +69,66 @@ public class UserService {
                     objectResult.put("Mensaje", "Inicio de Sesion Exitoso");
 
                 } else {
-                    if (tipo_persona==ESTUDIANTE){
+                    if (tipo_persona == ESTUDIANTE) {
                         int intentosMaximos = 3;
                         Integer intentos = ((usuario.getIntentoFallido() != null) ? usuario.getIntentoFallido() : 0);
-                        if (intentos<intentosMaximos){
-                            usuario.setIntentoFallido(intentos+1);
+                        if (intentos < intentosMaximos) {
+                            usuario.setIntentoFallido(intentos + 1);
                             userRepository.save(usuario);
-                        }else {
+                        } else {
                             usuario.setEstatus(BLOQUEADO);
                             userRepository.save(usuario);
                             /*preguntar si enviar correo notificando usuario bloqueado*/
                         }
                     }
-                    if (usuario.getEstatus()==BLOQUEADO){
+                    if (usuario.getEstatus() == BLOQUEADO) {
                         objectResult.put("Mensaje", "Ha superado el numero de intentos permitido. Su usuario se encuentra bloqueado por favor Restablezca contraseña");
-                    }else {
+                    } else {
                         objectResult.put("Mensaje", " Clave Invalida");
                     }
                 }
-            }else if(estatus==BLOQUEADO){
+            } else if (estatus == BLOQUEADO) {
                 objectResult.put("Mensaje", "Usuario Bloqueado, por favor Restablezca Contraseña");
 
-            }else {
+            } else {
                 objectResult.put("Mensaje", "Usuario Desactivado");
             }
-        }else {
+        } else {
             objectResult.put("Mensaje", " Usuario no Existe");
         }
         return objectResult;
     }
 
-    public Object signIn(String clave, String email ) throws IOException, MessagingException {
+    public Object signIn(String clave, String email) throws IOException, MessagingException {
         Object objectResult = null;
         Usuarios nuevoUsu = new Usuarios();
         String existEmail = userRepository.buscarEmail(email);
-        if ((existEmail==null)){
-                nuevoUsu.setEmail(email);
-                nuevoUsu.setPassword(clave);
-                nuevoUsu.setEstatus(1);
-                nuevoUsu.setTipo_persona(ESTUDIANTE);
-                nuevoUsu.setFecha(new Date());
-                nuevoUsu = userRepository.save(nuevoUsu);
-                String idUsu = nuevoUsu.getId().toString();
-                objectResult= mensaje("Usuario Creado con Exito",idUsu,"idUsu");
+        if ((existEmail == null)) {
+            nuevoUsu.setEmail(email);
+            nuevoUsu.setPassword(clave);
+            nuevoUsu.setEstatus(1);
+            nuevoUsu.setTipo_persona(ESTUDIANTE);
+            nuevoUsu.setFecha(new Date());
+            nuevoUsu = userRepository.save(nuevoUsu);
+            String idUsu = nuevoUsu.getId().toString();
+            objectResult = mensaje("Usuario Creado con Exito", idUsu, "idUsu");
 
-            generalService.enviarEmail(nuevoUsu.getEmail(),"Registro Exitoso a Mosi",DETALLE_REGISTRO_ESTUDIANTE);
+            generalService.enviarEmail(nuevoUsu.getEmail(), "Registro Exitoso a Mosi", DETALLE_REGISTRO_ESTUDIANTE);
 
 
-        }else{
-            objectResult = mensaje("El email ya esta registrado",null,null);
+        } else {
+            objectResult = mensaje("El email ya esta registrado", null, null);
         }
 
         return objectResult;
     }
 
-    private String getJWTToken(int id){
+    private String getJWTToken(int id) {
         String claveSecreta = "mySecretKey";
-        List<GrantedAuthority>grantedAuthorities = AuthorityUtils
+        List<GrantedAuthority> grantedAuthorities = AuthorityUtils
                 .commaSeparatedStringToAuthorityList("ROLE_USER");
 
-        String token= Jwts
+        String token = Jwts
                 .builder()
                 .setId("softtekJWT")
                 .setSubject(Integer.toString(id))
@@ -133,11 +138,12 @@ public class UserService {
                                 .collect(Collectors.toList()))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 600000))
-                .signWith(SignatureAlgorithm.HS512,claveSecreta.getBytes()).compact();
+                .signWith(SignatureAlgorithm.HS512, claveSecreta.getBytes()).compact();
         return "Bearer" + token;
 
     }
-    public static Map<String, Object> mensaje(String mensaje, String dato, String tipoDato){
+
+    public static Map<String, Object> mensaje(String mensaje, String dato, String tipoDato) {
         Map<String, Object> Message = new HashMap<String, Object>();
 
         Message.put("Mensaje", mensaje);
@@ -152,12 +158,13 @@ public class UserService {
     public static List<?> convertObjectToList(Object obj) {
         List<?> list = new ArrayList<>();
         if (obj.getClass().isArray()) {
-            list = Arrays.asList((Object[])obj);
+            list = Arrays.asList((Object[]) obj);
         } else if (obj instanceof Collection) {
-            list = new ArrayList<>((Collection<?>)obj);
+            list = new ArrayList<>((Collection<?>) obj);
         }
         return list;
     }
+
     public Usuarios findUsersbyId(Integer id) {
         Optional<Usuarios> users = null;
         try {
@@ -168,44 +175,44 @@ public class UserService {
         return users.get();
     }
 
-    public String updateResetClave(String email, String token,HttpServletRequest request) throws IOException, MessagingException {
+    public String updateResetClave(String email, String token, HttpServletRequest request) throws IOException, MessagingException {
         String msj = "";
         Usuarios usuarios = userRepository.findByEmail(email);
-        if(usuarios.getTipo_persona()!=EMPRESA) {
+        if (usuarios.getTipo_persona() != EMPRESA) {
             if (usuarios != null && token != null) {
                 usuarios.setTokenReseteo(token);
                 usuarios.setFechaReseteo(new Date());
                 userRepository.save(usuarios);
             }
             String resetPasswordLink = this.getSiteURL(request) + "/reset_password?token=" + token;
-            String msj_est =DETALLE_EMAIL_RECUPERAR_CLAVE + email + " \n Por favor haga click en el Siguiente enlace: " + resetPasswordLink;
-            estudianteService.enviarEmail(email,msj_est);
+            String msj_est = DETALLE_EMAIL_RECUPERAR_CLAVE + email + " \n Por favor haga click en el Siguiente enlace: " + resetPasswordLink;
+            estudianteService.enviarEmail(email, msj_est);
             msj = "Hemos enviado un enlace para restablecer la contraseña a su correo electrónico. Por favor, compruebe.";
-        }else{
+        } else {
             msj = "No tiene autorizacion para cambiar contraseña";
             String mensaje = "No tiene autorización para realizar estos cambios, comuníquese con soporte al correo: xxxxxxx";
-            estudianteService.enviarEmail(email,mensaje);
+            estudianteService.enviarEmail(email, mensaje);
         }
         return msj;
     }
 
     public String getSiteURL(HttpServletRequest request) {
         String siteUrl = request.getRequestURL().toString();
-        return siteUrl.replace(request.getServletPath(),"");
+        return siteUrl.replace(request.getServletPath(), "");
 
     }
 
     public void enviarLinkEmail(String msj, String email) throws IOException, MessagingException {
-       generalService.enviarEmail(email,RECUPERAR_CLAVE_ASUNTO,msj);
+        generalService.enviarEmail(email, RECUPERAR_CLAVE_ASUNTO, msj);
     }
 
-    public String resetClaveporToken( String token,String clave) throws IOException, MessagingException {
+    public String resetClaveporToken(String token, String clave) throws IOException, MessagingException {
         String msj = "";
         Usuarios usuarios = userRepository.findByTokenReseteo(token);
 
-        if (usuarios==null){
+        if (usuarios == null) {
             msj = "Token invalido";
-        }else {
+        } else {
             usuarios.setPassword(clave);
             usuarios.setTokenReseteo("");
             usuarios.setIntentoFallido(0);
@@ -213,9 +220,42 @@ public class UserService {
             userRepository.save(usuarios);
             msj = "Su Contraseña ha sido reestablecida con exito!";
             String mensaje = msj + "\n Si no cambió su contraseña, póngase en contacto con nosotros inmediatamente a traves de los numeros +56 000 0000000";
-            generalService.enviarEmail(usuarios.getEmail().toString(),ASUNTO_CONFIRMACION_DE_RECUPERACION_CLAVE,mensaje);
+            generalService.enviarEmail(usuarios.getEmail().toString(), ASUNTO_CONFIRMACION_DE_RECUPERACION_CLAVE, mensaje);
         }
 
         return msj;
     }
+
+    public String cambiarClave(Integer idUsuario, String claveActual, String claveNueva) throws IOException, MessagingException {
+        String resp = "";
+        Usuarios usuario = userRepository.findById(idUsuario).get();
+        if (usuario.getPassword().equals(claveActual)) {
+            usuario.setPassword(claveNueva);
+            usuario = userRepository.save(usuario);
+            resp = "Su contrasena se ha Cambiado Exitosamente";
+            generalService.enviarEmail(usuario.getEmail(), ASUNTO, resp);
+        } else {
+            resp = "la clave que ingreso no es correcta";
+            /*preguntar si se envia email*/
+        }
+
+        return resp;
+    }
+
+    public String debloquear_bloquear_Usuario(Integer idUsuario, Integer idPerfil, Integer estado) {
+        PerfilesBloqueados perfilesBloqueados = new PerfilesBloqueados();
+        Usuarios usuario = userRepository.findById(idUsuario).get();
+        perfilesBloqueados.setUsuario(usuario);
+        perfilesBloqueados.setPblIdperfil(idPerfil);
+        perfilesBloqueados.setPblEstatus(estado); // 2--Bloqueado 1--Desbloqueado
+        perfilesBloqueados.setPblFechacreacion(new Date());
+
+        perfilesBloqueados = perfilesBloqueadosRepository.save(perfilesBloqueados);
+
+        String msj = "El perfil se ha Bloqueado con Exito!!!";
+        return null;
+    }
+
 }
+
+

@@ -25,7 +25,7 @@ public class Estudiante implements Serializable {
 
     @ApiObjectField(description = "Fecha de Nacimiento", required = true)
     @Column(name="EST_Fecha_Nac")
-    private Integer fechaNac;
+    private String fechaNac;
 
     @OneToOne
     @ApiObjectField(description = "id del Pais", required = true)
@@ -104,11 +104,11 @@ public class Estudiante implements Serializable {
         this.apellido = apellido;
     }
 
-    public Integer getFechaNac() {
+    public String getFechaNac() {
         return fechaNac;
     }
 
-    public void setFechaNac(Integer fechaNac) {
+    public void setFechaNac(String fechaNac) {
         this.fechaNac = fechaNac;
     }
 

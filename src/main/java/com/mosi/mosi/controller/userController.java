@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.mosi.mosi.constantes.constante.*;
+import static com.mosi.mosi.constantes.constante.CLAVE_ACTUAL;
 
 @CrossOrigin(origins = {"http://localhost:4200","*"})
 @RestController
@@ -256,6 +257,37 @@ public class userController {
 
         return null;
     }
+    @PostMapping("cambiarClave")
+    public String cambiarClave(HttpServletRequest request, HttpServletResponse response,
+                               @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idUsuario = (params.containsKey(ID_USER) && params.get(ID_USER) != null) ? Integer.valueOf(params.get(ID_USER).toString()) : null;
+        String claveActual = (params.containsKey(CLAVE_ACTUAL) && params.get(CLAVE_ACTUAL) != null) ? params.get(CLAVE_ACTUAL).toString() : null;
+        String claveNueva = (params.containsKey(CLAVE) && params.get(CLAVE) != null) ? params.get(CLAVE).toString() : null;
+        String resp = userService.cambiarClave(idUsuario, claveActual, claveNueva);
+        return resp;
+    }
+
+/**
+{"idUser":1034,
+ "perfil":1014
+}
+
+* */
+    @PostMapping("desbloquearBloquearPerfil")
+    public String desbloquearBloquearPerfil(HttpServletRequest request, HttpServletResponse response,
+                               @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idUsuario = (params.containsKey(ID_USER) && params.get(ID_USER) != null) ? Integer.valueOf(params.get(ID_USER).toString()) : null;
+        Integer idPerfil = (params.containsKey(PERFIL) && params.get(PERFIL) != null) ? Integer.valueOf(params.get(PERFIL).toString()) : null;
+        Integer estaus = (params.containsKey(ESTATUS) && params.get(ESTATUS) != null) ? Integer.valueOf(params.get(ESTATUS).toString()) : null;
+
+
+        String resp = userService.debloquear_bloquear_Usuario(idUsuario,idPerfil,estaus);
+        return resp;
+    }
+
+
 
 }
 

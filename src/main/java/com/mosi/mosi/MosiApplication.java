@@ -65,7 +65,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/ModificarPerfilEstudianteDatosAcademicos","/ModificarPerfilEstudianteDatosGenerales",
 						"/eliminarPostulacion",
 						"/listarPostulacionesEstudiante",
-						"/rechazarPostulacion","/getCarreraByEstudents"
+						"/rechazarPostulacion","/getCarreraByEstudents","/cambiarClave","/desbloquearBloquearPerfil","/buscarPerfil"
 				).permitAll()
 				.antMatchers(HttpMethod.GET,
 						"/consultarDeportes",
@@ -78,7 +78,8 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/consultarEspecialidades",
 						"/consultarDeportes",
 						"/consultarHabilidadesBlandas",
-						"/consultarCiudades").permitAll()
+						"/consultarCiudades","/getallEstudiantes"
+					).permitAll()
 				.anyRequest().authenticated();
 	}
 }

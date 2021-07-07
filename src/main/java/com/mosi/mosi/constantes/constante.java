@@ -117,4 +117,7 @@ public interface constante {
     String DETALLE_MENSJE_NO_POSTULA_ESTUDIANTE = "Se ha postulado Exitosamente, se recomienda volver a postular respondiendo las preguntas para que su postulacion tenga mas relevancia";
 
 
+    String CLAVE_ACTUAL = "claveActual";
+    String PERFIL = "perfil";
+    String ESTATUS = "estatus" ;
 }

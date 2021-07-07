@@ -78,7 +78,6 @@ public class estudianteController {
     AsignaturaRepository asignaturaRepository;
     @Autowired
     PaisesRepository paisesRepository;
-
     /** Parametros: **
      {"idUser":,
      "Nombres":"",
@@ -128,8 +127,8 @@ public class estudianteController {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         String nombresEstudiante 	= (params.containsKey(NOMBRES) && params.get(NOMBRES) != null) ? params.get(NOMBRES).toString() : null;
         String apellidosEstudiante 	= (params.containsKey(APELLIDOS) && params.get(APELLIDOS) != null) ? params.get(APELLIDOS).toString() : null;
-        Integer fechaNac 	= (params.containsKey(FECHA) && params.get(FECHA) != null && !params.get(FECHA).toString().isEmpty())
-                ? Integer.valueOf(params.get(FECHA).toString()) : null;
+        String fechaNac 	= (params.containsKey(FECHA) && params.get(FECHA) != null && !params.get(FECHA).toString().isEmpty())
+                ? (params.get(FECHA).toString()) : null;
         Integer pais 	= (params.containsKey(PAIS_ID) && params.get(PAIS_ID) != null && !params.get(PAIS_ID).toString().isEmpty())
                 ? Integer.valueOf(params.get(PAIS_ID).toString()) : null;
         Integer ciudad 	= (params.containsKey(CIUDAD) && params.get(CIUDAD) != null && !params.get(CIUDAD).toString().isEmpty())
@@ -205,7 +204,7 @@ public class estudianteController {
     }
     @GetMapping("consultarIdiomas")
     public List<Idioma> consultarIdioma(HttpServletRequest request, HttpServletResponse response) {
-        List<Idioma> listIdioma= idiomaRepository.findAllByIdGreaterThan(0);
+        List<Idioma> listIdioma= idiomaRepository.consutarIdiomasPorNombre();
         return listIdioma;
     }
     @GetMapping("consultarCarreras")
@@ -242,6 +241,11 @@ public class estudianteController {
     public List<Ciudades> consultarCiudades(HttpServletRequest request, HttpServletResponse response) {
         List<Ciudades> ListCiudades= ciudadesRepository.findByIdGreaterThan(0);
         return ListCiudades;
+    }
+    @GetMapping("getallEstudiantes")
+    public List<Estudiante> getallEstudiantes(HttpServletRequest request, HttpServletResponse response) {
+        List<Estudiante> estudiantes= estudianteRepository.findByIdGreaterThan(0);
+        return estudiantes;
     }
     /**
      * Parametros:
@@ -327,8 +331,8 @@ public class estudianteController {
 
         // primero consulto perfil estudiante activo actualmente y cambio estatus a inactivo
         Estudiante perfilPrinc =estudianteRepository.consultaPerfilActivo(usuario);
-        String nombre,apellido,telf,codpais,descripcion,correo;
-        Integer fechaN,pais,ciudad = null;
+        String nombre,apellido,telf,codpais,descripcion,correo,fechaN;
+        Integer pais,ciudad = null;
         nombre = perfilPrinc.getNombre();
         apellido= perfilPrinc.getApellido();
         fechaN= perfilPrinc.getFechaNac();
@@ -406,7 +410,7 @@ public class estudianteController {
         return syt;
     }
     /**
-     *{"idEstudiante":"103","asignatura":"50"}
+     *{"idEstudiante":,"asignatura":}
      * */
     @PostMapping("consultarPreguntas")
     public List<Preguntas> consultarPreguntas(HttpServletRequest request, HttpServletResponse response,
@@ -480,8 +484,8 @@ public class estudianteController {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         String nombresEstudiante 	= (params.containsKey(NOMBRES) && params.get(NOMBRES) != null) ? params.get(NOMBRES).toString() : null;
         String apellidosEstudiante 	= (params.containsKey(APELLIDOS) && params.get(APELLIDOS) != null) ? params.get(APELLIDOS).toString() : null;
-        Integer fechaNac 	= (params.containsKey(FECHA) && params.get(FECHA) != null && !params.get(FECHA).toString().isEmpty())
-                ? Integer.valueOf(params.get(FECHA).toString()) : null;
+        String fechaNac 	= (params.containsKey(FECHA) && params.get(FECHA) != null && !params.get(FECHA).toString().isEmpty())
+                ? params.get(FECHA).toString() : null;
         Integer pais 	= (params.containsKey(PAIS_ID) && params.get(PAIS_ID) != null && !params.get(PAIS_ID).toString().isEmpty())
                 ? Integer.valueOf(params.get(PAIS_ID).toString()) : null;
         Integer ciudad 	= (params.containsKey(CIUDAD) && params.get(CIUDAD) != null && !params.get(CIUDAD).toString().isEmpty())
@@ -562,5 +566,20 @@ public class estudianteController {
         ArrayList<Object> carreras = estudianteService.obtenerCarrerasPorEstudiante(usuId);
 
         return carreras;
+    }
+
+    @PostMapping("buscarPerfil")
+    public HashMap<String,Object> buscarPerfil(HttpServletRequest request, HttpServletResponse response,
+                                                             @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idEmp = (params.containsKey(ID_EMPRESA) && params.get(ID_EMPRESA) != null && !params.get(ID_EMPRESA).toString().isEmpty())
+                ? Integer.valueOf(params.get(ID_EMPRESA).toString()) : null;
+        Integer idEstudiante = (params.containsKey(ID_ESTUDIANTE) && params.get(ID_ESTUDIANTE) != null && !params.get(ID_ESTUDIANTE).toString().isEmpty())
+                ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
+        Integer tipoPersona = (params.containsKey(TIPO_PERSONA) && params.get(TIPO_PERSONA) != null && !params.get(TIPO_PERSONA).toString().isEmpty())
+                ? Integer.valueOf(params.get(TIPO_PERSONA).toString()) : null;
+        HashMap<String,Object> empresa = estudianteService.buscarPerfilEmpresaEstudiante(idEmp,idEstudiante,tipoPersona);
+
+        return empresa;
     }
 }

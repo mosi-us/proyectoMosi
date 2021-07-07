@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Array;
 import java.util.*;
 
 import static com.mosi.mosi.constantes.constante.*;
@@ -78,10 +77,11 @@ public class EstudianteService {
     EmpresaRepository empresaRepository;
     @Autowired
     empresaService empresaService;
-
+    @Autowired
+    PerfilesBloqueadosRepository perfilesBloqueadosRepository;
 
 public Estudiante guardarEstudiante(String nombresEstudiante, String apellidosEstudiante,
-                                    Integer fechaNac, Integer pais,Integer ciudad,String tlf,String codPais,String correo, List<?>deporte,
+                                    String fechaNac, Integer pais,Integer ciudad,String tlf,String codPais,String correo, List<?>deporte,
                                     List<?> idioma, Integer universidad, Integer carrera, Integer usuario,Integer semestre,
                                     List<?> pasatiempo,String descripcion,List<?>softTecn,List<?>habilidades, Integer lugar) throws IOException, MessagingException {
     Estudiante estudiante = new Estudiante();
@@ -809,7 +809,7 @@ public List<Object> consultaEstudiante(Integer usuario){
 
             /**busqueda por carrera y pais*/
             List<DetalleEstudiante> det_estudiante;
-            det_estudiante = detalleEstudianteRepository.consultar_estudiantes_empresa(idCar, idPais, semestre, tipo);
+            det_estudiante = detalleEstudianteRepository.consultar_estudiantes_empresa(idCar, idPais, semestre, tipo,estId);
             List<HashMap<String,Object>> list = this.listarDetalleEstudiantes(det_estudiante);
             List<List<HashMap<String, Object>>> asigList = this.compatibilidad(list,perfil,ESTUDIANTE);
 
@@ -961,57 +961,58 @@ public List<Object> consultaEstudiante(Integer usuario){
     }
 
     public HashMap<String,Object> verPerfilEmpresas( Integer idEmp,Integer estId) {
-        Empresa empresa = empresaRepository.findById(idEmp).get();
-        Estudiante estudiante = estudianteRepository.findById(estId).get();
-        List<Asignatura> asignatura = asignaturaRepository.findByEmpresa(empresa);
         List<DetalleEstudiante> listDetalle = new ArrayList<>();
         List<Asignatura> listAsig = new ArrayList<>();
-        HashMap<String,Object> listAsigDet = new HashMap<>();
-        List<HashMap<String,Object>> listAsign = new ArrayList<>();
-        HashMap<String,Object> detalleEmpresa = new HashMap<>();
-        for (Asignatura asi: asignatura
-             ) {
+        HashMap<String, Object> listAsigDet = new HashMap<>();
+        List<HashMap<String, Object>> listAsign = new ArrayList<>();
+        HashMap<String, Object> detalleEmpresa = null;
+        Empresa empresa = empresaRepository.findById(idEmp).get();
+        Estudiante estudiante = estudianteRepository.findById(estId).get();
+
+        List<Asignatura> asignatura = asignaturaRepository.findByEmpresa(empresa);
+        for (Asignatura asi : asignatura
+        ) {
             listDetalle = detalleEstudianteRepository.findByAsignatura(asi);
         }
-        for (DetalleEstudiante det: listDetalle
-             ) {
-            if (estudiante.getCarrera().getId()==det.getCarrera().getId()){
+        for (DetalleEstudiante det : listDetalle
+        ) {
+            if (estudiante.getCarrera().getId() == det.getCarrera().getId()) {
                 listAsig.add(det.getAsignatura());
             }
         }
-        for (Asignatura asignat: listAsig
-             ) {
-            listAsigDet.put("Titulo",asignat.getAsiTitulo());
-            if (asignat.getAsiDescripcion()!=null) {
+        for (Asignatura asignat : listAsig
+        ) {
+            listAsigDet.put("Titulo", asignat.getAsiTitulo());
+            if (asignat.getAsiDescripcion() != null) {
                 listAsigDet.put("Descripcion", asignat.getAsiDescripcion());
                 listAsign.add(listAsigDet);
             }
 
         }
         detalleEmpresa.put("Nombre:", empresa.getNombre());
-        if (empresa.getDescripcion()!=null) {
+        if (empresa.getDescripcion() != null) {
             detalleEmpresa.put("Nombre:", empresa.getNombre());
         }
-        if (empresa.getMision()!=null) {
+        if (empresa.getMision() != null) {
             detalleEmpresa.put("Mision:", empresa.getMision());
         }
-        if (empresa.getVision()!=null) {
+        if (empresa.getVision() != null) {
             detalleEmpresa.put("Vision:", empresa.getVision());
         }
-        if (empresa.getPais()!=null) {
+        if (empresa.getPais() != null) {
             detalleEmpresa.put("Pais:", empresa.getPais().getNombrePais());
         }
-        if (empresa.getRubro()!=null) {
+        if (empresa.getRubro() != null) {
             detalleEmpresa.put("Rubro:", empresa.getRubro());
         }
-        if (empresa.getSitioWeb()!=null) {
+        if (empresa.getSitioWeb() != null) {
             detalleEmpresa.put("SitioWeb:", empresa.getSitioWeb());
         }
         detalleEmpresa.put("asignatura:", listAsign);
         return detalleEmpresa;
     }
 
-    public Estudiante actualizarPerfilEstudiante(String nombresEstudiante, String apellidosEstudiante, Integer fechaNac,
+    public Estudiante actualizarPerfilEstudiante(String nombresEstudiante, String apellidosEstudiante, String fechaNac,
                                                  Integer pais, Integer ciudad, String telefono, String codigoPais,
                                                  String correo, List<?> deporte, List<?> idioma, Integer usuario, List<?> pasatiempo,
                                                  String descripcion,List<?> softYTecn, List<?> hablidadesB) throws IOException, MessagingException {
@@ -1135,5 +1136,26 @@ public List<Object> consultaEstudiante(Integer usuario){
      est = estudianteRepository.save(est);
 
     return est;
+    }
+
+    public HashMap<String, Object> buscarPerfilEmpresaEstudiante(Integer idEmp, Integer idEstudiante, Integer tipoPersona) {
+        HashMap<String, Object> perfil = new HashMap<>();
+            Empresa empresa = empresaRepository.findById(idEmp).get();
+            Estudiante estudiante = estudianteRepository.findById(idEstudiante).get();
+            //busca primero que la empresa y estudiantes no se tengan bloqueados
+            PerfilesBloqueados empresaBloqueaEstudiante = perfilesBloqueadosRepository.buscarperfilbloqueado(empresa.getUsers().getId(), idEstudiante);
+            PerfilesBloqueados estudianteBloqueaEmpresa = perfilesBloqueadosRepository.buscarperfilbloqueado(estudiante.getUsuario().getId(), idEmp);
+        if((empresaBloqueaEstudiante==null ||empresaBloqueaEstudiante.getPblEstatus()!=2 ) &&
+                (estudianteBloqueaEmpresa == null || estudianteBloqueaEmpresa.getPblEstatus()!=2)) {
+            if ((tipoPersona == EMPRESA)) {
+                perfil.put("empresa", empresa);
+            } else {
+                perfil.put("estudiante", estudiante);
+            }
+            return perfil;
+        }else {
+            perfil = (HashMap<String, Object>) perfil.put("empresa","No se encontraron datos");
+            return perfil;
+        }
     }
 }

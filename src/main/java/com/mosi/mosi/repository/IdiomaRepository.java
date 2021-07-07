@@ -8,7 +8,10 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface IdiomaRepository extends JpaRepository<Idioma,Integer> {
-    List<Idioma> findAllByIdGreaterThan(Integer zero);
+
+    String SQL_CONSULTA_NOMBRE_IDIOMA_POR_NOMBRE = "SELECT * FROM IDI_Idiomas order by idi_nombre";
+    @Query(nativeQuery = true, value = SQL_CONSULTA_NOMBRE_IDIOMA_POR_NOMBRE)
+    List<Idioma> consutarIdiomasPorNombre();
 
     String SQL_CONSULTA_NOMBRE_IDIOMA = "SELECT * FROM IDI_Idiomas WHERE IDI_ID in :idiIdi ";
     @Query(nativeQuery = true, value = SQL_CONSULTA_NOMBRE_IDIOMA)
