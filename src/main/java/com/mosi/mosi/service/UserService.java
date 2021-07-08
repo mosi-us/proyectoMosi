@@ -253,7 +253,7 @@ public class UserService {
         perfilesBloqueados = perfilesBloqueadosRepository.save(perfilesBloqueados);
 
         String msj = "El perfil se ha Bloqueado con Exito!!!";
-        return null;
+        return msj;
     }
 
 }

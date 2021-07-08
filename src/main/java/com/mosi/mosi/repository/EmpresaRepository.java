@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface EmpresaRepository extends JpaRepository<Empresa,Integer> {
@@ -18,4 +19,9 @@ public interface EmpresaRepository extends JpaRepository<Empresa,Integer> {
 
     Optional<Empresa> findById(Integer idEmp);
     Empresa findByUsers(Usuarios user);
+
+    String SQL_CONSULTA_EMPRESAS ="SELECT * FROM EMP_Empresa EMP " +
+            "WHERE EMP_Id in (:ids) ";
+    @Query(nativeQuery = true,value = SQL_CONSULTA_EMPRESAS)
+    List<Empresa> consultarEmpresas(@Param("ids") List<Integer> ids );
 }

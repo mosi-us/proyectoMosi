@@ -269,8 +269,13 @@ public class userController {
     }
 
 /**
+ * parametros:
+ * idUser: id del usuario que esta pidiendo el bloqueo
+ * perfil: id del perfil que se desea ser bloqueado
+ * estatus: estatus del perfil 1: desbloqueado 2: bloqueado
 {"idUser":1034,
- "perfil":1014
+ "perfil":1014,
+ "estatus":1
 }
 
 * */

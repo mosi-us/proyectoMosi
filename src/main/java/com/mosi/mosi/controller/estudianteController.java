@@ -568,17 +568,27 @@ public class estudianteController {
         return carreras;
     }
 
+    /** parametros:
+     * id: id de la entidad(personas o empresas) que esta realizando la busqueda
+     * tipoPersona:  tipo de persona que esta buscando  1 = ESTUDIANTE
+     *                                                  2 = EMPRESA
+     * nombre: nombre a buscar
+    *{"id":1125,"tipoPersona":2,"nombre":"C.A"
+    }
+    *
+    *
+    * */
     @PostMapping("buscarPerfil")
-    public HashMap<String,Object> buscarPerfil(HttpServletRequest request, HttpServletResponse response,
+    public  List<List<?>> buscarPerfil(HttpServletRequest request, HttpServletResponse response,
                                                              @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
-        Integer idEmp = (params.containsKey(ID_EMPRESA) && params.get(ID_EMPRESA) != null && !params.get(ID_EMPRESA).toString().isEmpty())
-                ? Integer.valueOf(params.get(ID_EMPRESA).toString()) : null;
-        Integer idEstudiante = (params.containsKey(ID_ESTUDIANTE) && params.get(ID_ESTUDIANTE) != null && !params.get(ID_ESTUDIANTE).toString().isEmpty())
-                ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
+        Integer id = (params.containsKey(ID) && params.get(ID) != null && !params.get(ID).toString().isEmpty())
+                ? Integer.valueOf(params.get(ID).toString()) : null;
         Integer tipoPersona = (params.containsKey(TIPO_PERSONA) && params.get(TIPO_PERSONA) != null && !params.get(TIPO_PERSONA).toString().isEmpty())
                 ? Integer.valueOf(params.get(TIPO_PERSONA).toString()) : null;
-        HashMap<String,Object> empresa = estudianteService.buscarPerfilEmpresaEstudiante(idEmp,idEstudiante,tipoPersona);
+        String nombrePerfil = (params.containsKey(NOMBRE_PERFIL) && params.get(NOMBRE_PERFIL) != null && !params.get(NOMBRE_PERFIL).toString().isEmpty())
+                ? params.get(NOMBRE_PERFIL).toString() : null;
+        List<List<?>> empresa = estudianteService.buscarPerfilEmpresaEstudiante(id,nombrePerfil,tipoPersona);
 
         return empresa;
     }

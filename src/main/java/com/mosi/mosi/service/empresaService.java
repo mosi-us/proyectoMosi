@@ -63,6 +63,8 @@ public class empresaService {
     SoftwareTecnologiaRepository softwareTecnologiaRepository;
     @Autowired
     PostulacionesRepository postulacionesRepository;
+    @Autowired
+    UserRepository userRepository;
 
 public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubicacion,Integer pais,String sitioW, String codigoPais,String correo,
                                      String nombre,String razonSocial,String telefono,String mision,String vision,Integer usuId){
@@ -467,5 +469,48 @@ public Empresa guardarPerfilEmpresa (String descripcion,Integer rubro,String ubi
             mensaje ="Se ha rechazado el estudiante exitosamente!";
         }
         return mensaje;
+    }
+
+    public Empresa actualizarDatosEmpresa(String descripcion, Integer rubro, String ubicacion, Integer pais,
+                                          String sitioW, String codigoPais, String correo, String nombre,
+                                          String razonSocial, String telefono, String mision, String vision, Integer usuId) {
+
+    Empresa empresa = empresaRepository.findByUsers(userRepository.findById(usuId).get());
+        if (descripcion != null && (!empresa.getDescripcion().equals(descripcion))) {
+            empresa.setDescripcion(descripcion);
+        }
+        if (rubro != null && empresa.getRubro().getRubId()!=rubro) {
+            empresa.setRubro(rubroRepository.findById(rubro).get());
+        }
+        if (ubicacion != null && (!empresa.getUbicacion().equals(ubicacion))) {
+            empresa.setUbicacion(ubicacion);
+        }
+        if (pais!=null && empresa.getPais().getId()!=pais) {
+            empresa.setPais(paisService.findPaisbyId(pais));
+        }
+        if (sitioW != null && !empresa.getSitioWeb().equals(sitioW)) {
+            empresa.setSitioWeb(sitioW);
+        }
+        if (correo != null && !empresa.getCorreo().equals(correo)) {
+            empresa.setCorreo(correo);
+        }
+        if (nombre != null && !empresa.getNombre().equals(nombre)) {
+            empresa.setNombre(nombre);
+        }
+        if (razonSocial != null && !empresa.getRazonsocial().equals(razonSocial)) {
+            empresa.setRazonsocial(razonSocial);
+        }
+        if (telefono != null && !empresa.getTelefono().equals(codigoPais+" " + telefono)) {
+            empresa.setTelefono(codigoPais + " " + telefono);
+        }
+        if (mision != null && !empresa.getSitioWeb().equals(mision)) {
+            empresa.setMision(mision);
+        }
+        if (vision != null && !empresa.getVision().equals(vision)) {
+            empresa.setVision(vision);
+        }
+
+        empresa = empresaRepository.save(empresa);
+        return empresa;
     }
 }

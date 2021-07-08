@@ -412,20 +412,48 @@ public class empresaController {
         String resp =  empresaService.rechazarEstudiante(portulacion);
         return resp;
     }
-
-    /*@PostMapping("buscarPerfilEstudiante")
-    public HashMap<String,Object> buscarPerfilEmpresa(HttpServletRequest request, HttpServletResponse response,
+    /**PARAMETROS:
+     {"descripcion_empresa": " ",
+     "rubro":4 ,
+     "ubicacion": ,
+     "paisId":4 ,
+     "sitioWeb":"",
+     "codigo_pais": "",
+     "correo": "epacompania@gmail.com",
+     "nombreEmpresa":"EPA,C.A" ,
+     "razonSocial":"",
+     "telefono":"",
+     "mision":"",
+     "vision":"",
+     "idUser":22}
+     * */
+    @PostMapping("modificarPerfilEmpresa")
+    public Empresa modificarPerfilEmpresa(HttpServletRequest request, HttpServletResponse response,
                                                       @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
-        Integer idEmp = (params.containsKey(ID_EMPRESA) && params.get(ID_EMPRESA) != null && !params.get(ID_EMPRESA).toString().isEmpty())
-                ? Integer.valueOf(params.get(ID_EMPRESA).toString()) : null;
-        Integer idEstudiante = (params.containsKey(ID_ESTUDIANTE) && params.get(ID_ESTUDIANTE) != null && !params.get(ID_ESTUDIANTE).toString().isEmpty())
-                ? Integer.valueOf(params.get(ID_ESTUDIANTE).toString()) : null;
-         Integer tipoPersona = (params.containsKey(TIPO_PERSONA) && params.get(TIPO_PERSONA) != null && !params.get(TIPO_PERSONA).toString().isEmpty())
-                ? Integer.valueOf(params.get(ID_EMPRESA).toString()) : null;
-        HashMap<String,Object> empresa = estudianteService.buscarPerfilEmpresaEstudiante(idEmp,idEstudiante, tipoPersona);
-
+        String descripcion 	= (params.containsKey(DESCRIPCION_EMP) && params.get(DESCRIPCION_EMP) != null) ? params.get(DESCRIPCION_EMP).toString() : null;
+        Integer rubro 	= (params.containsKey(RUBRO) && params.get(RUBRO) != null) ? Integer.valueOf(params.get(RUBRO).toString()) : null;
+        String ubicacion 	= (params.containsKey(UBICACION_EMP) && params.get(UBICACION_EMP) != null && !params.get(UBICACION_EMP).toString().isEmpty())
+                ? params.get(UBICACION_EMP).toString() : null;
+        Integer pais 	= (params.containsKey(PAIS_ID) && params.get(PAIS_ID) != null && !params.get(PAIS_ID).toString().isEmpty())
+                ? Integer.valueOf(params.get(PAIS_ID).toString()) : null;
+        String sitioW 	= (params.containsKey(SITIO_WEB_EMP) && params.get(SITIO_WEB_EMP) != null && !params.get(SITIO_WEB_EMP).toString().isEmpty())
+                ? params.get(SITIO_WEB_EMP).toString() : null;
+        String codigoPais 	= (params.containsKey(CODIGO_PAIS) && params.get(CODIGO_PAIS) != null && !params.get(CODIGO_PAIS).toString().isEmpty())
+                ? params.get(CODIGO_PAIS).toString() : null;
+        String correo  = (params.containsKey(CORREO) && params.get(CORREO) != null && !params.get(CORREO).toString().isEmpty()) ? params.get(CORREO).toString() : null;
+        String nombre 	= (params.containsKey(NOMBRE_EMP) && params.get(NOMBRE_EMP) != null && !params.get(NOMBRE_EMP).toString().isEmpty())
+                ? params.get(NOMBRE_EMP).toString() : null;
+        String razonSocial = (params.containsKey(RAZON_SOCIAL_EMP) && params.get(RAZON_SOCIAL_EMP) != null && !params.get(RAZON_SOCIAL_EMP).toString().isEmpty())
+                ? params.get(RAZON_SOCIAL_EMP).toString() : null;
+        String telefono = (params.containsKey(TELEFONO) &&  params.get(TELEFONO) != null) ? params.get(TELEFONO).toString() : null;
+        String mision = (params.containsKey(MISION_EMP) &&  params.get(MISION_EMP) != null) ? params.get(MISION_EMP).toString() : null;
+        String vision = (params.containsKey(VISION) && params.get(VISION) != null && !params.get(VISION).toString().isEmpty())
+                ? params.get(VISION).toString() : null;
+        Integer usuId= (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty() ? Integer.valueOf(params.get(ID_USER).toString()) : null );
+        Empresa empresa = empresaService.actualizarDatosEmpresa(descripcion,rubro,ubicacion, pais,sitioW,codigoPais,correo,nombre,razonSocial,telefono,mision,
+                vision,usuId);
         return empresa;
-    }*/
+    }
 
     }

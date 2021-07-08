@@ -35,10 +35,12 @@ public interface constante {
     String ASIGNATURA = "asignatura";
     String TIPO = "tipo";
     String TIPO_PERSONA = "tipoPersona";
+    String NOMBRE_PERFIL = "nombre";
     String SIZE = "size";
     String ID_ASIGNATURA = "idAsignatura";
     String ID_ESTUDIANTE = "idEstudiante";
     String ID_EMPRESA = "idEmpresa";
+    String ID = "id";
     String LUGAR = "idLugar";
     String RESPUESTAS="respuestas";
     String CARACTERISTICAS = "Caracteristicas";

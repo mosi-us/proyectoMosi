@@ -71,9 +71,13 @@ public interface EstudianteRepository extends CrudRepository<Estudiante,Integer>
     int updateStatusPerfil(@Param("idEstudiante") int idEstudiante,@Param("Estatus") int Estatus);
 
 
-    String SQL_CONSULTA_ESTUDIANTE_ACTIVO = "SELECT * from EST_Estudiantes where USU_Id = :idUsu and EST_Principal = 1 ";
+    String SQL_CONSULTA_ESTUDIANTE_ACTIVO = "SELECT * from EST_Estudiantes where est_id = :est_id and EST_Principal = 1 ";
     @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTE_ACTIVO)
-    Estudiante consultaPerfilActivo(@Param("idUsu") Integer usuId);
+    Estudiante consultaPerfilActivo(@Param("est_id") Integer est_id);
+
+    String SQL_CONSULTA_ESTUDIANTES_ACTIVOS = "SELECT * from EST_Estudiantes where est_id in (:est_id) and EST_Principal = 1 ";
+    @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTES_ACTIVOS)
+    List<Estudiante> consultaPerfilesActivos(@Param("est_id") List<Integer> est_id);
 
     List<Estudiante> findByUsuario(Usuarios user);
 
@@ -94,4 +98,17 @@ public interface EstudianteRepository extends CrudRepository<Estudiante,Integer>
                                                      @Param("usuId") Integer usuId);
 
     List<Estudiante> findByIdGreaterThan(int i);
+
+    String SQL_CONSULTA_ESTUDIANTE_EMPRESA_POR_NOMBRE = "select" +
+            "       EST_ID as id, " +
+            "1 as tipo " +
+            "   from EST_Estudiantes " +
+            "   where UPPER(EST_Nombres +' '+ EST_Apellidos) like %:nombreBuscar% and EST_Principal = 1 " +
+            "   union" +
+            "   select EMP_ID as id," +
+            "       2 as tipo " +
+            "   from EMP_Empresa" +
+            "   where UPPER(EMP_Nombre) like %:nombreBuscar%";
+    @Query(nativeQuery = true, value = SQL_CONSULTA_ESTUDIANTE_EMPRESA_POR_NOMBRE)
+    List<Object[]> buscarEstudiantesPorNombre(@Param("nombreBuscar") String nombreABuscar);
 }

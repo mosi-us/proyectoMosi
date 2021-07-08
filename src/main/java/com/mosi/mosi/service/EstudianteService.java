@@ -2,6 +2,7 @@ package com.mosi.mosi.service;
 
 import com.mosi.mosi.bean.*;
 import com.mosi.mosi.repository.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -1138,24 +1139,75 @@ public List<Object> consultaEstudiante(Integer usuario){
     return est;
     }
 
-    public HashMap<String, Object> buscarPerfilEmpresaEstudiante(Integer idEmp, Integer idEstudiante, Integer tipoPersona) {
-        HashMap<String, Object> perfil = new HashMap<>();
-            Empresa empresa = empresaRepository.findById(idEmp).get();
-            Estudiante estudiante = estudianteRepository.findById(idEstudiante).get();
-            //busca primero que la empresa y estudiantes no se tengan bloqueados
-            PerfilesBloqueados empresaBloqueaEstudiante = perfilesBloqueadosRepository.buscarperfilbloqueado(empresa.getUsers().getId(), idEstudiante);
-            PerfilesBloqueados estudianteBloqueaEmpresa = perfilesBloqueadosRepository.buscarperfilbloqueado(estudiante.getUsuario().getId(), idEmp);
-        if((empresaBloqueaEstudiante==null ||empresaBloqueaEstudiante.getPblEstatus()!=2 ) &&
-                (estudianteBloqueaEmpresa == null || estudianteBloqueaEmpresa.getPblEstatus()!=2)) {
-            if ((tipoPersona == EMPRESA)) {
-                perfil.put("empresa", empresa);
-            } else {
-                perfil.put("estudiante", estudiante);
-            }
-            return perfil;
-        }else {
-            perfil = (HashMap<String, Object>) perfil.put("empresa","No se encontraron datos");
-            return perfil;
+    public List<List<?>> buscarPerfilEmpresaEstudiante(Integer idEE, String nombreABuscar, @NotNull Integer tipoPersona) {
+        List<List<?>> perfil = new ArrayList<>();
+        Empresa empresa = new Empresa();
+        List<Empresa> ListEmpresas = new ArrayList<>();
+        List<Estudiante> ListEstudiante = new ArrayList<>();
+        Estudiante estudiante = new Estudiante();
+        PerfilesBloqueados bloqueado = new PerfilesBloqueados();
+        List<Integer> listIdsEmp = new ArrayList<>();
+        List<Integer> listIdsEst = new ArrayList<>();
+        List<Object[]> busqueda = estudianteRepository.buscarEstudiantesPorNombre(nombreABuscar.toUpperCase());
+        switch (tipoPersona){
+            case 1: //ESTUDIANTE
+                 estudiante = estudianteRepository.findById(idEE).get();
+                for (int i = 0; i<busqueda.size();i++){
+                    Integer id =Integer.valueOf(busqueda.get(i)[0].toString());
+                    Integer tipo =Integer.valueOf(busqueda.get(i)[1].toString());
+                    PerfilesBloqueados estudianteBloqueaEmpresa = perfilesBloqueadosRepository.buscarperfilbloqueado(estudiante.getUsuario().getId(), id);
+                    if (estudianteBloqueaEmpresa == null || estudianteBloqueaEmpresa.getPblEstatus()==1){
+                       if (tipo == 1){
+                           Estudiante estP = estudianteRepository.consultaPerfilActivo(id);
+                            bloqueado = perfilesBloqueadosRepository.buscarperfilbloqueado(estP.getUsuario().getId(),estudiante.getId());
+                           if (bloqueado==null || bloqueado.getPblEstatus()==1) {
+                               listIdsEst.add(id);
+                           }
+                       }
+                       if (tipo==2){
+                           Empresa empP = empresaRepository.findById(id).get();
+                            bloqueado = perfilesBloqueadosRepository.buscarperfilbloqueado(empP.getUsers().getId(),empresa.getId());
+                            if (bloqueado == null || bloqueado.getPblEstatus()==1) {
+                                listIdsEmp.add(id);
+                            }
+                       }
+                    }
+                }
+                 break;
+            case 2: //EMPRESA
+                empresa = empresaRepository.findById(idEE).get();
+                for (int i = 0; i<busqueda.size();i++){
+                    Integer id =Integer.valueOf(busqueda.get(i)[0].toString());
+                    Integer tipo =Integer.valueOf(busqueda.get(i)[1].toString());
+                    PerfilesBloqueados empresaBloqueaEstudiante = perfilesBloqueadosRepository.buscarperfilbloqueado(empresa.getUsers().getId(), id);
+                    if (empresaBloqueaEstudiante == null ||empresaBloqueaEstudiante.getPblEstatus()==1){
+                        if (tipo == 1){
+                            Estudiante estP = estudianteRepository.consultaPerfilActivo(id);
+                            bloqueado = perfilesBloqueadosRepository.buscarperfilbloqueado(estP.getUsuario().getId(),empresa.getId());
+                            if (bloqueado==null || bloqueado.getPblEstatus()==1) {
+                                listIdsEst.add(id);
+                            }
+                        }
+                        if (tipo==2){
+                            Empresa empP = empresaRepository.findById(id).get();
+                            bloqueado = perfilesBloqueadosRepository.buscarperfilbloqueado(empP.getUsers().getId(),empresa.getId());
+                            if (bloqueado == null || bloqueado.getPblEstatus()==1) {
+                                listIdsEmp.add(id);
+                            }
+                        }
+                    }
+                }
+                break;
         }
+        if (listIdsEst.size()>0 && listIdsEst!=null){
+            ListEstudiante = estudianteRepository.consultaPerfilesActivos(listIdsEst);
+            perfil.add(ListEstudiante);
+        }
+        if (listIdsEmp.size()>0 && listIdsEmp!=null){
+            ListEmpresas = empresaRepository.consultarEmpresas(listIdsEmp);
+            perfil.add(ListEmpresas);
+        }
+
+        return perfil;
     }
 }
