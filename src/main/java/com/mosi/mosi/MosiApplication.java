@@ -67,7 +67,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/listarPostulacionesEstudiante",
 						"/rechazarPostulacion","/getCarreraByEstudents",
 						"/cambiarClave","/desbloquearBloquearPerfil","/buscarPerfil",
-						"/modificarPerfilEmpresa"
+						"/modificarPerfilEmpresa","/cambiarNombre","/cambiarCorreoElectronico","/CrearPublicacion","/EditarPublicacion","/EliminarPublicacion"
 				).permitAll()
 				.antMatchers(HttpMethod.GET,
 						"/consultarDeportes",

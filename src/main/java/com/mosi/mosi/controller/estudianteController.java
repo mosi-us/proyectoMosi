@@ -16,6 +16,7 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -137,7 +138,6 @@ public class estudianteController {
                 ? params.get(TELEFONO).toString() : null;
         String codigoPais 	= (params.containsKey(CODIGO_PAIS) && params.get(CODIGO_PAIS) != null && !params.get(CODIGO_PAIS).toString().isEmpty())
                 ? params.get(CODIGO_PAIS).toString() : null;
-        String correo  = (params.containsKey(CORREO) && params.get(CORREO) != null && !params.get(CORREO).toString().isEmpty()) ? params.get(CORREO).toString() : null;
         Integer usuario 	= (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty())
                 ? Integer.valueOf(params.get(ID_USER).toString()) : null;
         Integer semestre = (params.containsKey(SEMESTRE) && params.get(SEMESTRE) != null && !params.get(SEMESTRE).toString().isEmpty())
@@ -156,7 +156,7 @@ public class estudianteController {
         Integer lugar = (params.containsKey(LUGAR) && params.get(LUGAR) != null && !params.get(LUGAR).toString().isEmpty())
                 ? Integer.valueOf(params.get(LUGAR).toString()) : null;
 
-        estudiante = estudianteService.guardarEstudiante(nombresEstudiante,apellidosEstudiante,fechaNac,pais,ciudad,telefono,codigoPais,correo,deporte,
+        estudiante = estudianteService.guardarEstudiante(nombresEstudiante,apellidosEstudiante,fechaNac,pais,ciudad,telefono,codigoPais,deporte,
                 idioma,universidad,carrera, usuario,semestre,pasatiempo,descripcion,softYTecn,hablidadesB,lugar);
 
         return estudiante;
@@ -482,8 +482,8 @@ public class estudianteController {
     public Estudiante ModificarPerfilEstudianteDatosGenerales(HttpServletRequest request, HttpServletResponse response,
                                                              @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
-        String nombresEstudiante 	= (params.containsKey(NOMBRES) && params.get(NOMBRES) != null) ? params.get(NOMBRES).toString() : null;
-        String apellidosEstudiante 	= (params.containsKey(APELLIDOS) && params.get(APELLIDOS) != null) ? params.get(APELLIDOS).toString() : null;
+       // String nombresEstudiante 	= (params.containsKey(NOMBRES) && params.get(NOMBRES) != null) ? params.get(NOMBRES).toString() : null;
+      //  String apellidosEstudiante 	= (params.containsKey(APELLIDOS) && params.get(APELLIDOS) != null) ? params.get(APELLIDOS).toString() : null;
         String fechaNac 	= (params.containsKey(FECHA) && params.get(FECHA) != null && !params.get(FECHA).toString().isEmpty())
                 ? params.get(FECHA).toString() : null;
         Integer pais 	= (params.containsKey(PAIS_ID) && params.get(PAIS_ID) != null && !params.get(PAIS_ID).toString().isEmpty())
@@ -494,7 +494,7 @@ public class estudianteController {
                 ? params.get(TELEFONO).toString() : null;
         String codigoPais 	= (params.containsKey(CODIGO_PAIS) && params.get(CODIGO_PAIS) != null && !params.get(CODIGO_PAIS).toString().isEmpty())
                 ? params.get(CODIGO_PAIS).toString() : null;
-        String correo  = (params.containsKey(CORREO) && params.get(CORREO) != null && !params.get(CORREO).toString().isEmpty()) ? params.get(CORREO).toString() : null;
+        //String correo  = (params.containsKey(CORREO) && params.get(CORREO) != null && !params.get(CORREO).toString().isEmpty()) ? params.get(CORREO).toString() : null;
         Integer usuario 	= (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty())
                 ? Integer.valueOf(params.get(ID_USER).toString()) : null;
         //Integer semestre = (params.containsKey(SEMESTRE) && params.get(SEMESTRE) != null && !params.get(SEMESTRE).toString().isEmpty())
@@ -513,7 +513,7 @@ public class estudianteController {
       //  Integer lugar = (params.containsKey(LUGAR) && params.get(LUGAR) != null && !params.get(LUGAR).toString().isEmpty())
       //          ? Integer.valueOf(params.get(LUGAR).toString()) : null;
         Estudiante estudiante = new Estudiante();
-        estudiante = estudianteService.actualizarPerfilEstudiante(nombresEstudiante,apellidosEstudiante,fechaNac,pais,ciudad,telefono,codigoPais,correo,deporte,
+        estudiante = estudianteService.actualizarPerfilEstudiante(/*nombresEstudiante,apellidosEstudiante,*/fechaNac,pais,ciudad,telefono,codigoPais /*correo*/,deporte,
                 idioma, usuario,pasatiempo,descripcion,softYTecn,hablidadesB);
         return estudiante;
     }
@@ -591,5 +591,31 @@ public class estudianteController {
         List<List<?>> empresa = estudianteService.buscarPerfilEmpresaEstudiante(id,nombrePerfil,tipoPersona);
 
         return empresa;
+    }
+
+    /**
+     *Parametros:
+     * idUser: id del usuario
+     * nombres: nombre a cambiar
+     * apellidos: apellido a cambiar
+     {
+         "idUser": ,
+         "nombres":"" ,
+         "apellidos":"" ,
+      }
+     * */
+    @PostMapping("cambiarNombre")
+    public  List<HashMap<String,Object>> cambiarNombre(HttpServletRequest request, HttpServletResponse response,
+                                       @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException, ParseException, javax.mail.internet.ParseException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idUsuario = (params.containsKey(ID_USER) && params.get(ID_USER) != null && !params.get(ID_USER).toString().isEmpty())
+                ? Integer.valueOf(params.get(ID_USER).toString()) : null;
+        String nombres = (params.containsKey(NOMBRES) && params.get(NOMBRES) != null && !params.get(NOMBRES).toString().isEmpty())
+                ? params.get(NOMBRES).toString() : null;
+        String apellidos = (params.containsKey(APELLIDOS) && params.get(APELLIDOS) != null && !params.get(APELLIDOS).toString().isEmpty())
+                ? params.get(APELLIDOS).toString() : null;
+        List<HashMap<String,Object>> estudiante = estudianteService.cambiarNombre(idUsuario,nombres,apellidos);
+
+        return estudiante;
     }
 }

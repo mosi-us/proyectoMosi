@@ -98,11 +98,14 @@ public class UserService {
         }
         return objectResult;
     }
-
+    public String existEmail(String email){
+        String existEmail = userRepository.buscarEmail(email);
+        return existEmail;
+    }
     public Object signIn(String clave, String email) throws IOException, MessagingException {
         Object objectResult = null;
         Usuarios nuevoUsu = new Usuarios();
-        String existEmail = userRepository.buscarEmail(email);
+        String existEmail = this.existEmail(email);
         if ((existEmail == null)) {
             nuevoUsu.setEmail(email);
             nuevoUsu.setPassword(clave);
@@ -256,6 +259,31 @@ public class UserService {
         return msj;
     }
 
+    public String updateEmail(Integer idUsuario, String correo, Integer tipoPersona) {
+
+        Usuarios usuario = userRepository.findById(idUsuario).get();
+        String existEmail = this.existEmail(correo);
+        if (existEmail==null){
+                usuario.setEmail(correo);
+        usuario = userRepository.save(usuario);
+        if (tipoPersona==ESTUDIANTE) {
+            List<Estudiante> perfil = estudianteRepository.findByUsuario(usuario);
+            for (Estudiante est : perfil
+            ) {
+                est.setCorreo(usuario.getEmail());
+                estudianteRepository.save(est);
+            }
+        }else if (tipoPersona==EMPRESA){
+            Empresa empresa = empresaRepository.findByUsers(usuario);
+                empresa.setCorreo(usuario.getEmail());
+                empresaRepository.save(empresa);
+        }
+
+        return "El correo Electronico fue Actualizado con exito!";
+        }else {
+            return "El correo que registro ya existe en el sistema";
+        }
+    }
 }
 
 

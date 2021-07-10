@@ -4,6 +4,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name="EST_ESTUDIANTES")
@@ -79,6 +80,11 @@ public class Estudiante implements Serializable {
     @ApiObjectField(description = "Lugar", required = true)
     @Column(name="EST_Lugar")
     private Integer lugar;
+
+    @ApiObjectField(description = "Fechade Modificacion Nombre", required = true)
+    @Column(name="EST_FECHAMODIFICACIONNOMBRE")
+    private Date fechaModificacionNombre;
+
 
     public Integer getId() {
         return id;
@@ -206,5 +212,13 @@ public class Estudiante implements Serializable {
 
     public void setUsuario(Usuarios usuario) {
         this.usuario = usuario;
+    }
+
+    public Date getFechaModificacionNombre() {
+        return fechaModificacionNombre;
+    }
+
+    public void setFechaModificacionNombre(Date fechaModificacionNombre) {
+        this.fechaModificacionNombre = fechaModificacionNombre;
     }
 }

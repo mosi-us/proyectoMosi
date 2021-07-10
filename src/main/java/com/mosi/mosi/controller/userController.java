@@ -292,7 +292,31 @@ public class userController {
         return resp;
     }
 
+    /**
+     * Parametros:
+     idUser: id del usuario
+     email: correo electronico que se cambiara
+     tipoPersona: tipo de persona Empresa o Estudiante
 
+     {
+     "idUser": ,
+     "email": ,
+     "tipoPersona":
+     }
+
+     * */
+    @PostMapping("cambiarCorreoElectronico")
+    public String cambiarCorreoElectronico(HttpServletRequest request, HttpServletResponse response,
+                                            @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idUsuario = (params.containsKey(ID_USER) && params.get(ID_USER) != null) ? Integer.valueOf(params.get(ID_USER).toString()) : null;
+        String correo = (params.containsKey(EMAIL) && params.get(EMAIL) != null) ? params.get(EMAIL).toString() : null;
+        Integer tipoPersona = (params.containsKey(TIPO_PERSONA) && params.get(TIPO_PERSONA) != null) ? Integer.valueOf(params.get(TIPO_PERSONA).toString()) : null;
+
+
+        String resp = userService.updateEmail(idUsuario,correo,tipoPersona);
+        return resp;
+    }
 
 }
 

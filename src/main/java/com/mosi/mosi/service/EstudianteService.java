@@ -7,11 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.ParseException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
 import static com.mosi.mosi.constantes.constante.*;
+import static java.lang.Math.abs;
 
 @Service
 public class EstudianteService {
@@ -82,7 +84,7 @@ public class EstudianteService {
     PerfilesBloqueadosRepository perfilesBloqueadosRepository;
 
 public Estudiante guardarEstudiante(String nombresEstudiante, String apellidosEstudiante,
-                                    String fechaNac, Integer pais,Integer ciudad,String tlf,String codPais,String correo, List<?>deporte,
+                                    String fechaNac, Integer pais,Integer ciudad,String tlf,String codPais, List<?>deporte,
                                     List<?> idioma, Integer universidad, Integer carrera, Integer usuario,Integer semestre,
                                     List<?> pasatiempo,String descripcion,List<?>softTecn,List<?>habilidades, Integer lugar) throws IOException, MessagingException {
     Estudiante estudiante = new Estudiante();
@@ -91,7 +93,7 @@ public Estudiante guardarEstudiante(String nombresEstudiante, String apellidosEs
     PasatiempoMaestro hom =new PasatiempoMaestro();
     SoftwareTecnologiasMaestro syt = new SoftwareTecnologiasMaestro();
     HabilidadesBlandasMaestro ham= new HabilidadesBlandasMaestro();
-
+    Usuarios usu = userService.findUsersbyId(usuario);
 
     if ((!nombresEstudiante.isEmpty()) && (!apellidosEstudiante.isEmpty())
             &&(pais != null) && (carrera != null) && (usuario!=null)){
@@ -101,7 +103,7 @@ public Estudiante guardarEstudiante(String nombresEstudiante, String apellidosEs
             estudiante.setFechaNac(fechaNac);
         }
         estudiante.setPais(paisService.findPaisbyId(pais));
-        estudiante.setUsuario(userService.findUsersbyId(usuario));
+        estudiante.setUsuario(usu);
         estudiante.setCarrera(carreraService.findCarreraById(carrera));
         if (tlf!=null) {
             estudiante.setTelefono(tlf);
@@ -110,7 +112,7 @@ public Estudiante guardarEstudiante(String nombresEstudiante, String apellidosEs
         if (ciudad!=null) {
             estudiante.setCiudad(ciudadService.findCiudadById(ciudad));
         }
-        estudiante.setCorreo(correo);
+        estudiante.setCorreo(usu.getEmail());
         if (descripcion!=null) {
             estudiante.setDescripcion(descripcion);
         }
@@ -1013,9 +1015,9 @@ public List<Object> consultaEstudiante(Integer usuario){
         return detalleEmpresa;
     }
 
-    public Estudiante actualizarPerfilEstudiante(String nombresEstudiante, String apellidosEstudiante, String fechaNac,
+    public Estudiante actualizarPerfilEstudiante(/*String nombresEstudiante, String apellidosEstudiante,*/ String fechaNac,
                                                  Integer pais, Integer ciudad, String telefono, String codigoPais,
-                                                 String correo, List<?> deporte, List<?> idioma, Integer usuario, List<?> pasatiempo,
+                                                /* String correo,*/ List<?> deporte, List<?> idioma, Integer usuario, List<?> pasatiempo,
                                                  String descripcion,List<?> softYTecn, List<?> hablidadesB) throws IOException, MessagingException {
         DeporteMaestro dep =new DeporteMaestro();
         IdiomaMaestro idi =new IdiomaMaestro();
@@ -1030,12 +1032,13 @@ public List<Object> consultaEstudiante(Integer usuario){
              ) {
 
 
-            if ((nombresEstudiante != null) && (est.getNombre() != nombresEstudiante)) {
+           /* if ((nombresEstudiante != null) && (est.getNombre() != nombresEstudiante)) {
+
                 est.setNombre(nombresEstudiante);
             }
             if ((est.getApellido() != apellidosEstudiante) && (apellidosEstudiante != null)) {
                 est.setApellido(apellidosEstudiante);
-            }
+            }*/
             if ((fechaNac != null) && ((est.getFechaNac() != fechaNac))) {
                 est.setFechaNac(fechaNac);
             }
@@ -1052,8 +1055,8 @@ public List<Object> consultaEstudiante(Integer usuario){
             if ((ciudad != null) && (est.getCiudad().getId() != ciudad)) {
                 est.setCiudad(ciudadService.findCiudadById(ciudad));
             }
-            if ((correo != null) && (est.getCorreo() != correo))
-                est.setCorreo(correo);
+            /*if ((correo != null) && (est.getCorreo() != correo))
+                est.setCorreo(correo);*/
 
             if ((descripcion != null) && est.getDescripcion() != descripcion) {
                 est.setDescripcion(descripcion);
@@ -1071,8 +1074,9 @@ public List<Object> consultaEstudiante(Integer usuario){
 
             est = estudianteRepository.save(est);
 
-
-                Boolean saveCaracteristicas = this.guardarcaracteristicas(idioma,deporte,pasatiempo,hablidadesB,softYTecn,est,null,ESTUDIANTE);
+            if (idioma != null && deporte != null && pasatiempo != null && hablidadesB != null && softYTecn != null && idioma != null) {
+                Boolean saveCaracteristicas = this.guardarcaracteristicas(idioma, deporte, pasatiempo, hablidadesB, softYTecn, est, null, ESTUDIANTE);
+            }
         }
                 String mensaje="Haz modificado correctamente tu perfil en MOSI";
                 generalService.enviarEmail(perfiles.get(0).getCorreo(),ASUNTO,mensaje);
@@ -1209,5 +1213,63 @@ public List<Object> consultaEstudiante(Integer usuario){
         }
 
         return perfil;
+    }
+
+    public List<HashMap<String,Object>> cambiarNombre(Integer idUsuario, String nombres, String apellidos) throws ParseException {
+        List<HashMap<String, Object>> resp = new ArrayList<>();
+        List<Estudiante> estudiante = estudianteRepository.findByUsuario(userRepository.findById(idUsuario).get());
+        HashMap<String, Object> nombresNuevo = new HashMap<>();
+        Date fecha = estudiante.get(0).getFechaModificacionNombre();
+        String duracion = "";
+
+        if (fecha != null) {
+            Calendar inicio = Calendar.getInstance();
+            inicio.setTime(fecha);
+            Calendar fin = new GregorianCalendar();
+            Date fechafin = new Date();
+            fin.setTime(fechafin);
+            int difA = fin.get(Calendar.YEAR) - inicio.get(Calendar.YEAR);
+            int difM = difA * 12 + fin.get(Calendar.MONTH) - inicio.get(Calendar.MONTH);
+
+           //if (difA == 0) {
+                if (difM >= 3) {
+                    for (Estudiante perfil :
+                            estudiante) {
+                        perfil.setNombre(nombres);
+                        perfil.setApellido(apellidos);
+                        perfil.setFechaModificacionNombre(fechafin);
+                        estudianteRepository.save(perfil);
+                    }
+                    nombresNuevo.put("nombre", nombres + " " + apellidos);
+                    resp.add(nombresNuevo);
+                    return resp;
+                } else {
+                    if (abs(difM-3) > 1){
+                         duracion = abs(difM-3) + " meses";
+                    }else {
+                         duracion = abs(difM-3) + " mes";
+                    }
+                    nombresNuevo.put("mensaje", "no se pudo cambiar el nombre, intente nuevamente dentro de " + duracion);
+                    resp.add(nombresNuevo);
+                    return resp;
+                }
+           /* } else {
+                nombresNuevo.put("mensaje", "no se pudo cambiar el nombre");
+                resp.add(nombresNuevo);
+                return resp;
+            }*/
+        } else {
+            for (Estudiante perfil :
+                    estudiante) {
+                perfil.setNombre(nombres);
+                perfil.setApellido(apellidos);
+                perfil.setFechaModificacionNombre(new Date());
+                estudianteRepository.save(perfil);
+
+            }
+            nombresNuevo.put("nombre", nombres + " " + apellidos);
+            resp.add(nombresNuevo);
+        }
+        return resp;
     }
 }

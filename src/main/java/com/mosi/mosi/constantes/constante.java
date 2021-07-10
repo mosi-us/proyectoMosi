@@ -122,4 +122,7 @@ public interface constante {
     String CLAVE_ACTUAL = "claveActual";
     String PERFIL = "perfil";
     String ESTATUS = "estatus" ;
+    String DESCRIPCION_PUBLICACION = "descripcion" ;
+    String IDPUBLICACION = "IdPublicacion";
+    String ENLACE = "enlace";
 }
