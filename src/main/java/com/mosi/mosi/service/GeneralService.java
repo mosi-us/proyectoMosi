@@ -1,10 +1,8 @@
 package com.mosi.mosi.service;
 
 import com.mosi.mosi.MosiApplication;
-import com.mosi.mosi.bean.PublicacionesEntity;
-import com.mosi.mosi.bean.PublicacionesPersonaEntity;
-import com.mosi.mosi.repository.PublicacionRepository;
-import com.mosi.mosi.repository.PublicacionesPersonaRepository;
+import com.mosi.mosi.bean.*;
+import com.mosi.mosi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +11,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Properties;
 
 import static com.mosi.mosi.constantes.constante.*;
@@ -27,6 +25,18 @@ public class GeneralService {
 
     @Autowired
     PublicacionesPersonaRepository publicacionesPersonaRepository;
+
+    @Autowired
+    ComentarioRepository comentarioRepository;
+
+    @Autowired
+    PublicacionesCompartidasRepository publicacionesCompartidasRepository;
+
+    @Autowired
+    EstudianteRepository estudianteRepository;
+
+    @Autowired
+    EmpresaRepository empresaRepository;
 
     public Object getPropertiesEmail() throws IOException {
         Properties p = new Properties();
@@ -61,27 +71,68 @@ public class GeneralService {
         transport.close();
     }
 
-    public PublicacionesEntity crearPublicacion(Integer idPersona, Integer tipoPersona, String descripcion, String enlace) {
+    public  HashMap<String,Object> crearPublicacion(Integer idPersona, Integer tipoPersona, String descripcion, String enlace, Boolean compartida,Integer idPub) {
+        HashMap<String,Object> resp = new HashMap<>();
+        Publicaciones publicaciones = new Publicaciones();
+        PublicacionesPersona publicacionesPersona = new PublicacionesPersona();
 
-        PublicacionesEntity publicaciones = new PublicacionesEntity();
-        PublicacionesPersonaEntity publicacionesPersona = new PublicacionesPersonaEntity();
+        if (compartida==Boolean.TRUE){
+           return this.crearPublicacionCompartida(idPersona,idPub,tipoPersona,descripcion);
+        }else {
+            if (tipoPersona==ESTUDIANTE){
+                Estudiante estudiante = estudianteRepository.findById(idPersona).get();
+                publicaciones.setEstudiante(estudiante);
+            }if (tipoPersona==EMPRESA){
+                Empresa empresa = empresaRepository.findById(idPersona).get();
+                publicaciones.setEmpresa(empresa);
+            }
+            Date ini = new Date();
+            Date fin = this.obtenerFechafin(ini, 3);
+            publicaciones.setPubDescripcion(descripcion);
+            publicaciones.setPubEnlace(enlace);
+            publicaciones.setPubEstatus(ACTIVO);
+            publicaciones.setPubFechaCreacion(new Date());
+            publicaciones.setPubFechaInicio(ini);
+            publicaciones.setPubFechaFin(fin);
+            publicaciones = publicacionRepository.save(publicaciones);
 
-        Date ini = new Date();
-        Date fin = this.obtenerFechafin(ini,3);
-        publicaciones.setPubDescripcion(descripcion);
-        publicaciones.setPubEnlace(enlace);
-        publicaciones.setPubEstatus(ACTIVO);
-        publicaciones.setPubFechaCreacion(new Date());
-        publicaciones.setPubFechaInicio(ini);
-        publicaciones.setPubFechaFin(fin);
-        publicaciones = publicacionRepository.save(publicaciones);
+            resp.put("publicacion", publicaciones);
+        return resp;
 
-        publicacionesPersona.setPublicacion(publicaciones);
-        publicacionesPersona.setPupIdPersona(idPersona);
-        publicacionesPersona.setPupTipoPersona(tipoPersona);
-        publicacionesPersonaRepository.save(publicacionesPersona);
+        }
+    }
+    public  HashMap<String,Object> crearPublicacionCompartida(Integer idPersona,Integer idPub, Integer tipoPersona, String descripcion) {
+            PublicacionesCompartidas publicacionesCompartidas = new PublicacionesCompartidas();
+            HashMap<String,Object> resp = new HashMap<>();
+        try {
+            if (tipoPersona==ESTUDIANTE){
+                Estudiante estudiante = estudianteRepository.findById(idPersona).get();
+                publicacionesCompartidas.setEstudiante(estudiante);
+            }if (tipoPersona==EMPRESA){
+                Empresa empresa = empresaRepository.findById(idPersona).get();
+                publicacionesCompartidas.setEmpresa(empresa);
+            }
+            Date fechaInicio = new Date();
+            Date fechaFin = this.obtenerFechafin(fechaInicio,3);
+            Publicaciones publicacion = publicacionRepository.findById(idPub).get();
+            publicacionesCompartidas.setPubId(publicacion);
+            publicacionesCompartidas.setPucDescripcion(descripcion);
+            publicacionesCompartidas.setPucFechaCreacion(new Date());
+            publicacionesCompartidas.setPucTipoPersona(tipoPersona);
+            publicacionesCompartidas.setPucFechaInicio(fechaInicio);
+            publicacionesCompartidas.setPucFechaFin(fechaFin);
+            publicacionesCompartidas.setPucEstatus(ACTIVO);
 
-        return publicaciones;
+            publicacionesCompartidas = publicacionesCompartidasRepository.save(publicacionesCompartidas);
+            resp.put("Publicacion", publicacionesCompartidas);
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+            return resp;
     }
 
     public Date obtenerFechafin(Date fechaInicio, Integer dias) {
@@ -93,24 +144,94 @@ public class GeneralService {
         return fechaFin;
     }
 
-    public PublicacionesEntity editarPublicacion(Integer idPub, String descripcion) {
-        PublicacionesEntity publicacion = new PublicacionesEntity();
+    public HashMap<String,Object> editarPublicacion(Integer idPub, String descripcion, Boolean compartida) {
+        Publicaciones publicacion = new Publicaciones();
+        HashMap<String,Object> resp = new HashMap<>();
 
-        publicacion = publicacionRepository.findById(idPub).get();
-        publicacion.setPubDescripcion(descripcion);
-        publicacion.setPubFechaActualizacion(new Date());
-        publicacion = publicacionRepository.save(publicacion);
+        if (compartida==true){
+            return  this.editarPublicacionCompartida(idPub,descripcion);
+        }else {
+            publicacion = publicacionRepository.findById(idPub).get();
+            publicacion.setPubDescripcion(descripcion);
+            publicacion.setPubFechaActualizacion(new Date());
+            publicacion = publicacionRepository.save(publicacion);
+            resp.put("Publicacion", publicacion);
 
-        return publicacion;
+            return resp;
+        }
     }
 
-    public String eliminarPublicacion(Integer idPub) {
-        PublicacionesEntity publicacion = new PublicacionesEntity();
-        publicacion = publicacionRepository.findById(idPub).get();
+    private HashMap<String, Object> editarPublicacionCompartida(Integer idPub, String descripcion) {
+        HashMap<String,Object> resp = new HashMap<>();
+        PublicacionesCompartidas publicacion= publicacionesCompartidasRepository.findById(idPub).get();
+        publicacion.setPucDescripcion(descripcion);
+        publicacion.setPucFechaActualizacion(new Date());
+        publicacion = publicacionesCompartidasRepository.save(publicacion);
+        resp.put("Publicacion", publicacion);
 
-        publicacion.setPubEstatus(ELIMINADO);
-        publicacion = publicacionRepository.save(publicacion);
+        return resp;
+    }
+
+    public String eliminarPublicacion(Integer idPub, Boolean compartida) {
+        Publicaciones publicacion = new Publicaciones();
+        PublicacionesCompartidas publicacionesC = new PublicacionesCompartidas();
+        if (compartida==true){
+            publicacionesC = publicacionesCompartidasRepository.findById(idPub).get();
+            publicacionesC.setPucEstatus(ELIMINADO);
+            publicacionesCompartidasRepository.save(publicacionesC);
+        }else{
+            publicacion = publicacionRepository.findById(idPub).get();
+
+            publicacion.setPubEstatus(ELIMINADO);
+            publicacion = publicacionRepository.save(publicacion);
+        }
 
         return "Se ha Eliminado la publicacion con Exito!!";
+    }
+
+
+    public Comentarios crearcomentario(Integer idPub, String descripcion, Integer idPersona, Integer tipoPersona,Boolean compartido) {
+        Comentarios comentario = new Comentarios();
+        if (compartido==true){
+            PublicacionesCompartidas publicacion = publicacionesCompartidasRepository.findById(idPub).get();
+            comentario.setPublicacionesCompartidas(publicacion);
+        }else{
+            Publicaciones publicacion = publicacionRepository.findById(idPub).get();
+            comentario.setPubId(publicacion);
+        }
+        if (tipoPersona==ESTUDIANTE){
+            Estudiante estudiante = estudianteRepository.findById(idPersona).get();
+            comentario.setEstudiante(estudiante);
+        }
+        if (tipoPersona==EMPRESA){
+            Empresa empresa = empresaRepository.findById(idPersona).get();
+            comentario.setEmpresa(empresa);
+        }
+        comentario.setDescripcionComentario(descripcion);
+        comentario.setComTipoPersona(tipoPersona);
+        comentario.setComEstatus(ACTIVO);
+        comentario.setComFechaCreacion(new Date());
+        comentario = comentarioRepository.save(comentario);
+
+
+        return comentario;
+    }
+
+    public Comentarios editarcomentario(Integer idCom, String descripcion) {
+         Comentarios comentario = comentarioRepository.findById(idCom).get();
+
+         comentario.setDescripcionComentario(descripcion);
+         comentario.setComFechaActualizacion(new Date());
+         comentario = comentarioRepository.save(comentario);
+
+        return comentario;
+    }
+
+    public Comentarios eliminarComentario(Integer idCom) {
+        Comentarios comentario = comentarioRepository.findById(idCom).get();
+
+        comentario.setComEstatus(ELIMINADO);
+        comentario = comentarioRepository.save(comentario);
+        return comentario;
     }
 }

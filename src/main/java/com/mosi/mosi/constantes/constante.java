@@ -125,4 +125,7 @@ public interface constante {
     String DESCRIPCION_PUBLICACION = "descripcion" ;
     String IDPUBLICACION = "IdPublicacion";
     String ENLACE = "enlace";
+    String COMENTARIO = "comentario";
+    String IDCOMENTERIO = "idComentario";
+    String COMPARTIDA = "compartida";
 }
