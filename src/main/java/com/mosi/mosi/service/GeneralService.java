@@ -38,6 +38,14 @@ public class GeneralService {
     @Autowired
     EmpresaRepository empresaRepository;
 
+    @Autowired
+    ReaccionesPersonasRepository reaccionesPersonasRepository;
+
+    @Autowired
+    ReaccionesRepository reaccionesRepository;
+
+
+
     public Object getPropertiesEmail() throws IOException {
         Properties p = new Properties();
         Properties properties = new Properties();
@@ -161,7 +169,7 @@ public class GeneralService {
         }
     }
 
-    private HashMap<String, Object> editarPublicacionCompartida(Integer idPub, String descripcion) {
+    public HashMap<String, Object> editarPublicacionCompartida(Integer idPub, String descripcion) {
         HashMap<String,Object> resp = new HashMap<>();
         PublicacionesCompartidas publicacion= publicacionesCompartidasRepository.findById(idPub).get();
         publicacion.setPucDescripcion(descripcion);
@@ -233,5 +241,55 @@ public class GeneralService {
         comentario.setComEstatus(ELIMINADO);
         comentario = comentarioRepository.save(comentario);
         return comentario;
+    }
+
+    public ReaccionesPersonas reaccionarPublicacionComentario(Integer idCom, Integer idPub, Integer idPersona, Integer tipoPersona, Integer tipo, Integer reaccion, Boolean compartida) {
+        ReaccionesPersonas reacciones = new ReaccionesPersonas();
+        if (tipoPersona==ESTUDIANTE){
+            Estudiante persona = estudianteRepository.findById(idPersona).get();
+            reacciones.setEstudiante(persona);
+        }
+        if (tipoPersona==EMPRESA){
+            Empresa persona = empresaRepository.findById(idPersona).get();
+            reacciones.setEmpresa(persona);
+        }
+        if (tipo==TIPO_PUBLICACION){
+            if (compartida==true){
+                PublicacionesCompartidas publicaciones = publicacionesCompartidasRepository.findById(idPub).get();
+                reacciones.setPublicacionesCompartidas(publicaciones);
+            }else {
+                Publicaciones publicaciones = publicacionRepository.findById(idPub).get();
+                reacciones.setPublicacion(publicaciones);
+            }
+        }
+        if (tipo==TIPO_COMENTARIO){
+                Comentarios comentarios = comentarioRepository.findById(idCom).get();
+                reacciones.setComentarios(comentarios);
+        }
+        reacciones.setReacciones(reaccionesRepository.findById(reaccion).get());
+        reacciones.setRepFechaCreacion(new Date());
+        reacciones.setRepEstatus(ACTIVO);
+        reacciones = reaccionesPersonasRepository.save(reacciones);
+
+
+        return reacciones;
+    }
+
+    public ReaccionesPersonas editarReaccion(Integer reaccionP, Integer reaccion) {
+        ReaccionesPersonas reacciones = reaccionesPersonasRepository.findById(reaccionP).get();
+
+        reacciones.setReacciones(reaccionesRepository.findById(reaccion).get());
+        reacciones = reaccionesPersonasRepository.save(reacciones);
+
+        return reacciones;
+    }
+
+    public ReaccionesPersonas eliminarReaccion(Integer idReaccion) {
+        ReaccionesPersonas reacciones = reaccionesPersonasRepository.findById(idReaccion).get();
+
+        reacciones.setRepEstatus(ELIMINADO);
+        reacciones = reaccionesPersonasRepository.save(reacciones);
+
+        return reacciones;
     }
 }

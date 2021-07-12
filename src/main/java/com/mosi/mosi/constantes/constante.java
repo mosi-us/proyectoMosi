@@ -126,6 +126,11 @@ public interface constante {
     String IDPUBLICACION = "IdPublicacion";
     String ENLACE = "enlace";
     String COMENTARIO = "comentario";
-    String IDCOMENTERIO = "idComentario";
+    String IDCOMENTARIO = "idComentario";
     String COMPARTIDA = "compartida";
+    String IDREACCION = "idReaccion";
+    String ID_REACCION_PERSONA = "idReaccionPersona";
+
+    Integer TIPO_PUBLICACION = 1;
+    Integer TIPO_COMENTARIO = 2;
 }
