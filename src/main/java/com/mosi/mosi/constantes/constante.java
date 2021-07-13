@@ -133,4 +133,12 @@ public interface constante {
 
     Integer TIPO_PUBLICACION = 1;
     Integer TIPO_COMENTARIO = 2;
+    String ID_SEGUIDOR = "idSeguidor";
+    String ID_SEGUIDO = "idSeguido";
+    String ID_SEGUIDORES= "idSeg";
+
+
+    String TIPO_PERSONA_SEGUIDOR = "tipoPersonaSeguidor";
+    String TIPO_PERSONA_SEGUIDO = "tipoPersonaSeguido";
+
 }

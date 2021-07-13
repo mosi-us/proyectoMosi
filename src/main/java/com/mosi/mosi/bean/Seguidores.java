@@ -1,16 +1,26 @@
 package com.mosi.mosi.bean;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
 @Table(name = "SEG_Seguidores", schema = "dbo", catalog = "MOSI")
 public class Seguidores {
     private int segId;
-    private Integer segIdPersona;
-    private Integer segIdSeguidor;
+    private Integer segTipoSeguidor;
+    private Integer tipo;
+    private Integer segEstatus;
+    private Date segFechaCreacion;
+    private Date segFechaModificacion;
+    private Estudiante estudianteSeguidor;
+    private Estudiante estudianteSeguido;
+    private Empresa empresaSeguidor;
+    private Empresa empresaSeguido;
+
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SEG_Id")
     public int getSegId() {
         return segId;
@@ -21,37 +31,91 @@ public class Seguidores {
     }
 
     @Basic
-    @Column(name = "SEG_IdPersona")
-    public Integer getSegIdPersona() {
-        return segIdPersona;
+    @Column(name = "SEG_Tipo_Seguidor")
+    public Integer getSegTipoSeguidor() {
+        return segTipoSeguidor;
     }
 
-    public void setSegIdPersona(Integer segIdPersona) {
-        this.segIdPersona = segIdPersona;
+    public void setSegTipoSeguidor(Integer segTipoSeguidor) {
+        this.segTipoSeguidor = segTipoSeguidor;
     }
 
     @Basic
-    @Column(name = "SEG_IdSeguidor")
-    public Integer getSegIdSeguidor() {
-        return segIdSeguidor;
+    @Column(name = "tipo")
+    public Integer getTipo() {
+        return tipo;
     }
 
-    public void setSegIdSeguidor(Integer segIdSeguidor) {
-        this.segIdSeguidor = segIdSeguidor;
+    public void setTipo(Integer tipo) {
+        this.tipo = tipo;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Seguidores that = (Seguidores) o;
-        return segId == that.segId &&
-                Objects.equals(segIdPersona, that.segIdPersona) &&
-                Objects.equals(segIdSeguidor, that.segIdSeguidor);
+    @Basic
+    @Column(name = "SEG_Estatus")
+    public Integer getSegEstatus() {
+        return segEstatus;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(segId, segIdPersona, segIdSeguidor);
+    public void setSegEstatus(Integer segEstatus) {
+        this.segEstatus = segEstatus;
+    }
+
+    @Basic
+    @Column(name = "SEG_Fecha_Creacion")
+    public Date getSegFechaCreacion() {
+        return segFechaCreacion;
+    }
+
+    public void setSegFechaCreacion(Date segFechaCreacion) {
+        this.segFechaCreacion = segFechaCreacion;
+    }
+
+    @Basic
+    @Column(name = "SEG_Fecha_Modificacion")
+    public Date getSegFechaModificacion() {
+        return segFechaModificacion;
+    }
+
+    public void setSegFechaModificacion(Date segFechaModificacion) {
+        this.segFechaModificacion = segFechaModificacion;
+    }
+
+    @OneToOne
+    @JoinColumn(name = "SEG_Id_Est_Seguidor")
+
+    public Estudiante getEstudianteSeguidor() {
+        return estudianteSeguidor;
+    }
+    public void setEstudianteSeguidor(Estudiante estudianteSeguidor) {
+        this.estudianteSeguidor = estudianteSeguidor;
+    }
+
+    @OneToOne
+    @JoinColumn(name = "SEG_Id_Emp_Seguidor")
+    public Empresa getEmpresaSeguidor() {
+        return empresaSeguidor;
+    }
+
+    public void setEmpresaSeguidor(Empresa empresaSeguidor) {
+        this.empresaSeguidor = empresaSeguidor;
+    }
+    @OneToOne
+    @JoinColumn(name = "EST_Id")
+
+    public Estudiante getEstudianteSeguido() {
+        return estudianteSeguido;
+    }
+
+    public void setEstudianteSeguido(Estudiante estudianteSeguido) {
+        this.estudianteSeguido = estudianteSeguido;
+    }
+    @OneToOne
+    @JoinColumn(name = "EMP_Id")
+    public Empresa getEmpresaSeguido() {
+        return empresaSeguido;
+    }
+
+    public void setEmpresaSeguido(Empresa empresaSeguido) {
+        this.empresaSeguido = empresaSeguido;
     }
 }

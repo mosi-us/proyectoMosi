@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mosi.mosi.bean.Comentarios;
 import com.mosi.mosi.bean.Publicaciones;
 import com.mosi.mosi.bean.ReaccionesPersonas;
+import com.mosi.mosi.bean.Seguidores;
 import com.mosi.mosi.service.GeneralService;
 import org.jsondoc.core.annotation.ApiBodyObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.mosi.mosi.constantes.constante.*;
@@ -97,7 +101,7 @@ public class generalController {
      * */
     @PostMapping("crearComentario")
     public Comentarios comentarPublicacion(HttpServletRequest request, HttpServletResponse response,
-                                           @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
+                                           @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         Integer idPub = (params.containsKey(IDPUBLICACION) && params.get(IDPUBLICACION) != null && !params.get(IDPUBLICACION).toString().isEmpty()) ? Integer.valueOf(params.get(IDPUBLICACION).toString()) : null;
         String descripcion = (params.containsKey(COMENTARIO) && params.get(COMENTARIO) != null && !params.get(COMENTARIO).toString().isEmpty()) ? params.get(COMENTARIO).toString() : null;
@@ -152,7 +156,7 @@ public class generalController {
      * */
     @PostMapping("reaccionarPublicacionComentario")
     public ReaccionesPersonas reaccionarPublicacionComentario(HttpServletRequest request, HttpServletResponse response,
-                                          @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
+                                          @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         Integer idCom = (params.containsKey(IDCOMENTARIO) && params.get(IDCOMENTARIO) != null && !params.get(IDCOMENTARIO).toString().isEmpty()) ? Integer.valueOf(params.get(IDCOMENTARIO).toString()) : null;
         Integer idPub = (params.containsKey(IDPUBLICACION) && params.get(IDPUBLICACION) != null && !params.get(IDPUBLICACION).toString().isEmpty()) ? Integer.valueOf(params.get(IDPUBLICACION).toString()) : null;
@@ -184,5 +188,106 @@ public class generalController {
 
         ReaccionesPersonas publicacion = generalService.eliminarReaccion(idReaccion);
         return publicacion;
+    }
+
+    /**
+     {
+     "idSeguidor": ,
+     "tipoPersonaSeguidor": ,
+     "idSeguido": ,
+     "tipoPersonaSeguido": ,
+
+     }
+     *
+     * */
+    @PostMapping("seguirPersona")
+    public Seguidores seguirPersona(HttpServletRequest request, HttpServletResponse response,
+                                               @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idSeguidor = (params.containsKey(ID_SEGUIDOR) && params.get(ID_SEGUIDOR) != null && !params.get(ID_SEGUIDOR).toString().isEmpty()) ? Integer.valueOf(params.get(ID_SEGUIDOR).toString()) : null;
+        Integer tipoPersonaSeguidor = (params.containsKey(TIPO_PERSONA_SEGUIDOR) && params.get(TIPO_PERSONA_SEGUIDOR) != null && !params.get(TIPO_PERSONA_SEGUIDOR).toString().isEmpty()) ? Integer.valueOf(params.get(TIPO_PERSONA_SEGUIDOR).toString()) : null;
+        Integer idSeguido = (params.containsKey(ID_SEGUIDO) && params.get(ID_SEGUIDO) != null && !params.get(ID_SEGUIDO).toString().isEmpty()) ? Integer.valueOf(params.get(ID_SEGUIDO).toString()) : null;
+        Integer tipoPersonaSeguido = (params.containsKey(TIPO_PERSONA_SEGUIDO) && params.get(TIPO_PERSONA_SEGUIDO) != null && !params.get(TIPO_PERSONA_SEGUIDO).toString().isEmpty()) ? Integer.valueOf(params.get(TIPO_PERSONA_SEGUIDO).toString()) : null;
+
+        Seguidores seguidores = generalService.seguirPersona(idSeguido,tipoPersonaSeguido,idSeguidor,tipoPersonaSeguidor);
+        return seguidores;
+    }
+
+    /**
+     {
+     "idSeg":
+     }
+     *
+     * */
+    @PostMapping("dejarSeguirPersona")
+    public Seguidores dejarSeguirPersona(HttpServletRequest request, HttpServletResponse response,
+                                    @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idSeguidores = (params.containsKey(ID_SEGUIDORES) && params.get(ID_SEGUIDORES) != null && !params.get(ID_SEGUIDORES).toString().isEmpty()) ? Integer.valueOf(params.get(ID_SEGUIDORES).toString()) : null;
+
+        Seguidores seguidores = generalService.dejarSeguir(idSeguidores);
+        return seguidores;
+    }
+/**
+    {
+        "idSeguido": ,
+        "tipoPersonaSeguido":
+    }
+ */
+    @PostMapping("verSeguidores")
+    public  List<String> verSeguidores(HttpServletRequest request, HttpServletResponse response,
+                                         @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idSeguido = (params.containsKey(ID_SEGUIDO) && params.get(ID_SEGUIDO) != null && !params.get(ID_SEGUIDO).toString().isEmpty()) ? Integer.valueOf(params.get(ID_SEGUIDO).toString()) : null;
+        Integer tipoPersona = (params.containsKey(TIPO_PERSONA_SEGUIDO) && params.get(TIPO_PERSONA_SEGUIDO) != null && !params.get(TIPO_PERSONA_SEGUIDO).toString().isEmpty()) ? Integer.valueOf(params.get(TIPO_PERSONA_SEGUIDO).toString()) : null;
+
+        List<String> seguidores = generalService.verSeguidores(idSeguido,tipoPersona);
+        return seguidores;
+    }
+
+    /**
+     {
+     "idSeguidor": ,
+     "tipoPersonaSeguidor":
+     }
+     *
+     *
+     * */
+    @PostMapping("verSeguidos")
+    public List<String> verSeguidos(HttpServletRequest request, HttpServletResponse response,
+                                    @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idSeguidor = (params.containsKey(ID_SEGUIDOR) && params.get(ID_SEGUIDOR) != null && !params.get(ID_SEGUIDOR).toString().isEmpty()) ?
+                Integer.valueOf(params.get(ID_SEGUIDOR).toString()) : null;
+        Integer tipoPersona = (params.containsKey(TIPO_PERSONA_SEGUIDOR) && params.get(TIPO_PERSONA_SEGUIDOR) != null && !params.get(TIPO_PERSONA_SEGUIDOR).toString().isEmpty()) ?
+                Integer.valueOf(params.get(TIPO_PERSONA_SEGUIDOR).toString()) : null;
+
+        List<String> seguidores = generalService.verSeguidos(idSeguidor,tipoPersona);
+        return seguidores;
+    }
+
+    /**
+     {
+
+     "idSeguido": ,
+     "tipoPersonaSeguido":
+
+     }
+     * @param request
+     * @param response
+     * @param json
+     * @return
+     * @throws IOException
+     * @throws MessagingException
+     */
+    @PostMapping("verCantidadSeguidores")
+    public Integer verCantidadSeguidores(HttpServletRequest request, HttpServletResponse response,
+                                  @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idSeguido = (params.containsKey(ID_SEGUIDO) && params.get(ID_SEGUIDO) != null && !params.get(ID_SEGUIDO).toString().isEmpty()) ? Integer.valueOf(params.get(ID_SEGUIDO).toString()) : null;
+        Integer tipoPersona = (params.containsKey(TIPO_PERSONA_SEGUIDO) && params.get(TIPO_PERSONA_SEGUIDO) != null && !params.get(TIPO_PERSONA_SEGUIDO).toString().isEmpty()) ? Integer.valueOf(params.get(TIPO_PERSONA_SEGUIDO).toString()) : null;
+
+        Integer seguidores = generalService.verCantidadSeguidores(idSeguido,tipoPersona);
+        return seguidores;
     }
 }
