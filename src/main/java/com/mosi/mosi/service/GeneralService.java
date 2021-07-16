@@ -200,30 +200,80 @@ public class GeneralService {
 
         return "Se ha Eliminado la publicacion con Exito!!";
     }
-    public Comentarios crearcomentario(Integer idPub, String descripcion, Integer idPersona, Integer tipoPersona,Boolean compartido) throws IOException, MessagingException {
+    public Comentarios crearcomentario(Integer idPub, String descripcion, Integer idPersona, Integer tipoPersona,Boolean compartido,Integer tipo) throws IOException, MessagingException {
         Comentarios comentario = new Comentarios();
         String correo = "";
         String nombrePersona = "";
         Integer tipoPersonaPublicacion = 0;
-        if (compartido==true){
-            PublicacionesCompartidas publicacion = publicacionesCompartidasRepository.findById(idPub).get();
-            comentario.setPublicacionesCompartidas(publicacion);
-            tipoPersonaPublicacion = publicacion.getPubId().getTipoPersona();
-            if (tipoPersonaPublicacion==ESTUDIANTE){
-                correo = publicacion.getPubId().getEstudiante().getCorreo();
-            }else if (tipoPersonaPublicacion==EMPRESA){
-                correo = publicacion.getPubId().getEmpresa().getCorreo();
+        Boolean notificar = true;
+        switch (tipo) {
+            case 1://Publicacion
+            if (compartido == true) {
+                PublicacionesCompartidas publicacion = publicacionesCompartidasRepository.findById(idPub).get();
+                comentario.setPublicacionesCompartidas(publicacion);
+                tipoPersonaPublicacion = publicacion.getPubId().getTipoPersona();
+
+                if (tipoPersonaPublicacion == ESTUDIANTE) {
+                    if (publicacion.getPubId().getEstudiante().getId().intValue() == idPersona) {
+                        notificar = false;
+                    } else {
+                        correo = publicacion.getPubId().getEstudiante().getCorreo();
+                    }
+                } else if (tipoPersonaPublicacion == EMPRESA) {
+                    if (publicacion.getPubId().getEmpresa().getId().intValue() == idPersona) {
+                        notificar = false;
+                    } else {
+                        correo = publicacion.getPubId().getEmpresa().getCorreo();
+                    }
+                }
+
+            } else {
+                Publicaciones publicacion = publicacionRepository.findById(idPub).get();
+                comentario.setPubId(publicacion);
+                tipoPersonaPublicacion = publicacion.getTipoPersona();
+                if (publicacion.getEstudiante().getId().intValue() == idPersona) {
+                    notificar = false;
+                } else {
+                    if (tipoPersonaPublicacion == ESTUDIANTE) {
+                        if (publicacion.getEstudiante().getId().intValue() == idPersona) {
+                            notificar = false;
+                        } else {
+                            correo = publicacion.getEstudiante().getCorreo();
+                        }
+                    }
+                }
+                if (tipoPersonaPublicacion == EMPRESA) {
+                    if (publicacion.getEmpresa().getId().intValue() == idPersona) {
+                        notificar = false;
+                    } else {
+                        correo = publicacion.getEmpresa().getCorreo();
+                    }
+                }
             }
-        }else{
-            Publicaciones publicacion = publicacionRepository.findById(idPub).get();
-            comentario.setPubId(publicacion);
-            tipoPersonaPublicacion = publicacion.getTipoPersona();
-            if (tipoPersonaPublicacion==ESTUDIANTE){
-                correo = publicacion.getEstudiante().getCorreo();
-            }else if (tipoPersonaPublicacion==EMPRESA){
-                correo = publicacion.getEmpresa().getCorreo();
-            }
+            break;
+            case 2://Comentario
+                Comentarios comentarios = comentarioRepository.findById(idPub).get();
+                comentario.setComentarios(comentarios);
+                tipoPersonaPublicacion = comentarios.getComTipoPersona();
+
+                    if (tipoPersonaPublicacion == ESTUDIANTE) {
+                        if (comentarios.getEstudiante().getId().intValue() == idPersona) {
+                            notificar = false;
+                        } else {
+                            correo = comentarios.getEstudiante().getCorreo();
+                        }
+                    }
+
+                if (tipoPersonaPublicacion == EMPRESA) {
+                    if (comentarios.getEmpresa().getId().intValue() == idPersona) {
+                        notificar = false;
+                    } else {
+                        correo = comentarios.getEmpresa().getCorreo();
+                    }
+                }
+                break;
         }
+
         if (tipoPersona==ESTUDIANTE){
             Estudiante estudiante = estudianteRepository.findById(idPersona).get();
             comentario.setEstudiante(estudiante);
@@ -240,7 +290,7 @@ public class GeneralService {
         comentario.setComEstatus(ACTIVO);
         comentario.setComFechaCreacion(new Date());
         comentario = comentarioRepository.save(comentario);
-        if (!correo.isEmpty()){
+        if (!correo.isEmpty()&&notificar){
             this.enviarEmail(correo,ASUNTO,nombrePersona + " A comentado tu Publicacion");
         }
         /*Notificaciones noti = new Notificaciones();
@@ -272,6 +322,7 @@ public class GeneralService {
         Integer tipoPersonaPublicacion;
         String correo = null, nombrePersona = null;
         String tipoP = null;
+        Boolean notificar = true;
         if (tipoPersona==ESTUDIANTE){
             Estudiante persona = estudianteRepository.findById(idPersona).get();
             reacciones.setEstudiante(persona);
@@ -288,31 +339,62 @@ public class GeneralService {
                 PublicacionesCompartidas publicaciones = publicacionesCompartidasRepository.findById(idPub).get();
                 reacciones.setPublicacionesCompartidas(publicaciones);
                 tipoPersonaPublicacion = publicaciones.getPubId().getTipoPersona();
-                if (tipoPersonaPublicacion==ESTUDIANTE){
-                    correo = publicaciones.getPubId().getEstudiante().getCorreo();
-                }else if (tipoPersonaPublicacion==EMPRESA){
-                    correo = publicaciones.getPubId().getEmpresa().getCorreo();
-                }
+
+                    if (tipoPersonaPublicacion == ESTUDIANTE) {
+                        if (publicaciones.getPubId().getEstudiante().getId().intValue() == idPersona){
+                            notificar = false;
+                        }else{
+                        correo = publicaciones.getPubId().getEstudiante().getCorreo();
+                        }
+                    } else if (tipoPersonaPublicacion == EMPRESA) {
+                        if (publicaciones.getPubId().getEmpresa().getId().intValue() == idPersona){
+                            notificar = false;
+                        }else{
+                        correo = publicaciones.getPubId().getEmpresa().getCorreo();
+                        }
+                    }
+
             }else {
                 Publicaciones publicaciones = publicacionRepository.findById(idPub).get();
                 reacciones.setPublicacion(publicaciones);
                 tipoPersonaPublicacion = publicaciones.getTipoPersona();
-                if (tipoPersonaPublicacion==ESTUDIANTE){
-                    correo = publicaciones.getEstudiante().getCorreo();
-                }else if (tipoPersonaPublicacion==EMPRESA){
-                    correo = publicaciones.getEmpresa().getCorreo();
+
+                    if (tipoPersonaPublicacion == ESTUDIANTE) {
+                        if (publicaciones.getEstudiante().getId().intValue() == idPersona) {
+                            notificar = false;
+                        } else{
+                            correo = publicaciones.getEstudiante().getCorreo();
+                        }
+                    } else if (tipoPersonaPublicacion == EMPRESA) {
+                        if (publicaciones.getEmpresa().getId().intValue() == idPersona) {
+                            notificar = false;
+                        }else {
+                            correo = publicaciones.getEmpresa().getCorreo();
+                        }
+                    }
                 }
-            }
         }
         if (tipo==TIPO_COMENTARIO){
             tipoP = "Comentario";
                 Comentarios comentarios = comentarioRepository.findById(idCom).get();
                 reacciones.setComentarios(comentarios);
             tipoPersonaPublicacion = comentarios.getComTipoPersona();
-            if (tipoPersonaPublicacion==ESTUDIANTE){
-                correo = comentarios.getEstudiante().getCorreo();
-            }else if (tipoPersonaPublicacion==EMPRESA){
-                correo = comentarios.getEmpresa().getCorreo();
+            if (comentarios.getEstudiante().getId() == idPersona){
+                notificar = false;
+            }else {
+                if (tipoPersonaPublicacion == ESTUDIANTE) {
+                    if (comentarios.getEstudiante().getId().intValue() == idPersona) {
+                        notificar = false;
+                    }else {
+                        correo = comentarios.getEstudiante().getCorreo();
+                    }
+                } else if (tipoPersonaPublicacion == EMPRESA) {
+                    if (comentarios.getEmpresa().getId().intValue() == idPersona) { //validacion para no enviar correo a la misma persona
+                        notificar = false;
+                    }else {
+                        correo = comentarios.getEmpresa().getCorreo();
+                    }
+                }
             }
         }
         reacciones.setReacciones(reaccionesRepository.findById(reaccion).get());
@@ -320,7 +402,7 @@ public class GeneralService {
         reacciones.setRepEstatus(ACTIVO);
         reacciones = reaccionesPersonasRepository.save(reacciones);
 
-        if (!correo.isEmpty() && correo!=null){
+        if (!correo.isEmpty() && correo!=null && notificar){
             this.enviarEmail(correo,ASUNTO,nombrePersona + " A Reaccionado a Tu " + tipoP);
         }return reacciones;
     }
@@ -351,42 +433,65 @@ public class GeneralService {
         Seguidores seguidores = new Seguidores();
         String correo = null;
         String nomprePersona = null;
+        Seguidores seg = new Seguidores();
 
-        switch (tipoPersonaSeguido){
-            case 1://ESTUDIANTE
-                estudianteSeguido = estudianteRepository.findById(idSeguido).get();
-                seguidores.setEstudianteSeguido(estudianteSeguido);
-                seguidores.setTipo(1);
-                correo = estudianteSeguido.getCorreo();
-                break;
-            case 2: //EMPRESA
-                empresaSeguido = empresaRepository.findById(idSeguido).get();
-                seguidores.setEmpresaSeguido(empresaSeguido);
-                seguidores.setTipo(2);
-                correo = empresaSeguido.getCorreo();
-                break;
+        seg = this.buscarSeguidosySeguidores(idSeguido,tipoPersonaSeguido,idSeguidor,tipoPersonaSeguidor);
+        if (seg==null) {
+            switch (tipoPersonaSeguido) {
+                case 1://ESTUDIANTE
+                    estudianteSeguido = estudianteRepository.findById(idSeguido).get();
+                    seguidores.setEstudianteSeguido(estudianteSeguido);
+                    seguidores.setTipo(1);
+                    correo = estudianteSeguido.getCorreo();
+                    break;
+                case 2: //EMPRESA
+                    empresaSeguido = empresaRepository.findById(idSeguido).get();
+                    seguidores.setEmpresaSeguido(empresaSeguido);
+                    seguidores.setTipo(2);
+                    correo = empresaSeguido.getCorreo();
+                    break;
+            }
+            switch (tipoPersonaSeguidor) {
+                case 1://ESTUDIANTE
+                    estudianteSeguidor = estudianteRepository.findById(idSeguidor).get();
+                    seguidores.setEstudianteSeguidor(estudianteSeguidor);
+                    seguidores.setSegTipoSeguidor(1);
+                    nomprePersona = estudianteSeguidor.getNombre() + " " + estudianteSeguidor.getApellido();
+                    break;
+                case 2: //EMPRESA
+                    empresaSeguidor = empresaRepository.findById(idSeguidor).get();
+                    seguidores.setEmpresaSeguidor(empresaSeguidor);
+                    seguidores.setSegTipoSeguidor(2);
+                    nomprePersona = empresaSeguidor.getNombre();
+
+                    break;
+            }
+            seguidores.setSegEstatus(ACTIVO);
+            seguidores.setSegFechaCreacion(new Date());
+            seguidores = seguidoresRepository.save(seguidores);
+
+    }else {
+            seguidores = this.cambiarEstatusSeguidor(null,null,null,tipoPersonaSeguidor,ACTIVO,seg);
+            switch (seguidores.getTipo()) { //obtener nombre y correo para el envio de msj
+                case 1://ESTUDIANTE
+                    correo = seguidores.getEstudianteSeguido().getCorreo();
+                    break;
+                case 2: //EMPRESA
+                    correo =seguidores.getEmpresaSeguido().getCorreo();
+                    break;
+            }
+            switch (seguidores.getSegTipoSeguidor()) {
+                case 1://ESTUDIANTE
+                    nomprePersona = seguidores.getEstudianteSeguidor().getNombre() + " " + seguidores.getEstudianteSeguidor().getApellido();
+                    break;
+                case 2: //EMPRESA
+                    nomprePersona = seguidores.getEmpresaSeguidor().getNombre();
+
+                    break;
+            }
         }
-        switch (tipoPersonaSeguidor){
-            case 1://ESTUDIANTE
-                estudianteSeguidor = estudianteRepository.findById(idSeguidor).get();
-                seguidores.setEstudianteSeguidor(estudianteSeguidor);
-                seguidores.setSegTipoSeguidor(1);
-                nomprePersona = estudianteSeguidor.getNombre() + " " + estudianteSeguidor.getApellido();
-                break;
-            case 2: //EMPRESA
-                empresaSeguidor = empresaRepository.findById(idSeguidor).get();
-                seguidores.setEmpresaSeguidor(empresaSeguidor);
-                seguidores.setSegTipoSeguidor(2);
-                nomprePersona = empresaSeguidor.getNombre();
-
-                break;
-        }
-        seguidores.setSegEstatus(ACTIVO);
-        seguidores.setSegFechaCreacion(new Date());
-        seguidores = seguidoresRepository.save(seguidores);
-
-        if (correo!=null){
-            this.enviarEmail(correo,ASUNTO,nomprePersona + " Te emprezo a seguir en MOCHY");
+        if (correo != null) {
+            this.enviarEmail(correo, ASUNTO, nomprePersona + " Te emprezo a seguir en MOCHY");
         }
         return seguidores;
     }
@@ -429,18 +534,18 @@ public class GeneralService {
         List<Seguidores> seguidos = new ArrayList<>();
         List<String> listaSeguidos = new ArrayList<>();
         if (tipoPersona == ESTUDIANTE) {
-            seguidos = seguidoresRepository.findByEstudianteSeguidor(estudianteRepository.findById(idSeguidor).get());
+            seguidos = seguidoresRepository.findByEstudianteSeguidorAndSegEstatus(estudianteRepository.findById(idSeguidor).get(),1);
             for (Seguidores seg : seguidos) {
                 if (seg.getTipo()==ESTUDIANTE){
-                listaSeguidos.add(seg.getEstudianteSeguido().getNombre() + " " + seg.getEstudianteSeguido().getApellido());
+                listaSeguidos.add(seg.getEstudianteSeguido().getNombre() + " " + seg.getEstudianteSeguidor().getApellido());
                 }else{
-                    listaSeguidos.add(seg.getEmpresaSeguidor().getNombre());
+                    listaSeguidos.add(seg.getEmpresaSeguido().getNombre());
 
                 }
             }
         }
         if (tipoPersona == EMPRESA) {
-            seguidos = seguidoresRepository.findByEmpresaSeguidor(empresaRepository.findById(idSeguidor).get());
+            seguidos = seguidoresRepository.findByEmpresaSeguidorAndSegEstatus(empresaRepository.findById(idSeguidor).get(),1);
             for (Seguidores seg : seguidos) {
                 if (seg.getTipo()==ESTUDIANTE){
                     listaSeguidos.add(seg.getEstudianteSeguido().getNombre() + " " + seg.getEstudianteSeguido().getApellido());
@@ -462,6 +567,42 @@ public class GeneralService {
              seguidores = seguidoresRepository.cantidadSeguidoresEmp(idSeguido);
         }
         return seguidores;
+    }
+
+
+    public Seguidores cambiarEstatusSeguidor(Integer idSeguido, Integer tipoPersona, Integer idSeguidor, Integer tipoPersonaSeguidor,Integer estatus,Seguidores seg) {
+            Seguidores seguidor = new Seguidores();
+
+        if (seg==null) {
+            seguidor = this.buscarSeguidosySeguidores(idSeguido, tipoPersona, idSeguidor, tipoPersonaSeguidor);
+        }else {
+            seguidor = seg;
+        }
+       seguidor.setSegEstatus(estatus);
+       seguidor = seguidoresRepository.save(seguidor);
+        return seguidor;
+    }
+
+    public Seguidores buscarSeguidosySeguidores(Integer idSeguido, Integer tipoPersona, Integer idSeguidor, Integer tipoPersonaSeguidor){
+        Seguidores seguidor = new Seguidores();
+        switch (tipoPersona){ //tipo de persona seguido
+            case 1: //Estudiante
+                if (tipoPersonaSeguidor==ESTUDIANTE){
+                    seguidor = seguidoresRepository.findByEstudianteSeguidoAndEstudianteSeguidor(idSeguido,idSeguidor);
+                }else {
+                    seguidor = seguidoresRepository.findByEstudianteSeguidoAndEmpresaSeguidor(idSeguido,idSeguidor);
+
+                }
+                break;
+            case 2://Empresa
+                if (tipoPersonaSeguidor==ESTUDIANTE){
+                    seguidor = seguidoresRepository.findByEmpresaSeguidoAndEstudianteSeguidor(idSeguido,idSeguidor);
+                }else {
+                    seguidor = seguidoresRepository.findByEmpresaSeguidoAndEmpresaSeguidor(idSeguido,idSeguidor);
+                }
+                break;
+        }
+        return seguidor;
     }
 }
 

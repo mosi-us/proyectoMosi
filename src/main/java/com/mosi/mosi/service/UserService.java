@@ -102,8 +102,9 @@ public class UserService {
         String existEmail = userRepository.buscarEmail(email);
         return existEmail;
     }
-    public Object signIn(String clave, String email) throws IOException, MessagingException {
+    public Integer signIn(String clave, String email) throws IOException, MessagingException {
         Object objectResult = null;
+        Integer resp = 1;
         Usuarios nuevoUsu = new Usuarios();
         String existEmail = this.existEmail(email);
         if ((existEmail == null)) {
@@ -113,17 +114,17 @@ public class UserService {
             nuevoUsu.setTipo_persona(ESTUDIANTE);
             nuevoUsu.setFecha(new Date());
             nuevoUsu = userRepository.save(nuevoUsu);
-            String idUsu = nuevoUsu.getId().toString();
-            objectResult = mensaje("Usuario Creado con Exito", idUsu, "idUsu");
-
+            Integer idUsu = Integer.valueOf(nuevoUsu.getId().toString());
+            //objectResult = mensaje("Usuario Creado con Exito", idUsu, "idUsu");
+            resp = idUsu;
             generalService.enviarEmail(nuevoUsu.getEmail(), "Registro Exitoso a Mosi", DETALLE_REGISTRO_ESTUDIANTE);
 
 
         } else {
-            objectResult = mensaje("El email ya esta registrado", null, null);
+           resp = 0; // duplicado
         }
 
-        return objectResult;
+        return resp;
     }
 
     private String getJWTToken(int id) {

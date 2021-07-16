@@ -12,11 +12,13 @@ public class Comentarios {
 
     private Estudiante estudiante;
     private Empresa empresa;
+    private Comentarios comentarios;
     private Integer comTipoPersona;
     private Integer comEstatus;
     private Date comFechaCreacion;
     private Date comFechaActualizacion;
     private String descripcionComentario;
+    private Integer tipo;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -118,5 +120,23 @@ public class Comentarios {
     public void setDescripcionComentario(String descripcionComentario) {
         this.descripcionComentario = descripcionComentario;
     }
+    @OneToOne
+    @JoinColumn(name = "COM_IDCOM")
+    public Comentarios getComentarios() {
+        return comentarios;
+    }
 
+    public void setComentarios(Comentarios comentarios) {
+        this.comentarios = comentarios;
+    }
+    @Basic
+    @Column(name = "COM_Tipo")
+
+    public Integer getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(Integer tipo) {
+        this.tipo = tipo;
+    }
 }

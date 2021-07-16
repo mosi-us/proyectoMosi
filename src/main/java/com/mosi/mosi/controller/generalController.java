@@ -94,7 +94,8 @@ public class generalController {
      "comentario": ,
      "compartida": ,
      "IdPersona": ,
-     "tipoPersona":
+     "tipoPersona":,
+     "tipo":
      }
 
      *
@@ -108,8 +109,9 @@ public class generalController {
         Integer idPersona = (params.containsKey(IDPERSONA) && params.get(IDPERSONA) != null && !params.get(IDPERSONA).toString().isEmpty()) ? Integer.valueOf(params.get(IDPERSONA).toString()) : null;
         Integer tipoPersona = (params.containsKey(TIPO_PERSONA) && params.get(TIPO_PERSONA) != null && !params.get(TIPO_PERSONA).toString().isEmpty()) ? Integer.valueOf(params.get(TIPO_PERSONA).toString()) : null;
         Boolean compartida = (params.containsKey(COMPARTIDA) && params.get(COMPARTIDA) != null && !params.get(COMPARTIDA).toString().isEmpty()) ? Boolean.parseBoolean(params.get(COMPARTIDA).toString()): null;
+        Integer tipo = (params.containsKey(TIPO) && params.get(TIPO) != null && !params.get(TIPO).toString().isEmpty()) ? Integer.valueOf(params.get(TIPO).toString()) : null;
 
-        Comentarios comentario = generalService.crearcomentario(idPub,descripcion,idPersona,tipoPersona,compartida);
+        Comentarios comentario = generalService.crearcomentario(idPub,descripcion,idPersona,tipoPersona,compartida,tipo);
         return comentario;
     }
     /**
@@ -143,7 +145,7 @@ public class generalController {
     /**
      * Parametros:
      {
-     "IdComentario":,
+     "idComentario":,
      "IdPublicacion":,
      "IdPersona":,
      "tipoPersona":,
@@ -288,6 +290,34 @@ public class generalController {
         Integer tipoPersona = (params.containsKey(TIPO_PERSONA_SEGUIDO) && params.get(TIPO_PERSONA_SEGUIDO) != null && !params.get(TIPO_PERSONA_SEGUIDO).toString().isEmpty()) ? Integer.valueOf(params.get(TIPO_PERSONA_SEGUIDO).toString()) : null;
 
         Integer seguidores = generalService.verCantidadSeguidores(idSeguido,tipoPersona);
+        return seguidores;
+    }
+
+    /**
+     {
+     "idSeguidor": ,
+     "tipoPersonaSeguidor": ,
+     "idSeguido": ,
+     "tipoPersonaSeguido": ,
+
+     }
+     * @param request
+     * @param response
+     * @param json
+     * @return
+     * @throws IOException
+     * @throws MessagingException
+     */
+    @PostMapping("eliminarSeguidor")
+    public Seguidores eliminarSeguidor(HttpServletRequest request, HttpServletResponse response,
+                                         @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        Integer idSeguido = (params.containsKey(ID_SEGUIDO) && params.get(ID_SEGUIDO) != null && !params.get(ID_SEGUIDO).toString().isEmpty()) ? Integer.valueOf(params.get(ID_SEGUIDO).toString()) : null;
+        Integer tipoPersona = (params.containsKey(TIPO_PERSONA_SEGUIDO) && params.get(TIPO_PERSONA_SEGUIDO) != null && !params.get(TIPO_PERSONA_SEGUIDO).toString().isEmpty()) ? Integer.valueOf(params.get(TIPO_PERSONA_SEGUIDO).toString()) : null;
+        Integer idSeguidor = (params.containsKey(ID_SEGUIDOR) && params.get(ID_SEGUIDOR) != null && !params.get(ID_SEGUIDOR).toString().isEmpty()) ? Integer.valueOf(params.get(ID_SEGUIDOR).toString()) : null;
+        Integer tipoPersonaSeguidor = (params.containsKey(TIPO_PERSONA_SEGUIDOR) && params.get(TIPO_PERSONA_SEGUIDOR) != null && !params.get(TIPO_PERSONA_SEGUIDOR).toString().isEmpty()) ? Integer.valueOf(params.get(TIPO_PERSONA_SEGUIDOR).toString()) : null;
+
+        Seguidores seguidores = generalService.cambiarEstatusSeguidor(idSeguido,tipoPersona,idSeguidor,tipoPersonaSeguidor,ELIMINADO,null);
         return seguidores;
     }
 }
