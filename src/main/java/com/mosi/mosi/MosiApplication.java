@@ -75,7 +75,8 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/dejarSeguirPersona",
 						"/verSeguidores",
 						"/verSeguidos",
-						"/verCantidadSeguidores","/eliminarSeguidor"
+						"/verCantidadSeguidores","/eliminarSeguidor",
+						"/userLoginGoogle","/userLoginFacebook"
 
 				).permitAll()
 				.antMatchers(HttpMethod.GET,

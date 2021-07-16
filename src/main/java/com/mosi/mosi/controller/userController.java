@@ -2,6 +2,11 @@ package com.mosi.mosi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.Value;
 import com.mosi.mosi.bean.Imagen;
 import com.mosi.mosi.constantes.CustomLoggerLevelEnum;
 import com.mosi.mosi.repository.*;
@@ -11,6 +16,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsondoc.core.annotation.ApiBodyObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.facebook.api.User;
+import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,10 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.mosi.mosi.constantes.constante.*;
 import static com.mosi.mosi.constantes.constante.CLAVE_ACTUAL;
@@ -126,16 +133,17 @@ public class userController {
      {"email":"","clave":""}
      * */
     @PostMapping("userLogin")
-    public HashMap<String,String> loginUser(HttpServletRequest request, HttpServletResponse response,
+    public Integer loginUser(HttpServletRequest request, HttpServletResponse response,
                                             @ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
         HashMap<String,String> objectResult = new HashMap<>();
+        Integer resp =0;
         String email 	= (params.containsKey(EMAIL) && params.get(EMAIL) != null) ? params.get(EMAIL).toString() : null;
         String clave = (params.containsKey(CLAVE) && params.get(CLAVE) != null) ? params.get(CLAVE).toString() : null;
 
         if ((!email.isEmpty()) && (!clave.isEmpty())){
             try{
-                 objectResult = userService.userlogin(email,clave);
+                 resp = userService.userlogin(email,clave);
 
 
 
@@ -149,7 +157,7 @@ public class userController {
             objectResult.put("Mensaje", "Verifique los datos enviados");
             objectResult.put("tipo", "error");
         }
-        return objectResult;
+        return resp;
     }
 
     /**
@@ -316,6 +324,35 @@ public class userController {
 
         String resp = userService.updateEmail(idUsuario,correo,tipoPersona);
         return resp;
+    }
+
+    @PostMapping("userLoginGoogle")
+    public ResponseEntity<?> userLoginGoogle(HttpServletRequest request, HttpServletResponse response,
+                                          @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        String token = (params.containsKey(TOKEN) && params.get(TOKEN) != null) ? params.get(TOKEN).toString() : null;
+        Properties properties =(Properties) generalService.getProperties();
+        String clientId = properties.getProperty("google");
+        final NetHttpTransport netHttpTransport = new NetHttpTransport();
+        final JacksonFactory jacksonFactory = JacksonFactory.getDefaultInstance();
+        GoogleIdTokenVerifier.Builder verifier = new GoogleIdTokenVerifier.Builder(netHttpTransport,jacksonFactory).setAudience(Collections.singletonList(clientId));
+        final GoogleIdToken googleIdToken = GoogleIdToken.parse(verifier.getJsonFactory(),token);
+        final GoogleIdToken.Payload payload = googleIdToken.getPayload();
+        return new ResponseEntity(payload, HttpStatus.OK);
+    }
+    @PostMapping("userLoginFacebook")
+    public ResponseEntity<?> userLoginFacebook(HttpServletRequest request, HttpServletResponse response,
+                                             @ApiBodyObject(clazz = String.class) @RequestBody String json) throws IOException, MessagingException {
+
+        Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
+        String token = (params.containsKey(TOKEN) && params.get(TOKEN) != null) ? params.get(TOKEN).toString() : null;
+        Properties properties =(Properties) generalService.getProperties();
+        String clientId = properties.getProperty("facebook");
+        Facebook facebook = new FacebookTemplate(token);
+        final String[] fields = {"email","picture"};
+        User user = facebook.fetchObject("me",User.class,fields);
+        return new ResponseEntity(user,HttpStatus.OK);
     }
 
 }

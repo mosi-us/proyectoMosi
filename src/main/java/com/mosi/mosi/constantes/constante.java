@@ -106,6 +106,8 @@ public interface constante {
     String PUERTO_STMP = "mail.smtp.port";
     String CERTIFICADO_SSL = "smtp.gmail.com";
     String SMTP_SSL ="mail.smtp.ssl.trust";
+    String GOOGLE ="google.clientId";
+    String FACEBOOK = "facebook.clientId";
 
     String ASUNTO = "Tienes una Notificacion de MOSI";
     String RECUPERAR_CLAVE_ASUNTO = "Recupera tu Acceso a MOSI";

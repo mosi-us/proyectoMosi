@@ -41,9 +41,9 @@ public class UserService {
     @Autowired
     PerfilesBloqueadosRepository perfilesBloqueadosRepository;
 
-    public HashMap<String, String> userlogin(String email, String clave) {
+    public Integer userlogin(String email, String clave) {
         HashMap<String, String> objectResult = new HashMap<>();
-
+        Integer resp = 0;
         Boolean validar_clave = false;
         Empresa perfil = new Empresa();
         Usuarios usuario = userRepository.findByEmail(email);
@@ -65,9 +65,9 @@ public class UserService {
                     String token = getJWTToken(idUsu);
                     usuario.setToken(token);
                     usuario.setIntentoFallido(0);
-                    userRepository.save(usuario);
+                    usuario= userRepository.save(usuario);
                     objectResult.put("Mensaje", "Inicio de Sesion Exitoso");
-
+                    resp = usuario.getId();
                 } else {
                     if (tipo_persona == ESTUDIANTE) {
                         int intentosMaximos = 3;
@@ -81,22 +81,27 @@ public class UserService {
                             /*preguntar si enviar correo notificando usuario bloqueado*/
                         }
                     }
-                    if (usuario.getEstatus() == BLOQUEADO) {
+                    if (usuario.getEstatus() == BLOQUEADO) { //cod_error -> 20
                         objectResult.put("Mensaje", "Ha superado el numero de intentos permitido. Su usuario se encuentra bloqueado por favor Restablezca contraseña");
+                        resp = 20;
                     } else {
-                        objectResult.put("Mensaje", " Clave Invalida");
+                        objectResult.put("Mensaje", " Clave Invalida"); // cod_erro -> 10
+                        resp = 10;
                     }
                 }
-            } else if (estatus == BLOQUEADO) {
+            } else if (estatus == BLOQUEADO) {//cod_error -> 20
                 objectResult.put("Mensaje", "Usuario Bloqueado, por favor Restablezca Contraseña");
+                resp= 20;
 
-            } else {
+            } else { //cod_error -> 30
                 objectResult.put("Mensaje", "Usuario Desactivado");
+                resp = 30;
             }
-        } else {
+        } else { //cod_error -> 40
             objectResult.put("Mensaje", " Usuario no Existe");
+            resp = 40;
         }
-        return objectResult;
+        return resp;
     }
     public String existEmail(String email){
         String existEmail = userRepository.buscarEmail(email);

@@ -67,6 +67,16 @@ public class GeneralService {
         return properties;
     }
 
+    public Object getProperties() throws IOException {
+        Properties p = new Properties();
+        Properties properties = new Properties();
+        InputStream file = null;
+        file = MosiApplication.class.getClassLoader().getResourceAsStream("application.properties");
+        p.load(file);
+        properties.put("google",p.getProperty(GOOGLE));
+        properties.put("facebook",p.getProperty(FACEBOOK));
+        return properties;
+    }
     public void enviarEmail(String desti,String asunto,String cuerpo) throws MessagingException, IOException {
         Address destinatario= new InternetAddress(desti);
         Properties properties =(Properties) this.getPropertiesEmail();
